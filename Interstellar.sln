@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29503.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{2173101E-392D-4167-8928-A66A3D777746}"
+	ProjectSection(SolutionItems) = preProject
+		paket.dependencies = paket.dependencies
+	EndProjectSection
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Interstellar.Core", "Interstellar.Core\Interstellar.Core.fsproj", "{7ADA52C2-A422-44C8-B14F-CE43566F8E03}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Interstellar.Windows.Chromium.Wpf", "Interstellar.Windows.Chromium.Wpf\Interstellar.Windows.Chromium.Wpf.fsproj", "{37698B3F-834B-4730-BD0E-B2F753CFD7DA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7ADA52C2-A422-44C8-B14F-CE43566F8E03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7ADA52C2-A422-44C8-B14F-CE43566F8E03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7ADA52C2-A422-44C8-B14F-CE43566F8E03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7ADA52C2-A422-44C8-B14F-CE43566F8E03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37698B3F-834B-4730-BD0E-B2F753CFD7DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37698B3F-834B-4730-BD0E-B2F753CFD7DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37698B3F-834B-4730-BD0E-B2F753CFD7DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37698B3F-834B-4730-BD0E-B2F753CFD7DA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A67740F5-352E-46BF-A4E3-B7D199B90811}
+	EndGlobalSection
+EndGlobal
