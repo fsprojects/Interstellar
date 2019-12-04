@@ -8,9 +8,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{217310
 		paket.dependencies = paket.dependencies
 	EndProjectSection
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Interstellar.Core", "Interstellar.Core\Interstellar.Core.fsproj", "{7ADA52C2-A422-44C8-B14F-CE43566F8E03}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Interstellar.Core", "Interstellar.Core\Interstellar.Core.fsproj", "{7ADA52C2-A422-44C8-B14F-CE43566F8E03}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Interstellar.Windows.Chromium.Wpf", "Interstellar.Windows.Chromium.Wpf\Interstellar.Windows.Chromium.Wpf.fsproj", "{37698B3F-834B-4730-BD0E-B2F753CFD7DA}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Interstellar.Windows.Chromium.Wpf", "Interstellar.Windows.Chromium.Wpf\Interstellar.Windows.Chromium.Wpf.fsproj", "{EA841C98-988C-4B47-9FCA-B0CED74EC958}"
+EndProject
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Example.Windows.Chromium.Wpf.NetCore", "Examples\Examples.Windows.Chromium.Wpf.NetCore\Example.Windows.Chromium.Wpf.NetCore.fsproj", "{04B3E200-3F1B-46A4-A889-0EC240640EF0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -22,10 +24,14 @@ Global
 		{7ADA52C2-A422-44C8-B14F-CE43566F8E03}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7ADA52C2-A422-44C8-B14F-CE43566F8E03}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7ADA52C2-A422-44C8-B14F-CE43566F8E03}.Release|Any CPU.Build.0 = Release|Any CPU
-		{37698B3F-834B-4730-BD0E-B2F753CFD7DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{37698B3F-834B-4730-BD0E-B2F753CFD7DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{37698B3F-834B-4730-BD0E-B2F753CFD7DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{37698B3F-834B-4730-BD0E-B2F753CFD7DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA841C98-988C-4B47-9FCA-B0CED74EC958}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA841C98-988C-4B47-9FCA-B0CED74EC958}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA841C98-988C-4B47-9FCA-B0CED74EC958}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA841C98-988C-4B47-9FCA-B0CED74EC958}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{04B3E200-3F1B-46A4-A889-0EC240640EF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04B3E200-3F1B-46A4-A889-0EC240640EF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04B3E200-3F1B-46A4-A889-0EC240640EF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04B3E200-3F1B-46A4-A889-0EC240640EF0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
