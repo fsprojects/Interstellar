@@ -1,3 +1,4 @@
 source https://api.nuget.org/v3/index.json
+framework net452, netcoreapp3.0, netstandard1.6
 
-nuget FSharp.Core
+nuget FSharp.Core 4.2.3
