@@ -2,6 +2,7 @@
 open System
 open System.Windows
 open System.Windows.Controls
+open Interstellar.Windows.Chromium.Wpf
 
 type MainWindow() =
     inherit Window()
@@ -22,5 +23,7 @@ type App() =
 module Main =
     [<EntryPoint; STAThread>]
     let main argv =
+        let w = new BrowserWindow()
+        printfn "%A" w
         let app = new App()
         app.Run ()
