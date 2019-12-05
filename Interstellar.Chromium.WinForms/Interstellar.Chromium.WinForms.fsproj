@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFrameworks>net452;netcoreapp3.0</TargetFrameworks>
     <CefSharpAnyCpuSupport>true</CefSharpAnyCpuSupport>
-    <UseWPF>true</UseWPF>
-    <DefineConstants>WPF</DefineConstants>
+    <UseWindowsForms>true</UseWindowsForms>
+    <DefineConstants>WINFORMS</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Update="FSharp.Core" Version="4.2.3" />

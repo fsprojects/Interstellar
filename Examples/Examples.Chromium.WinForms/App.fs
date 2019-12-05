@@ -3,22 +3,21 @@ open System
 open System.Diagnostics
 open System.Reflection
 open System.Windows
-open System.Windows.Controls
+open System.Windows.Forms
 open Interstellar.Core
-open Interstellar.Chromium.Wpf
+open Interstellar.Chromium.WinForms
 open System.Runtime.Versioning
 
-type App() =
-    inherit Application()
-    override this.OnStartup(e: StartupEventArgs) =
-        base.OnStartup e
-        let window = new BrowserWindow(Address = "https://google.com/")
-        window.Show ()
 
 module Main =
+    let runApp () =
+        Application.EnableVisualStyles ()
+        Application.SetCompatibleTextRenderingDefault true
+        Application.Run (new BrowserWindow(Address = "https://google.com/"))
+    
     [<EntryPoint; STAThread>]
     let main argv =
         Trace.WriteLine (sprintf "Runtime framework: %s" (Assembly.GetEntryAssembly().GetCustomAttribute<TargetFrameworkAttribute>().FrameworkName))
         Interstellar.Chromium.Platform.Initialize ()
-        let app = new App()
-        app.Run ()
+        runApp ()
+        0

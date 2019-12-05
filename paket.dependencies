@@ -1,5 +1,6 @@
 source https://api.nuget.org/v3/index.json
 framework net452, netcoreapp3.0, netstandard1.6
 
+nuget CefSharp.WinForms
 nuget CefSharp.Wpf >= 75.1.143
 nuget FSharp.Core 4.2.3
