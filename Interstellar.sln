@@ -14,7 +14,7 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Interstellar.Chromium.Wpf",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{96BB8378-7D63-49AF-BEF5-6016E234653D}"
 EndProject
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Examples.Chromium.Wpf.NetCore", "Examples\Examples.Chromium.Wpf\Examples.Chromium.Wpf.NetCore.fsproj", "{F8F250AA-A4E3-4DC2-863E-1348C98862D9}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Examples.Chromium.Wpf", "Examples\Examples.Chromium.Wpf\Examples.Chromium.Wpf.fsproj", "{F8F250AA-A4E3-4DC2-863E-1348C98862D9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
