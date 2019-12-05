@@ -38,6 +38,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Interstellar.Core\Interstellar.Core.fsproj" />
-    <ProjectReference Include="..\..\Interstellar.Windows.Chromium.Wpf\Interstellar.Windows.Chromium.Wpf.fsproj" />
+    <ProjectReference Include="..\..\Interstellar.Chromium.Wpf\Interstellar.Chromium.Wpf.fsproj" />
   </ItemGroup>
 </Project>
