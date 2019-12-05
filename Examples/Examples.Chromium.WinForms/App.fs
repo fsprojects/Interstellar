@@ -13,7 +13,7 @@ module Main =
     let runApp () =
         Application.EnableVisualStyles ()
         Application.SetCompatibleTextRenderingDefault true
-        Application.Run (new BrowserWindow(Address = "https://google.com/"))
+        Application.Run (new BrowserWindow("https://google.com/"))
     
     [<EntryPoint; STAThread>]
     let main argv =

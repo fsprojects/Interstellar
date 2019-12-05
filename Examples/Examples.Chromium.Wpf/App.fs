@@ -12,7 +12,7 @@ type App() =
     inherit Application()
     override this.OnStartup(e: StartupEventArgs) =
         base.OnStartup e
-        let window = new BrowserWindow(Address = "https://google.com/")
+        let window = new BrowserWindow("https://google.com/")
         window.Show ()
 
 module Main =

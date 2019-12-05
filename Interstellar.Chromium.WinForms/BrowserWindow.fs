@@ -6,7 +6,7 @@ open CefSharp
 open CefSharp.WinForms
 open Interstellar.Core
 
-type BrowserWindow() as this =
+type BrowserWindow(?initialAddress: string) as this =
     inherit Form()
 
     let browser = new ChromiumWebBrowser(null: string)
@@ -15,6 +15,7 @@ type BrowserWindow() as this =
     // (primary) constructor
     do
         this.Controls.Add browser
+        initialAddress |> Option.iter this.Load
         // TODO: dispose the event handler
         browser.TitleChanged.Add (fun e ->
             title <- e.Title
@@ -23,9 +24,9 @@ type BrowserWindow() as this =
     interface IBrowserWindow with
         member this.Engine = BrowserEngineType.Chromium
         member this.Platform = BrowserPlatformType.WindowsWpf
-        member this.Address
-            with get () = browser.Address
-            and set address = browser.Load address
+        member this.Address = browser.Address
+        member this.Load address = browser.Load address
+        member this.Reload () = browser.Reload ()
         member this.Title = title
         [<CLIEvent>]
         member this.TitleChanged : IEvent<string> =
@@ -35,6 +36,7 @@ type BrowserWindow() as this =
 
     member this.Engine = this.I.Engine
     member this.Platform = this.I.Platform
-    member this.Address with get () = this.I.Address and set x = (this.I.Address <- x)
+    member this.Address with get () = this.I.Address
+    member this.Load address = this.I.Load address
     member this.Title = this.I
     [<CLIEvent>] member this.TitleChanged = this.I.TitleChanged
