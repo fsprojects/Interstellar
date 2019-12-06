@@ -11,14 +11,17 @@ open Interstellar.Chromium.Wpf
 
 type App() =
     inherit Application()
-    override this.OnStartup(e: StartupEventArgs) =
+
+    static member RuntimeFramework = Assembly.GetEntryAssembly().GetCustomAttribute<TargetFrameworkAttribute>().FrameworkName
+
+    override this.OnStartup (e: StartupEventArgs) =
         base.OnStartup e
-        BrowserApp.run (SimpleBrowserApp.app)
+        BrowserApp.run (SimpleBrowserApp.app "WPF" App.RuntimeFramework)
 
 module Main =
     [<EntryPoint; STAThread>]
     let main argv =
-        Trace.WriteLine (sprintf "Runtime framework: %s" (Assembly.GetEntryAssembly().GetCustomAttribute<TargetFrameworkAttribute>().FrameworkName))
+        Trace.WriteLine (sprintf "Runtime framework: %s" App.RuntimeFramework)
         Interstellar.Chromium.Platform.Initialize ()
         let app = new App()
         app.Run ()
