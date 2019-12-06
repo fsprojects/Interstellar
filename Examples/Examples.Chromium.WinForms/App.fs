@@ -4,7 +4,7 @@ open System.Diagnostics
 open System.Reflection
 open System.Windows
 open System.Windows.Forms
-open Interstellar.Core
+open Interstellar
 open Interstellar.Chromium.WinForms
 open System.Runtime.Versioning
 

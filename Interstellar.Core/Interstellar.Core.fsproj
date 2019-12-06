@@ -7,7 +7,7 @@
     <PackageReference Update="FSharp.Core" Version="4.2.3" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IBrowserWindow.fs" />
+    <Compile Include="Api.fs" />
   </ItemGroup>
   <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>

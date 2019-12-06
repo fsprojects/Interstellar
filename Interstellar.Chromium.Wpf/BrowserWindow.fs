@@ -4,7 +4,7 @@ open System.Windows
 open System.Windows.Controls
 open CefSharp
 open CefSharp.Wpf
-open Interstellar.Core
+open Interstellar
 
 type BrowserWindow(?initialAddress: string) as this =
     inherit Window()
@@ -24,10 +24,13 @@ type BrowserWindow(?initialAddress: string) as this =
         member this.Address = browser.Address
         member this.Load address = browser.Load address
         member this.Reload () = browser.Reload ()
-        member this.Title = browser.Title
+        member this.PageTitle = browser.Title
         [<CLIEvent>]
-        member this.TitleChanged : IEvent<string> =
+        member this.PageTitleChanged : IEvent<string> =
             browser.TitleChanged |> Event.map (fun (e: DependencyPropertyChangedEventArgs) -> e.NewValue :?> string)
+        member this.Title
+            with get () = (this :> Window).Title
+            and set title = (this :> Window).Title <- title
 
     member inline private this.I = this :> IBrowserWindow
 
@@ -35,5 +38,4 @@ type BrowserWindow(?initialAddress: string) as this =
     member this.Platform = this.I.Platform
     member this.Address with get () = this.I.Address
     member this.Load address = this.I.Load address
-    member this.Title = this.I
-    [<CLIEvent>] member this.TitleChanged = this.I.TitleChanged
+    [<CLIEvent>] member this.PageTitleChanged = this.I.PageTitleChanged

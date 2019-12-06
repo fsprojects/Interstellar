@@ -38,6 +38,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Interstellar.Core\Interstellar.Core.fsproj" />
     <ProjectReference Include="..\..\Interstellar.Chromium.Wpf\Interstellar.Chromium.Wpf.fsproj" />
+    <ProjectReference Include="..\Examples.SharedCode\Examples.SharedCode.fsproj" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

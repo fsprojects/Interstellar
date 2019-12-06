@@ -20,6 +20,8 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Interstellar.Chromium.WinFo
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Examples.Chromium.WinForms", "Examples\Examples.Chromium.WinForms\Examples.Chromium.WinForms.fsproj", "{8FD85916-B47D-4055-8661-718B9ABEFF6B}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Examples.SharedCode", "Examples\Examples.SharedCode\Examples.SharedCode.fsproj", "{7DC66E91-1D5D-4775-BE40-378AA2E432F8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -46,6 +48,10 @@ Global
 		{8FD85916-B47D-4055-8661-718B9ABEFF6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8FD85916-B47D-4055-8661-718B9ABEFF6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8FD85916-B47D-4055-8661-718B9ABEFF6B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7DC66E91-1D5D-4775-BE40-378AA2E432F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DC66E91-1D5D-4775-BE40-378AA2E432F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DC66E91-1D5D-4775-BE40-378AA2E432F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DC66E91-1D5D-4775-BE40-378AA2E432F8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -53,6 +59,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{F8F250AA-A4E3-4DC2-863E-1348C98862D9} = {96BB8378-7D63-49AF-BEF5-6016E234653D}
 		{8FD85916-B47D-4055-8661-718B9ABEFF6B} = {96BB8378-7D63-49AF-BEF5-6016E234653D}
+		{7DC66E91-1D5D-4775-BE40-378AA2E432F8} = {96BB8378-7D63-49AF-BEF5-6016E234653D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A67740F5-352E-46BF-A4E3-B7D199B90811}

@@ -2,18 +2,18 @@
 open System
 open System.Diagnostics
 open System.Reflection
+open System.Runtime.Versioning
 open System.Windows
 open System.Windows.Controls
-open Interstellar.Core
+open Examples.SharedCode
+open Interstellar
 open Interstellar.Chromium.Wpf
-open System.Runtime.Versioning
 
 type App() =
     inherit Application()
     override this.OnStartup(e: StartupEventArgs) =
         base.OnStartup e
-        let window = new BrowserWindow("https://google.com/")
-        window.Show ()
+        BrowserApp.run (SimpleBrowserApp.app)
 
 module Main =
     [<EntryPoint; STAThread>]
