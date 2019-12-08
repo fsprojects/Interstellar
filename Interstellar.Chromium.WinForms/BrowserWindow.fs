@@ -15,7 +15,7 @@ type BrowserWindow(?initialAddress: string) as this =
     // (primary) constructor
     do
         this.Controls.Add browser
-        initialAddress |> Option.iter this.Load
+        initialAddress |> Option.iter ((this :> IBrowserWindow).Load)
         // TODO: dispose the event handler
         browser.TitleChanged.Add (fun e ->
             lastKnownPageTitle <- e.Title
@@ -25,6 +25,9 @@ type BrowserWindow(?initialAddress: string) as this =
         member this.Engine = BrowserEngineType.Chromium
         member this.Platform = BrowserPlatformType.WindowsWpf
         member this.Address = browser.Address
+        member this.Show () = (this :> Form).Show ()
+        [<CLIEvent>]
+        member this.Shown = (this :> Form).Shown |> Event.map ignore
         member this.Load address = browser.Load address
         member this.Reload () = browser.Reload ()
         member this.PageTitle = lastKnownPageTitle
@@ -34,12 +37,6 @@ type BrowserWindow(?initialAddress: string) as this =
         member this.Title
             with get () = this.Text
             and set title = this.Text <- title
-
-    member private this.I = this :> IBrowserWindow
-
-    member this.Engine = this.I.Engine
-    member this.Platform = this.I.Platform
-    member this.Address with get () = this.I.Address
-    member this.Load address = this.I.Load address
-    member this.Title = this.I.Title
-    [<CLIEvent>] member this.PageTitleChanged = this.I.PageTitleChanged
+        member this.Close () = (this :> Form).Close ()
+        [<CLIEvent>]
+        member this.Closed : IEvent<unit> = (this :> Form).FormClosed |> Event.map ignore

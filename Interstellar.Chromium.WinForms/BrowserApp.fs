@@ -1,4 +1,6 @@
 ﻿namespace Interstellar.Chromium.WinForms
+open System
+open System.Windows.Forms
 open Interstellar
 
 module BrowserApp =
@@ -8,5 +10,7 @@ module BrowserApp =
             w.Show ()
             upcast w
         do! app.onStart windowCreator
+        Application.Exit ()
     }
+
     let run app = Async.StartImmediate <| runAsync app

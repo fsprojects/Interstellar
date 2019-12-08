@@ -18,10 +18,17 @@ type BrowserWindow(?initialAddress: string) as this =
             browser.Address <- x
         )
 
+    interface IDisposable with
+        member this.Dispose () = this.Close ()
+
     interface IBrowserWindow with
         member this.Engine = BrowserEngineType.Chromium
         member this.Platform = BrowserPlatformType.WindowsWpf
         member this.Address = browser.Address
+        member this.Show () = (this :> Window).Show ()
+        [<CLIEvent>] member this.Shown = failwith "bang" :> IEvent<unit>
+        member this.Close () = (this :> Window).Close ()
+        [<CLIEvent>] member this.Closed = (this :> Window).Closed |> Event.map ignore
         member this.Load address = browser.Load address
         member this.Reload () = browser.Reload ()
         member this.PageTitle = browser.Title
@@ -31,11 +38,3 @@ type BrowserWindow(?initialAddress: string) as this =
         member this.Title
             with get () = (this :> Window).Title
             and set title = (this :> Window).Title <- title
-
-    member inline private this.I = this :> IBrowserWindow
-
-    member this.Engine = this.I.Engine
-    member this.Platform = this.I.Platform
-    member this.Address with get () = this.I.Address
-    member this.Load address = this.I.Load address
-    [<CLIEvent>] member this.PageTitleChanged = this.I.PageTitleChanged
