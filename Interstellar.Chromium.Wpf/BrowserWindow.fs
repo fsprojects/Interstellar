@@ -12,6 +12,7 @@ type BrowserWindow(?initialAddress: string) as this =
 
     let mainCtx = SynchronizationContext.Current
     let browser = new CefSharp.Wpf.ChromiumWebBrowser()
+    let owningThreadId = Thread.CurrentThread.ManagedThreadId
 
     // (primary) constructor
     do
@@ -34,7 +35,10 @@ type BrowserWindow(?initialAddress: string) as this =
         member this.Engine = BrowserEngineType.Chromium
         member this.Platform = BrowserPlatformType.WindowsWpf
         member this.Address = browser.Address
-        member this.Show () = (this :> Window).Show ()
+        member this.Show () =
+            if owningThreadId <> Thread.CurrentThread.ManagedThreadId then
+                raise (new InvalidOperationException("Show() called from a thread other than the thread on which the BrowserWindow was constructed."))
+            (this :> Window).Show ()
         [<CLIEvent>] member this.Shown = shown.Publish
         member this.Close () = (this :> Window).Close ()
         [<CLIEvent>] member this.Closed = (this :> Window).Closed |> Event.map ignore

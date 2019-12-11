@@ -11,7 +11,7 @@ open Interstellar
 open Interstellar.Chromium.Wpf
 
 type App() =
-    inherit Application()
+    inherit Application(ShutdownMode = ShutdownMode.OnExplicitShutdown)
 
     static member RuntimeFramework = Assembly.GetEntryAssembly().GetCustomAttribute<TargetFrameworkAttribute>().FrameworkName
 
@@ -27,4 +27,6 @@ module Main =
         Trace.WriteLine (sprintf "Runtime framework: %s" App.RuntimeFramework)
         Interstellar.Chromium.Platform.Initialize ()
         let app = new App()
-        app.Run ()
+        let result = app.Run ()
+        Debug.WriteLine "main() exiting"
+        result

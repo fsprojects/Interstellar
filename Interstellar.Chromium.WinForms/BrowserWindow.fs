@@ -14,8 +14,6 @@ type BrowserWindow(?initialAddress: string) as this =
     let browser = new ChromiumWebBrowser(null: string)
     let mutable lastKnownPageTitle = ""
     let owningThreadId = Thread.CurrentThread.ManagedThreadId
-    do
-        System.Diagnostics.Debug.WriteLine (sprintf "creating BrowserWindow on thread id: %A" System.Threading.Thread.CurrentThread.ManagedThreadId)
 
     // (primary) constructor
     do

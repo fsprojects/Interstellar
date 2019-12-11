@@ -7,10 +7,10 @@ open System.Threading
 module BrowserApp =
     let runAsync mainCtx (app: BrowserApp) = async {
         let windowCreator : BrowserWindowCreator = fun config ->
-            let w = new BrowserWindow(?initialAddress = config.initialAddress)
-            //w.Show ()
-            upcast w
+            upcast new BrowserWindow(?initialAddress = config.initialAddress)
         do! app.onStart mainCtx windowCreator
+        do! Async.SwitchToContext mainCtx
+        Application.Current.Shutdown ()
     }
 
     let run app = Async.Start <| runAsync SynchronizationContext.Current app
