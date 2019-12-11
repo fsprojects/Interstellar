@@ -1,5 +1,6 @@
 ﻿namespace Interstellar
 open System
+open System.Threading
 
 type BrowserEngineType = | Chromium = 0 | WebKit = 0b1
 type BrowserPlatformType = | WindowsWpf = 0 | MacOS = 0b1
@@ -26,18 +27,18 @@ type BrowserWindowConfig =
 type BrowserWindowCreator = BrowserWindowConfig -> IBrowserWindow
 
 type BrowserApp = {
-    onStart : BrowserWindowCreator -> Async<unit>
+    onStart : SynchronizationContext -> BrowserWindowCreator -> Async<unit>
 }
 
 module BrowserApp =
     /// A do-nothing application
-    let zero = { onStart = fun _ -> async { () } }
+    let zero = { onStart = fun _ _ -> async { () } }
     /// Creates an application with the given onStart function
     let create onStart = { onStart = onStart }
-    let openAddress = { onStart = fun createWindow -> async {
+    let openAddress = { onStart = fun mainCtx createWindow -> async {
+            do! Async.SwitchToContext mainCtx
             let window = createWindow { BrowserWindowConfig.DefaultValue with initialAddress = Some "" }
             window.Show ()
-            ()
         }
     }
 

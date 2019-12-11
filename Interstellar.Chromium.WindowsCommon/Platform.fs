@@ -21,10 +21,15 @@ type Platform private() =
                 Platform.InitAnyCpuCefSharp () |> ignore
         )
 
+    static member Shutdown () =
+        System.Diagnostics.Debug.WriteLine (sprintf "Platform.Shutdown called from thread id: %A" System.Threading.Thread.CurrentThread.ManagedThreadId)
+        Cef.Shutdown ()
+
     static member private GetPlatformAssemblyPath assemblyName =
         Path.Combine(AppDomain.CurrentDomain.SetupInformation.ApplicationBase, (if Environment.Is64BitProcess then "x64" else "x86"), assemblyName)
 
     static member private InitAnyCpuCefSharp () =
+        System.Diagnostics.Debug.WriteLine (sprintf "Initializing CefSharp on thread id %A" System.Threading.Thread.CurrentThread.ManagedThreadId)
         let browserSubpath = Platform.GetPlatformAssemblyPath("CefSharp.BrowserSubprocess.exe")
         let settings = new CefSettings(BrowserSubprocessPath = browserSubpath)
         Cef.Initialize (settings, false, (null : IBrowserProcessHandler))

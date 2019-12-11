@@ -3,6 +3,7 @@ open System
 open System.Diagnostics
 open System.Reflection
 open System.Runtime.Versioning
+open System.Threading
 open System.Windows
 open System.Windows.Controls
 open Examples.SharedCode
@@ -17,10 +18,12 @@ type App() =
     override this.OnStartup (e: StartupEventArgs) =
         base.OnStartup e
         BrowserApp.run (SimpleBrowserApp.app "WPF" App.RuntimeFramework)
+        Trace.WriteLine "returning from OnStartup"
 
 module Main =
     [<EntryPoint; STAThread>]
     let main argv =
+        Thread.CurrentThread.Name <- "Main"
         Trace.WriteLine (sprintf "Runtime framework: %s" App.RuntimeFramework)
         Interstellar.Chromium.Platform.Initialize ()
         let app = new App()
