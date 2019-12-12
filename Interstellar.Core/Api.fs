@@ -25,8 +25,8 @@ type IBrowserWindow =
     abstract AreDevToolsShowing : bool
 
 type BrowserWindowConfig =
-    { address: string option; html: string option }
-    static member DefaultValue = { address = None; html = None }
+    { address: string option; html: string option; showDevTools: bool }
+    static member DefaultValue = { address = None; html = None; showDevTools = false }
 
 type BrowserWindowCreator = BrowserWindowConfig -> IBrowserWindow
 

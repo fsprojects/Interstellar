@@ -29,6 +29,7 @@ type BrowserWindow(config: BrowserWindowConfig) as this =
                 | address, Some html -> browser.LoadHtml (html, Option.toObj address) |> ignore
                 | Some address, None -> browser.Load address
                 | None, None -> ()
+                if config.showDevTools then browser.ShowDevTools()
         )
 
     member this.ChromiumBrowser = browser
