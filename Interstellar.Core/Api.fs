@@ -12,6 +12,8 @@ type IBrowserWindow =
     abstract Close : unit -> unit
     abstract CloseDevTools : unit -> unit
     abstract Engine : BrowserEngineType
+    /// <summary>Executes some Javascript in the browser, returning immediately.</summary>
+    abstract ExecuteJavascript : string -> unit
     [<CLIEvent>] abstract Closed : IEvent<unit>
     abstract Load : uri:string -> unit
     abstract LoadString : html: string * ?uri: string -> unit

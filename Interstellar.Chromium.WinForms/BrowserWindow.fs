@@ -42,10 +42,12 @@ type BrowserWindow(config: BrowserWindowConfig) as this =
         member this.Closed : IEvent<unit> = (this :> Form).FormClosed |> Event.map ignore
         member this.CloseDevTools () = browser.CloseDevTools ()
         member this.Engine = BrowserEngineType.Chromium
+        member this.ExecuteJavascript code = browser.ExecuteScriptAsync code
         member this.Load address = browser.Load address
         member this.LoadString (html, ?uri) =
-            browser.LoadString (html, Option.toObj uri)
-            browser.ShowDevTools ()
+            match uri with
+            | Some uri -> browser.LoadHtml (html, uri) |> ignore
+            | None -> browser.LoadHtml html
         member this.PageTitle = lastKnownPageTitle
         [<CLIEvent>]
         member this.PageTitleChanged : IEvent<string> =

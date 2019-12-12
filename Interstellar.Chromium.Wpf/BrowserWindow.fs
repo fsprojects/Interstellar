@@ -46,6 +46,7 @@ type BrowserWindow(config: BrowserWindowConfig) as this =
         member this.Close () = (this :> Window).Close ()
         [<CLIEvent>] member this.Closed = (this :> Window).Closed |> Event.map ignore
         member this.Engine = BrowserEngineType.Chromium
+        member this.ExecuteJavascript code = browser.ExecuteScriptAsync code
         member this.Load address = browser.Load address
         member this.LoadString (html, ?uri) =
             match uri with
