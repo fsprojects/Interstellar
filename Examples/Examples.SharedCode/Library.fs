@@ -25,12 +25,12 @@ module SimpleBrowserApp =
             cancellation.Cancel ()
         }
 
-    let app host runtimeFramework = BrowserApp.create (fun mainCtx createWindow -> async {
+    let complexApp host runtimeFramework = BrowserApp.create (fun mainCtx createWindow -> async {
         Trace.WriteLine "Opening first window"
         do! async {
             do! Async.SwitchToContext mainCtx
-            use window1 = createWindow { defaultBrowserWindowConfig with initialAddress = Some "file:///C:/WINDOWS/" }
-            window1.Show ()
+            use window1 = createWindow { defaultBrowserWindowConfig with address = Some "https://rendering/"; html = Some "<html><body><p1>Hello world</p1></body></html>" }
+            do! window1.Show ()
             do! Async.SwitchToThreadPool ()
             startTitleUpdater mainCtx (fun pageTitle -> sprintf "%s - %s - %s" host runtimeFramework pageTitle) window1
             do! Async.AwaitEvent window1.Closed
@@ -38,8 +38,8 @@ module SimpleBrowserApp =
         Trace.WriteLine "First window closed. Opening next window"
         do! async {
             do! Async.SwitchToContext mainCtx
-            use window2 = createWindow { defaultBrowserWindowConfig with initialAddress = Some "https://google.com/" }
-            window2.Show ()
+            use window2 = createWindow { defaultBrowserWindowConfig with address = Some "https://google.com/" }
+            do! window2.Show ()
             do! Async.SwitchToThreadPool ()
             startTitleUpdater mainCtx (fun pageTitle -> sprintf "%s - %s - %s" host runtimeFramework pageTitle) window2
             do! Async.AwaitEvent window2.Closed
@@ -47,16 +47,13 @@ module SimpleBrowserApp =
         Trace.WriteLine "Second window closed -- exiting app"
     })
 
-    let simpleApp host runtimeFramework = BrowserApp.create (fun mainCtx createWindow -> async {
-        Trace.WriteLine (sprintf "Opening window. mainCtx: %A, thread id: %A" mainCtx Thread.CurrentThread.ManagedThreadId)
+    let app host runtimeFramework = BrowserApp.create (fun mainCtx createWindow -> async {
         do! Async.SwitchToContext mainCtx
-        Trace.WriteLine (sprintf "ctx switch successful. mainCtx: %A, thread id: %A" mainCtx Thread.CurrentThread.ManagedThreadId)
-        let window = createWindow { defaultBrowserWindowConfig with initialAddress = Some "file:///C:/WINDOWS/" }
-        window.Show ()
-        do! Async.SwitchToNewThread ()
+        Trace.WriteLine "Opening window"
+        let window = createWindow { defaultBrowserWindowConfig with address = Some "https://rendering/"; html = Some "<html><body><p>Hello world</p></body></html>" }
+        do! window.Show ()
+        do! Async.SwitchToThreadPool ()
         Trace.WriteLine "Window shown"
-        window.Closed.Add (fun e -> Trace.WriteLine "Closed event fired")
         do! Async.AwaitEvent window.Closed
-        //do! Async.Sleep 10_000
         Trace.WriteLine "Window closed. Exiting app function"
     })

@@ -6,8 +6,9 @@ open CefSharp
 open CefSharp.WinForms
 open Interstellar
 open System.Threading
+open System.Diagnostics
 
-type BrowserWindow(?initialAddress: string) as this =
+type BrowserWindow(config: BrowserWindowConfig) as this =
     inherit Form(Visible = false)
 
     let mutable disposed = false
@@ -18,11 +19,19 @@ type BrowserWindow(?initialAddress: string) as this =
     // (primary) constructor
     do
         this.Controls.Add browser
-        initialAddress |> Option.iter ((this :> IBrowserWindow).Load)
-        // TODO: dispose the event handler
+        // TODO: dispose event handlers if necessary
         browser.TitleChanged.Add (fun e ->
             lastKnownPageTitle <- e.Title
         )
+        browser.IsBrowserInitializedChanged.Add (fun x ->
+            if browser.IsBrowserInitialized then
+                match config.address, config.html with
+                | address, Some html -> browser.LoadHtml (html, Option.toObj address) |> ignore
+                | Some address, None -> browser.Load address
+                | None, None -> ()
+        )
+
+    member this.ChromiumBrowser = browser
 
     interface IBrowserWindow with
         member this.Engine = BrowserEngineType.Chromium
@@ -31,10 +40,29 @@ type BrowserWindow(?initialAddress: string) as this =
         member this.Show () =
             if (Thread.CurrentThread.ManagedThreadId <> owningThreadId) then
                 raise (new InvalidOperationException("Show() called from a thread other than the thread on which the BrowserWindow was constructed."))
-            else (this :> Form).Show ()
+            //let awaitReady = async {
+            //    this
+            //    let! child1 = Async.StartChild <| Async.AwaitEvent (this :> IBrowserWindow).Shown
+            //    let! child2 = Async.StartChild <| Async.Ignore (Async.AwaitEvent browser.IsBrowserInitializedChanged)
+            //    Debug.WriteLine "awaiting Shown event"
+            //    do! child1
+            //    Debug.WriteLine "Shown even fired. Awaiting initializedChanged"
+            //    do! child2
+            //    Debug.WriteLine "Finished showing"
+            //}
+            (this :> Form).Show ()
+            async {
+                if browser.IsBrowserInitialized then ()
+                else
+                    let! _ = Async.AwaitEvent browser.IsBrowserInitializedChanged
+                    ()
+            }
         [<CLIEvent>]
         member this.Shown = (this :> Form).Shown |> Event.map ignore
         member this.Load address = browser.Load address
+        member this.LoadString (html, ?uri) =
+            browser.LoadString (html, Option.toObj uri)
+            browser.ShowDevTools ()
         member this.Reload () = browser.Reload ()
         member this.PageTitle = lastKnownPageTitle
         [<CLIEvent>]

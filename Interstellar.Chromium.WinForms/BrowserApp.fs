@@ -7,12 +7,9 @@ open System.Diagnostics
 
 module BrowserApp =    
     let runAsync mainCtx (app: BrowserApp) = async {
-        let windowCreator : BrowserWindowCreator = fun config ->
-            upcast new BrowserWindow(?initialAddress = config.initialAddress)
+        let windowCreator : BrowserWindowCreator = fun config -> upcast new BrowserWindow(config)
         do! app.onStart mainCtx windowCreator
-        Debug.WriteLine "after app function"
         do! Async.SwitchToContext mainCtx
-        Debug.WriteLine (sprintf "Calling Application.Exit (). thread id: %A" Thread.CurrentThread.ManagedThreadId)
         Interstellar.Chromium.Platform.Shutdown ()
         Application.Exit ()
     }

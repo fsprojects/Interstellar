@@ -10,19 +10,20 @@ type IBrowserWindow =
     abstract Engine : BrowserEngineType
     abstract Platform : BrowserPlatformType
     abstract Address : string
-    abstract Show : unit -> unit
+    abstract Show : unit -> Async<unit>
     [<CLIEvent>] abstract Shown : IEvent<unit>
     abstract Close : unit -> unit
     [<CLIEvent>] abstract Closed : IEvent<unit>
-    abstract Load : string -> unit
+    abstract Load : uri:string -> unit
+    abstract LoadString : html: string * ?uri: string -> unit
     abstract Reload : unit -> unit
     abstract PageTitle : string
     [<CLIEvent>] abstract PageTitleChanged: IEvent<string>
     abstract Title : string with get, set
 
 type BrowserWindowConfig =
-    { initialAddress: string option }
-    static member DefaultValue = { initialAddress = None }
+    { address: string option; html: string option }
+    static member DefaultValue = { address = None; html = None }
 
 type BrowserWindowCreator = BrowserWindowConfig -> IBrowserWindow
 
@@ -35,10 +36,10 @@ module BrowserApp =
     let zero = { onStart = fun _ _ -> async { () } }
     /// Creates an application with the given onStart function
     let create onStart = { onStart = onStart }
-    let openAddress = { onStart = fun mainCtx createWindow -> async {
+    let openAddress address = { onStart = fun mainCtx createWindow -> async {
             do! Async.SwitchToContext mainCtx
-            let window = createWindow { BrowserWindowConfig.DefaultValue with initialAddress = Some "" }
-            window.Show ()
+            let window = createWindow { BrowserWindowConfig.DefaultValue with address = Some address }
+            do! window.Show ()
         }
     }
 

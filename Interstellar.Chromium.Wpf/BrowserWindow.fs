@@ -6,23 +6,31 @@ open CefSharp
 open CefSharp.Wpf
 open Interstellar
 open System.Threading
+open System.Diagnostics
 
-type BrowserWindow(?initialAddress: string) as this =
+type BrowserWindow(config: BrowserWindowConfig) as this =
     inherit Window()
 
     let mainCtx = SynchronizationContext.Current
     let browser = new CefSharp.Wpf.ChromiumWebBrowser()
     let owningThreadId = Thread.CurrentThread.ManagedThreadId
 
+    let mutable alreadyShown = false
+    let shown = new Event<unit>()
+
     // (primary) constructor
     do
         this.Content <- browser
-        initialAddress |> Option.iter (fun x ->
-            browser.Address <- x
+        browser.IsBrowserInitializedChanged.Add (fun x ->
+            if browser.IsBrowserInitialized then
+                match config.address, config.html with
+                | address, Some html -> browser.LoadHtml (html, Option.toObj address) |> ignore
+                | Some address, None -> browser.Load address
+                | None, None -> ()
         )
+        
 
-    let mutable alreadyShown = false
-    let shown = new Event<unit>()
+    member this.ChromiumBrowser = browser
 
     interface IDisposable with
         member this.Dispose () =
@@ -39,10 +47,20 @@ type BrowserWindow(?initialAddress: string) as this =
             if owningThreadId <> Thread.CurrentThread.ManagedThreadId then
                 raise (new InvalidOperationException("Show() called from a thread other than the thread on which the BrowserWindow was constructed."))
             (this :> Window).Show ()
+            async {
+                if browser.IsBrowserInitialized then ()
+                else
+                    let! _ = Async.AwaitEvent browser.IsBrowserInitializedChanged
+                    ()
+            }
         [<CLIEvent>] member this.Shown = shown.Publish
         member this.Close () = (this :> Window).Close ()
         [<CLIEvent>] member this.Closed = (this :> Window).Closed |> Event.map ignore
         member this.Load address = browser.Load address
+        member this.LoadString (html, ?uri) =
+            match uri with
+            | Some uri -> browser.LoadHtml (html, uri) |> ignore
+            | None -> browser.LoadHtml html
         member this.Reload () = browser.Reload ()
         member this.PageTitle = browser.Title
         [<CLIEvent>]
