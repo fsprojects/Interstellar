@@ -40,16 +40,6 @@ type BrowserWindow(config: BrowserWindowConfig) as this =
         member this.Show () =
             if (Thread.CurrentThread.ManagedThreadId <> owningThreadId) then
                 raise (new InvalidOperationException("Show() called from a thread other than the thread on which the BrowserWindow was constructed."))
-            //let awaitReady = async {
-            //    this
-            //    let! child1 = Async.StartChild <| Async.AwaitEvent (this :> IBrowserWindow).Shown
-            //    let! child2 = Async.StartChild <| Async.Ignore (Async.AwaitEvent browser.IsBrowserInitializedChanged)
-            //    Debug.WriteLine "awaiting Shown event"
-            //    do! child1
-            //    Debug.WriteLine "Shown even fired. Awaiting initializedChanged"
-            //    do! child2
-            //    Debug.WriteLine "Finished showing"
-            //}
             (this :> Form).Show ()
             async {
                 if browser.IsBrowserInitialized then ()
@@ -74,6 +64,9 @@ type BrowserWindow(config: BrowserWindowConfig) as this =
         member this.Close () = (this :> Form).Close ()
         [<CLIEvent>]
         member this.Closed : IEvent<unit> = (this :> Form).FormClosed |> Event.map ignore
+        member this.ShowDevTools () = browser.ShowDevTools ()
+        member this.CloseDevTools () = browser.CloseDevTools ()
+        member this.AreDevToolsShowing = browser.GetBrowserHost().HasDevTools
 
     member private this._Dispose disposing =
         if not disposed then

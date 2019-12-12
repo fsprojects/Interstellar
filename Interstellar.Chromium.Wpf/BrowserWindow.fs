@@ -28,7 +28,6 @@ type BrowserWindow(config: BrowserWindowConfig) as this =
                 | Some address, None -> browser.Load address
                 | None, None -> ()
         )
-        
 
     member this.ChromiumBrowser = browser
 
@@ -69,6 +68,9 @@ type BrowserWindow(config: BrowserWindowConfig) as this =
         member this.Title
             with get () = (this :> Window).Title
             and set title = (this :> Window).Title <- title
+        member this.ShowDevTools () = browser.ShowDevTools ()
+        member this.CloseDevTools () = browser.CloseDevTools ()
+        member this.AreDevToolsShowing = browser.GetBrowserHost().HasDevTools
 
     override this.OnContentRendered e =
         base.OnContentRendered e

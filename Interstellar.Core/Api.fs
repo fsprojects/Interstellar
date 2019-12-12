@@ -20,6 +20,9 @@ type IBrowserWindow =
     abstract PageTitle : string
     [<CLIEvent>] abstract PageTitleChanged: IEvent<string>
     abstract Title : string with get, set
+    abstract ShowDevTools : unit -> unit
+    abstract CloseDevTools : unit -> unit
+    abstract AreDevToolsShowing : bool
 
 type BrowserWindowConfig =
     { address: string option; html: string option }

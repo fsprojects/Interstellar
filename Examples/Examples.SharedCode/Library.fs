@@ -50,8 +50,10 @@ module SimpleBrowserApp =
     let app host runtimeFramework = BrowserApp.create (fun mainCtx createWindow -> async {
         do! Async.SwitchToContext mainCtx
         Trace.WriteLine "Opening window"
+        //let window = createWindow { defaultBrowserWindowConfig with address = Some "data:text/html;charset=utf-8;base64,PGh0bWw+PGJvZHk+PHA+SGVsbG8gd29ybGQ8L3A+PC9ib2R5PjwvaHRtbD4=" }
         let window = createWindow { defaultBrowserWindowConfig with address = Some "https://rendering/"; html = Some "<html><body><p>Hello world</p></body></html>" }
         do! window.Show ()
+        do window.ShowDevTools ()
         do! Async.SwitchToThreadPool ()
         Trace.WriteLine "Window shown"
         do! Async.AwaitEvent window.Closed
