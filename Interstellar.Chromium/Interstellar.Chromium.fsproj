@@ -1,21 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net452;netcoreapp3.0</TargetFrameworks>
     <CefSharpAnyCpuSupport>true</CefSharpAnyCpuSupport>
-    <UseWPF>true</UseWPF>
-    <DefineConstants>WPF</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Update="FSharp.Core" Version="4.2.3" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Interstellar.Chromium.WindowsCommon\Platform.fs" Link="Platform.fs" />
-    <Compile Include="BrowserWindow.fs" />
-    <Compile Include="BrowserApp.fs" />
+    <Compile Include="Browser.fs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Interstellar.Chromium\Interstellar.Chromium.fsproj" />
     <ProjectReference Include="..\Interstellar.Core\Interstellar.Core.fsproj" />
   </ItemGroup>
   <Import Project="..\.paket\Paket.Restore.targets" />

@@ -20,7 +20,9 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Interstellar.Chromium.WinFo
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Examples.Chromium.WinForms", "Examples\Examples.Chromium.WinForms\Examples.Chromium.WinForms.fsproj", "{8FD85916-B47D-4055-8661-718B9ABEFF6B}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Examples.SharedCode", "Examples\Examples.SharedCode\Examples.SharedCode.fsproj", "{7DC66E91-1D5D-4775-BE40-378AA2E432F8}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Examples.SharedCode", "Examples\Examples.SharedCode\Examples.SharedCode.fsproj", "{7DC66E91-1D5D-4775-BE40-378AA2E432F8}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Interstellar.Chromium", "Interstellar.Chromium\Interstellar.Chromium.fsproj", "{58387294-2BDC-4799-919E-9F71883DA9B5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -52,6 +54,10 @@ Global
 		{7DC66E91-1D5D-4775-BE40-378AA2E432F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7DC66E91-1D5D-4775-BE40-378AA2E432F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7DC66E91-1D5D-4775-BE40-378AA2E432F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58387294-2BDC-4799-919E-9F71883DA9B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58387294-2BDC-4799-919E-9F71883DA9B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58387294-2BDC-4799-919E-9F71883DA9B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58387294-2BDC-4799-919E-9F71883DA9B5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

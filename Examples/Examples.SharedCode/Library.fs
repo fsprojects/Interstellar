@@ -11,7 +11,7 @@ module SimpleBrowserApp =
             use! holder = Async.OnCancel (fun () ->
                 Trace.WriteLine "Window title updater cancelled")
             while true do
-                let! pageTitle = Async.AwaitEvent window.PageTitleChanged
+                let! pageTitle = Async.AwaitEvent window.Browser.PageTitleChanged
                 Trace.WriteLine (sprintf "Browser page title is: %s" pageTitle)
                 do! Async.SwitchToContext mainCtx
                 window.Title <- mapPageTitle pageTitle
@@ -56,7 +56,7 @@ module SimpleBrowserApp =
         do! Async.SwitchToThreadPool ()
         do! Async.Sleep 1_000
         do! Async.SwitchToContext mainCtx
-        window.ExecuteJavascript "alert('hello')"
+        window.Browser.ExecuteJavascript "alert('hello')"
         do! Async.SwitchToThreadPool ()
         Trace.WriteLine "Window shown"
         do! Async.AwaitEvent window.Closed
