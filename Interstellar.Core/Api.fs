@@ -7,22 +7,22 @@ type BrowserPlatformType = | WindowsWpf = 0 | MacOS = 0b1
 
 type IBrowserWindow =
     inherit IDisposable
-    abstract Engine : BrowserEngineType
-    abstract Platform : BrowserPlatformType
     abstract Address : string
-    abstract Show : unit -> Async<unit>
-    [<CLIEvent>] abstract Shown : IEvent<unit>
+    abstract AreDevToolsShowing : bool
     abstract Close : unit -> unit
+    abstract CloseDevTools : unit -> unit
+    abstract Engine : BrowserEngineType
     [<CLIEvent>] abstract Closed : IEvent<unit>
     abstract Load : uri:string -> unit
     abstract LoadString : html: string * ?uri: string -> unit
-    abstract Reload : unit -> unit
     abstract PageTitle : string
+    abstract Platform : BrowserPlatformType
+    abstract Reload : unit -> unit
     [<CLIEvent>] abstract PageTitleChanged: IEvent<string>
-    abstract Title : string with get, set
+    abstract Show : unit -> Async<unit>
     abstract ShowDevTools : unit -> unit
-    abstract CloseDevTools : unit -> unit
-    abstract AreDevToolsShowing : bool
+    [<CLIEvent>] abstract Shown : IEvent<unit>
+    abstract Title : string with get, set
 
 type BrowserWindowConfig =
     { address: string option; html: string option; showDevTools: bool }

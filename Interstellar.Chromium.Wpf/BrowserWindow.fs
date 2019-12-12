@@ -40,9 +40,23 @@ type BrowserWindow(config: BrowserWindowConfig) as this =
             }
 
     interface IBrowserWindow with
-        member this.Engine = BrowserEngineType.Chromium
-        member this.Platform = BrowserPlatformType.WindowsWpf
+        member this.AreDevToolsShowing = browser.GetBrowserHost().HasDevTools
         member this.Address = browser.Address
+        member this.CloseDevTools () = browser.CloseDevTools ()
+        member this.Close () = (this :> Window).Close ()
+        [<CLIEvent>] member this.Closed = (this :> Window).Closed |> Event.map ignore
+        member this.Engine = BrowserEngineType.Chromium
+        member this.Load address = browser.Load address
+        member this.LoadString (html, ?uri) =
+            match uri with
+            | Some uri -> browser.LoadHtml (html, uri) |> ignore
+            | None -> browser.LoadHtml html
+        member this.Platform = BrowserPlatformType.WindowsWpf
+        member this.PageTitle = browser.Title
+        [<CLIEvent>]
+        member this.PageTitleChanged : IEvent<string> =
+            browser.TitleChanged |> Event.map (fun (e: DependencyPropertyChangedEventArgs) -> e.NewValue :?> string)
+        member this.Reload () = browser.Reload ()
         member this.Show () =
             if owningThreadId <> Thread.CurrentThread.ManagedThreadId then
                 raise (new InvalidOperationException("Show() called from a thread other than the thread on which the BrowserWindow was constructed."))
@@ -54,24 +68,10 @@ type BrowserWindow(config: BrowserWindowConfig) as this =
                     ()
             }
         [<CLIEvent>] member this.Shown = shown.Publish
-        member this.Close () = (this :> Window).Close ()
-        [<CLIEvent>] member this.Closed = (this :> Window).Closed |> Event.map ignore
-        member this.Load address = browser.Load address
-        member this.LoadString (html, ?uri) =
-            match uri with
-            | Some uri -> browser.LoadHtml (html, uri) |> ignore
-            | None -> browser.LoadHtml html
-        member this.Reload () = browser.Reload ()
-        member this.PageTitle = browser.Title
-        [<CLIEvent>]
-        member this.PageTitleChanged : IEvent<string> =
-            browser.TitleChanged |> Event.map (fun (e: DependencyPropertyChangedEventArgs) -> e.NewValue :?> string)
+        member this.ShowDevTools () = browser.ShowDevTools ()
         member this.Title
             with get () = (this :> Window).Title
             and set title = (this :> Window).Title <- title
-        member this.ShowDevTools () = browser.ShowDevTools ()
-        member this.CloseDevTools () = browser.CloseDevTools ()
-        member this.AreDevToolsShowing = browser.GetBrowserHost().HasDevTools
 
     override this.OnContentRendered e =
         base.OnContentRendered e
