@@ -54,7 +54,7 @@ module SimpleBrowserApp =
         let window = createWindow { defaultBrowserWindowConfig with showDevTools = true; address = Some "https://rendering/"; html = Some "<html><body><p>Hello world</p><div id=\"myDiv\"></div></body></html>" }
         do! window.Show ()
         do! Async.SwitchToThreadPool ()
-        do! Async.Sleep 1_000
+        do! Async.Sleep 1_000 // FIXME: introduce some mechanism to let us wait until it is valid to start executing Javascript
         do! Async.SwitchToContext mainCtx
         window.Browser.ExecuteJavascript "alert('hello')"
         do! Async.SwitchToThreadPool ()

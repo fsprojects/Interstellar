@@ -2,28 +2,37 @@
 open System
 open System.Threading
 
-type BrowserEngineType = | Chromium = 0 | WebKit = 0b1
-type BrowserPlatformType = | WindowsWpf = 0 | MacOS = 0b1
+type BrowserEngineType = | Chromium = 0 | AppleWebKit = 0b1
+type BrowserWindowPlatform = | WindowsWpf = 0b0 | WindowsWinForms = 0b1 | MacOS = 0b1
 
 type IBrowser =
     abstract Address : string
     abstract AreDevToolsShowing : bool
+    abstract CanGoBack : bool
+    abstract CanGoForward : bool
     abstract CloseDevTools : unit -> unit
     abstract Engine : BrowserEngineType
     /// <summary>Executes some Javascript in the browser, returning immediately.</summary>
     abstract ExecuteJavascript : string -> unit
     abstract Load : uri:string -> unit
     abstract LoadString : html: string * ?uri: string -> unit
+    abstract GoBack : unit -> unit
+    abstract GoForward : unit -> unit
     abstract PageTitle : string
-    abstract Platform : BrowserPlatformType
+    [<CLIEvent>]
+    abstract PageLoaded : IEvent<EventArgs>
     abstract Reload : unit -> unit
     [<CLIEvent>] abstract PageTitleChanged: IEvent<string>
     abstract ShowDevTools : unit -> unit
 
+/// <summary>
+///     A natively-hosted graphical window that hosts a <see cref="Interstellar.IBrowser"/>
+/// </summary>
 type IBrowserWindow =
     inherit IDisposable
     abstract Browser : IBrowser
     abstract Close : unit -> unit
+    abstract Platform : BrowserWindowPlatform
     [<CLIEvent>] abstract Closed : IEvent<unit>
     abstract Show : unit -> Async<unit>
     [<CLIEvent>] abstract Shown : IEvent<unit>
