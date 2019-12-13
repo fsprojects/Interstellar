@@ -38,7 +38,7 @@ type BrowserWindow(config: BrowserWindowConfig) as this =
         member this.Close () = (this :> Form).Close ()
         [<CLIEvent>]
         member this.Closed : IEvent<unit> = (this :> Form).FormClosed |> Event.map ignore
-        member this.Platform = BrowserWindowPlatform.WindowsWinForms
+        member this.Platform = BrowserWindowPlatform.WinForms
         member this.Show () =
             if (Thread.CurrentThread.ManagedThreadId <> owningThreadId) then
                 raise (new InvalidOperationException("Show() called from a thread other than the thread on which the BrowserWindow was constructed."))

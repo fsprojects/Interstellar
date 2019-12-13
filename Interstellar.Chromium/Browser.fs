@@ -30,11 +30,14 @@ type Browser(browser: IWebBrowser, browserInternals: SharedChromiumBrowserIntern
 
     interface Interstellar.IBrowser with
         member this.AreDevToolsShowing = browser.GetBrowserHost().HasDevTools
-        member this.Address = browser.Address
+        member this.Address =
+            match browser.Address with
+            | null -> None
+            | value -> Some (new Uri(value))
         member this.CloseDevTools () = browser.CloseDevTools ()
         member this.CanGoBack = browser.GetBrowser().CanGoBack
         member this.CanGoForward = browser.GetBrowser().CanGoForward
-        member this.Engine = BrowserEngineType.Chromium
+        member this.Engine = BrowserEngine.Chromium
         member this.ExecuteJavascript code = browser.ExecuteScriptAsync code
         member this.Load address = browser.Load address
         member this.LoadString (html, ?uri) =

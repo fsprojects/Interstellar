@@ -41,7 +41,7 @@ type BrowserWindow(config: BrowserWindowConfig) as this =
         member this.Browser = upcast browser
         member this.Close () = (this :> Window).Close ()
         [<CLIEvent>] member this.Closed = (this :> Window).Closed |> Event.map ignore
-        member this.Platform = BrowserWindowPlatform.WindowsWpf
+        member this.Platform = BrowserWindowPlatform.Wpf
         member this.Show () =
             if owningThreadId <> Thread.CurrentThread.ManagedThreadId then
                 raise (new InvalidOperationException("Show() called from a thread other than the thread on which the BrowserWindow was constructed."))
