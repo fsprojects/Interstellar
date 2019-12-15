@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>xamarin.mac20</TargetFramework>
@@ -8,13 +9,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="Library.fs" />
+    <Compile Include="Browser.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Interstellar.Core\Interstellar.Core.fsproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="mscorlib" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="Xamarin.Mac" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'xamarin.mac20' ">
     <TargetFrameworkIdentifier>Xamarin.Mac</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
   </PropertyGroup>
+  <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>
