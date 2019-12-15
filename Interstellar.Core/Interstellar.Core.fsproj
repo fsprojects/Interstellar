@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.6;net452;netcoreapp3.0</TargetFrameworks>
+    <TargetFrameworks>netstandard1.6;net452;netcoreapp3.0;xamarin.mac20</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Update="FSharp.Core" Version="4.2.3" />
@@ -9,5 +9,9 @@
   <ItemGroup>
     <Compile Include="Api.fs" />
   </ItemGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'xamarin.mac20' ">
+    <TargetFrameworkIdentifier>Xamarin.Mac</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+  </PropertyGroup>
   <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>
