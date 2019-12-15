@@ -16,7 +16,7 @@ type BrowserWindowPlatform = | Wpf = 0b01 | WinForms = 0b11 | MacOS = 0b100
 
 type IBrowser =
     /// <summary>The address which the browser is currently displaying, if any</summary>
-    abstract Address : string option
+    abstract Address : Uri option
     /// <summary>Whether or not this browser instance is showing any dev tools</summary>
     abstract AreDevToolsShowing : bool
     /// <summary>Indicates whether or not there is a previous page to go to</summary>

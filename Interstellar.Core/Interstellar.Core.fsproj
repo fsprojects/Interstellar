@@ -9,6 +9,10 @@
   <ItemGroup>
     <Compile Include="Api.fs" />
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="mscorlib" />
+    <Reference Include="System" />
+  </ItemGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'xamarin.mac20' ">
     <TargetFrameworkIdentifier>Xamarin.Mac</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
