@@ -12,15 +12,15 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
+    <Reference Include="System.Threading" />
     <Reference Include="Xamarin.Mac" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Interstellar.Core\Interstellar.Core.fsproj" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Browser.fs" />
     <Compile Include="BrowserWindow.fs" />
+    <ProjectReference Include="..\Interstellar.Core\Interstellar.Core.fsproj" />
+    <Compile Include="BrowserApp.fs" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'xamarin.mac20' ">
     <TargetFrameworkIdentifier>Xamarin.Mac</TargetFrameworkIdentifier>

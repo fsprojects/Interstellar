@@ -27,30 +27,44 @@ open WebKit
 
 //type BrowserWindowView() = inherit NSWindow()
 
-type BrowserWindow() as this =
+type NiblessViewController(view: NSView) =
+    inherit NSViewController()
+
+    override this.LoadView () =
+        base.View <- view
+
+type BrowserWindow(config: BrowserWindowConfig) as this =
     inherit NSWindowController("BrowserWindow")
 
     let wkBrowser = new WKWebView(CGRect.Empty, new WKWebViewConfiguration())
+    //let wkBrowserController = new NSViewController()
     let browser = new Browser(wkBrowser)
 
     let shown = new Event<_>()
 
     do
-        //this.ContentViewController <- {
-        //    new NSViewController() with
-        //        override this.ViewDidAppear () =
-        //            base.ViewDidAppear ()
-        //            shown.Trigger ()
-        //}
+        let wkBrowserController = {
+            new NiblessViewController(wkBrowser) with
+                override this.ViewDidAppear () =
+                    base.ViewDidAppear ()
+                    shown.Trigger ()
+        }
         this.Window <-
             new NSWindow(new CGRect (0., 0., 1000., 500.),
                          NSWindowStyle.Titled ||| NSWindowStyle.Closable ||| NSWindowStyle.Miniaturizable ||| NSWindowStyle.Resizable,
                          NSBackingStore.Buffered, false, Title = "My Window")
+        this.Window.ContentView <- wkBrowser
+        this.Window.ContentViewController <- wkBrowserController
+        //wkBrowser.LoadRequest (new NSUrlRequest(new NSUrl("https://google.com/"))) |> ignore
         this.Window.Center ()
         this.Window.AwakeFromNib ()
 
+
     member this.WKBrowserView = wkBrowser
     member this.WKBrowser = browser
+
+    override this.LoadWindow () =
+        base.LoadWindow ()
 
     //override this.LoadWindow () =
         ////let window = new NSWindow()
