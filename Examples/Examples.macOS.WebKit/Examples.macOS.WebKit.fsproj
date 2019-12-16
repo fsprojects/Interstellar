@@ -9,6 +9,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Example.macOS.WebKit</RootNamespace>
     <AssemblyName>InterstellarExample</AssemblyName>
+    <TargetFramework>xamarin.mac20</TargetFramework>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <TargetFrameworkIdentifier>Xamarin.Mac</TargetFrameworkIdentifier>
     <MonoMacResourcePrefix>Resources</MonoMacResourcePrefix>
@@ -76,15 +77,18 @@
     <ImageAsset Include="Assets.xcassets\Contents.json" />
     <None Include="Info.plist" />
     <None Include="Entitlements.plist" />
-    <InterfaceDefinition Include="Main.storyboard" />
     <Compile Include="AppDelegate.fs" />
     <None Include="packages.config" />
     <Compile Include="Main.fs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Interstellar.macOS.WebKit\Interstellar.macOS.WebKit.fsproj">
+    <ProjectReference Include="..\..\Interstellar.macOS.WebKit\Interstellar.macOS.WebKit.fsproj">
       <Project>{728F9219-A62A-481F-92E6-716E09E0C5A9}</Project>
       <Name>Interstellar.macOS.WebKit</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Interstellar.Core\Interstellar.Core.fsproj">
+      <Project>{7D096C2C-0960-4754-9954-421832426807}</Project>
+      <Name>Interstellar.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.FSharp.targets" />
