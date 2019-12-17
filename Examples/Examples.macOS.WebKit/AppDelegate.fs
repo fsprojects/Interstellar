@@ -20,10 +20,10 @@ type AppDelegate() =
         let w = new Internal.BrowserWindow(BrowserWindowConfig.DefaultValue)
         (w :> IBrowserWindow).Show () |> Async.StartImmediate
 
-        //let mainCtx = SynchronizationContext.Current
-        //Async.Start <| async {
-        //    do! BrowserApp.runAsync mainCtx SimpleBrowserApp.app
-        //    NSApplication.SharedApplication.Terminate null
-        //}
+        let mainCtx = SynchronizationContext.Current
+        Async.Start <| async {
+            do! BrowserApp.runAsync mainCtx SimpleBrowserApp.app
+            NSApplication.SharedApplication.Terminate null
+        }
 
         ()

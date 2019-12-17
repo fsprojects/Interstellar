@@ -14,8 +14,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		global.json = global.json
 	EndProjectSection
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ClassLib", "ClassLib\ClassLib.fsproj", "{76461290-52DA-4838-A95F-E1C88F0C495D}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,9 +36,5 @@ Global
 		{0332BEB2-0915-47CC-A709-49FC4C2B3DB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0332BEB2-0915-47CC-A709-49FC4C2B3DB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0332BEB2-0915-47CC-A709-49FC4C2B3DB5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{76461290-52DA-4838-A95F-E1C88F0C495D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{76461290-52DA-4838-A95F-E1C88F0C495D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{76461290-52DA-4838-A95F-E1C88F0C495D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{76461290-52DA-4838-A95F-E1C88F0C495D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

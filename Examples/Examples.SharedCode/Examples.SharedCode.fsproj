@@ -4,9 +4,6 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="4.2.3" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Library.fs" />
   </ItemGroup>
   <ItemGroup>

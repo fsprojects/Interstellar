@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="MSBuild.Sdk.Extras">
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.6;net452;netcoreapp3.0;xamarin.mac20</TargetFrameworks>
+    <TargetFramework>netstandard1.6</TargetFramework>
     <TargetProfile>netcore</TargetProfile>
   </PropertyGroup>
   <ItemGroup>
