@@ -1,5 +1,5 @@
 source https://api.nuget.org/v3/index.json
-framework net452, netcoreapp3.0, netstandard1.6
+framework: auto-detect
 
 nuget CefSharp.WinForms
 nuget CefSharp.Wpf >= 75.1.143

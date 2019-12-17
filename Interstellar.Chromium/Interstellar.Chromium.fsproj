@@ -1,12 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net452;netcoreapp3.0</TargetFrameworks>
+    <TargetFrameworks>net472;netcoreapp3.0</TargetFrameworks>
     <CefSharpAnyCpuSupport>true</CefSharpAnyCpuSupport>
   </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="4.2.3" />
-  </ItemGroup>
   <ItemGroup>
     <Compile Include="Browser.fs" />
   </ItemGroup>
