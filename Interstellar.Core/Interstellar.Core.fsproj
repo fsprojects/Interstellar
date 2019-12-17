@@ -1,9 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="MSBuild.Sdk.Extras">
   <PropertyGroup>
-    <!-- We don't need to target the core library/api to anything other than .Net Standard (as it contains no platform-specific code), but MS's xplat targeting guide suggests targeting .net 4.6.1 because of compatability issues with 4.6.x and .net standard 2.0.
-         See: https://docs.microsoft.com/en-us/dotnet/standard/library-guidance/cross-platform-targeting -->
-    <TargetFrameworks>netstandard1.6;netstandard2.0;net461</TargetFrameworks>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <TargetProfile>netcore</TargetProfile>
   </PropertyGroup>
   <ItemGroup>
