@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="MSBuild.Sdk.Extras">
   <PropertyGroup>
     <TargetFramework>xamarin.mac20</TargetFramework>
     <RootNamespace>Interstellar.macOS.WebKit</RootNamespace>
@@ -23,9 +23,5 @@
     <ProjectReference Include="..\Interstellar.Core\Interstellar.Core.fsproj" />
     <Compile Include="BrowserApp.fs" />
   </ItemGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'xamarin.mac20' ">
-    <TargetFrameworkIdentifier>Xamarin.Mac</TargetFrameworkIdentifier>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
-  </PropertyGroup>
   <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>

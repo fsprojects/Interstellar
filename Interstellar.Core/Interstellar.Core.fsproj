@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="MSBuild.Sdk.Extras">
   <PropertyGroup>
     <TargetFrameworks>netstandard1.6;net452;netcoreapp3.0;xamarin.mac20</TargetFrameworks>
   </PropertyGroup>
@@ -13,9 +13,5 @@
     <Reference Include="mscorlib" />
     <Reference Include="System" />
   </ItemGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'xamarin.mac20' ">
-    <TargetFrameworkIdentifier>Xamarin.Mac</TargetFrameworkIdentifier>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
-  </PropertyGroup>
   <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>
