@@ -72,7 +72,7 @@ module SimpleBrowserApp =
                 </body>
             </html>"
         let window = createWindow { defaultBrowserWindowConfig with showDevTools = true; address = Some "https://rendering/"; html = Some page }
-        startTitleUpdater mainCtx (sprintf "BrowserApp - %s") window
+        //startTitleUpdater mainCtx (sprintf "BrowserApp - %s") window
         do! window.Show ()
         do! Async.SwitchToThreadPool ()
         do! Async.Sleep 1_000 // FIXME: introduce some mechanism to let us wait until it is valid to start executing Javascript
@@ -87,6 +87,8 @@ module SimpleBrowserApp =
         let script = String.Join (";", lines)
         Debug.WriteLine (sprintf "Executing script:\n%s" script)
         window.Browser.ExecuteJavascript script
+        let w, h = window.Size
+        window.Size <- w + 100., h + 100.
         do! Async.SwitchToThreadPool ()
         Trace.WriteLine "Window shown"
         do! Async.AwaitEvent window.Closed

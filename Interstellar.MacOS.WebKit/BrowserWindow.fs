@@ -72,6 +72,16 @@ type BrowserWindow(config: BrowserWindowConfig) as this =
         }
         [<CLIEvent>]
         member this.Shown = shown.Publish
+        member this.Size
+            with get () =
+                let size = this.Window.Frame.Size
+                float size.Width, float size.Height
+            and set (width, height) =
+                let oldFrame = this.Window.Frame
+                // Cocoa uses a bottom-left origin, so we have to move the bottom-left corner in order to keep the top-right
+                // corner in place
+                let rect = new CGRect(float oldFrame.X, float oldFrame.Y - (height - float oldFrame.Height), width, height)
+                this.Window.SetFrame (rect, true, true)
         member this.Title
             with get () = base.Window.Title
             and set x = base.Window.Title <- x
