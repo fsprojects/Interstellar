@@ -10,9 +10,5 @@
   <ItemGroup>
     <Compile Include="Api.fs" />
   </ItemGroup>
-  <ItemGroup>
-    <Reference Include="mscorlib" />
-    <Reference Include="System" />
-  </ItemGroup>
   <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>

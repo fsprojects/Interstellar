@@ -7,10 +7,6 @@
     <Compile Include="Library.fs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="mscorlib" />
-    <Reference Include="System" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\Interstellar.Core\Interstellar.Core.fsproj" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
