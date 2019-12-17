@@ -56,6 +56,7 @@ module SimpleBrowserApp =
         do! Async.SwitchToContext mainCtx
         Trace.WriteLine "Opening window"
         //let window = createWindow { defaultBrowserWindowConfig with address = Some "data:text/html;charset=utf-8;base64,PGh0bWw+PGJvZHk+PHA+SGVsbG8gd29ybGQ8L3A+PC9ib2R5PjwvaHRtbD4=" }
+        //let window = createWindow { defaultBrowserWindowConfig with address = Some "https://google.com/" }
         let page = sprintf "
             <html>
                 <body>

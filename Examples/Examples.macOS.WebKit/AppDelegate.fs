@@ -17,9 +17,6 @@ type AppDelegate() =
         printfn "DidFinishLaunching"
         Thread.CurrentThread.Name <- "Main"
 
-        let w = new Internal.BrowserWindow(BrowserWindowConfig.DefaultValue)
-        (w :> IBrowserWindow).Show () |> Async.StartImmediate
-
         let mainCtx = SynchronizationContext.Current
         Async.Start <| async {
             do! BrowserApp.runAsync mainCtx SimpleBrowserApp.app

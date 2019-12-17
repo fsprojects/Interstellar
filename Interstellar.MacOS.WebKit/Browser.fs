@@ -5,8 +5,16 @@ open Foundation
 open Interstellar
 open WebKit
 
-type Browser(wkBrowser: WKWebView) =
+type Browser(config: BrowserWindowConfig, wkBrowser: WKWebView) =
+    do
+        match config.address, config.html with
+        | Some address, Some html -> wkBrowser.LoadHtmlString (html, new NSUrl(address)) |> ignore
+        | None, Some html -> wkBrowser.LoadHtmlString (html, null) |> ignore
+        | Some address, None -> wkBrowser.LoadRequest (new NSUrlRequest(new NSUrl(address))) |> ignore
+        | None, None -> ()
+
     member this.WebKitBrowser = wkBrowser
+
     interface IBrowser with
         member this.Address = raise (new NotImplementedException())
         member this.AreDevToolsShowing = false
@@ -14,7 +22,7 @@ type Browser(wkBrowser: WKWebView) =
         member this.CanGoBack = raise (new NotImplementedException())
         member this.CanGoForward = raise (new NotImplementedException())
         member this.Engine = BrowserEngine.AppleWebKit
-        member this.ExecuteJavascript code = raise (new NotImplementedException())
+        member this.ExecuteJavascript code = wkBrowser.EvaluateJavaScript (code, null)
         member this.Load address = wkBrowser.LoadRequest (new NSUrlRequest(new NSUrl(address))) |> ignore
         member this.LoadString (html, ?uri) =
             let nsUrl = match uri with | Some uri -> new NSUrl(uri) | None -> null

@@ -7,26 +7,6 @@ open Interstellar
 open Interstellar.MacOS.WebKit
 open WebKit
 
-//type BrowserWindow() =
-    //inherit NSViewController()
-
-    //let wkBrowser = new WKWebView(CGRect.Empty, new WKWebViewConfiguration())
-    //let browser = new Browser(wkBrowser)
-
-    //do
-    //    browser.WebKitBrowser
-    //    ()
-
-    //member this.WebKitBrowser = wkBrowser
-    //member this.Browser = browser
-
-    //override this.LoadView () =
-    //    base.View <- new NSView()
-
-    ////member this.View = view
-
-//type BrowserWindowView() = inherit NSWindow()
-
 type NiblessViewController(view: NSView) =
     inherit NSViewController()
 
@@ -37,9 +17,9 @@ type BrowserWindow(config: BrowserWindowConfig) as this =
     inherit NSWindowController("BrowserWindow")
 
     let wkBrowser = new WKWebView(CGRect.Empty, new WKWebViewConfiguration())
-    //let wkBrowserController = new NSViewController()
-    let browser = new Browser(wkBrowser)
+    let browser = new Browser(config, wkBrowser)
 
+    let closed = new Event<_>()
     let shown = new Event<_>()
 
     do
@@ -53,6 +33,7 @@ type BrowserWindow(config: BrowserWindowConfig) as this =
             new NSWindow(new CGRect (0., 0., 1000., 500.),
                          NSWindowStyle.Titled ||| NSWindowStyle.Closable ||| NSWindowStyle.Miniaturizable ||| NSWindowStyle.Resizable,
                          NSBackingStore.Buffered, false, Title = "My Window")
+        this.Window.WillClose.Add (fun x -> closed.Trigger ())
         this.Window.ContentView <- wkBrowser
         this.Window.ContentViewController <- wkBrowserController
         //wkBrowser.LoadRequest (new NSUrlRequest(new NSUrl("https://google.com/"))) |> ignore
@@ -85,7 +66,7 @@ type BrowserWindow(config: BrowserWindowConfig) as this =
         member this.Close () = (this :> NSWindowController).Close ()
         member this.Platform = BrowserWindowPlatform.MacOS
         [<CLIEvent>]
-        member this.Closed = (this :> NSWindowController).Window.WillClose |> Event.map (fun x -> ())
+        member this.Closed = closed.Publish
         member this.Show () = async {
             (this :> NSWindowController).ShowWindow this
         }
