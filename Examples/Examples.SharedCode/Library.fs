@@ -59,6 +59,9 @@ module SimpleBrowserApp =
         //let window = createWindow { defaultBrowserWindowConfig with address = Some "https://google.com/" }
         let page = sprintf "
             <html>
+                <head>
+                    <title>Static HTML Example</title>
+                </head>
                 <body>
                     <p>Here is some static HTML.</p>
                     <p id=\"dynamicContent\" />
@@ -69,6 +72,7 @@ module SimpleBrowserApp =
                 </body>
             </html>"
         let window = createWindow { defaultBrowserWindowConfig with showDevTools = true; address = Some "https://rendering/"; html = Some page }
+        startTitleUpdater mainCtx (sprintf "BrowserApp - %s") window
         do! window.Show ()
         do! Async.SwitchToThreadPool ()
         do! Async.Sleep 1_000 // FIXME: introduce some mechanism to let us wait until it is valid to start executing Javascript
@@ -78,6 +82,7 @@ module SimpleBrowserApp =
             sprintf "document.getElementById(\"runtimeFramework\")     .innerHTML = \"Runtime framework: %s\"" runtimeFramework
             sprintf "document.getElementById(\"browserEngine\")        .innerHTML = \"Browser engine: %A\"" window.Browser.Engine
             sprintf "document.getElementById(\"browserWindowPlatform\").innerHTML = \"BrowserWindow platform: %A\"" window.Platform
+            sprintf "setTimeout(function () { document.title = \"PSYCH, It's actually a Dynamic Javascript Example!\" }, 5000)"
         ]
         let script = String.Join (";", lines)
         Debug.WriteLine (sprintf "Executing script:\n%s" script)
