@@ -6,7 +6,23 @@ open Interstellar
 open WebKit
 
 type Browser(config: BrowserWindowConfig, wkBrowser: WKWebView) =
+    let pageLoaded = new Event<EventArgs>()
+    let pageTitleChanged = new Event<string>()
+    let mutable pageTitleObserverHandle = null
+
     do
+        wkBrowser.NavigationDelegate <- {
+            new WKNavigationDelegate() with
+                member this.DidFinishNavigation (view, nav) =
+                    pageLoaded.Trigger (new EventArgs())
+        }
+
+        // TODO: dispose this
+        pageTitleObserverHandle <-
+            wkBrowser.AddObserver
+                (new NSString("title"), NSKeyValueObservingOptions.New, fun x ->
+                    pageTitleChanged.Trigger (wkBrowser.Title))
+
         match config.address, config.html with
         | Some address, Some html -> wkBrowser.LoadHtmlString (html, new NSUrl(address)) |> ignore
         | None, Some html -> wkBrowser.LoadHtmlString (html, null) |> ignore
@@ -16,23 +32,26 @@ type Browser(config: BrowserWindowConfig, wkBrowser: WKWebView) =
     member this.WebKitBrowser = wkBrowser
 
     interface IBrowser with
-        member this.Address = raise (new NotImplementedException())
+        member this.Address =
+            match wkBrowser.Url with
+            | null -> None
+            | url -> Some (new Uri(url.AbsoluteString))
         member this.AreDevToolsShowing = false
-        member this.CloseDevTools () = raise (new NotImplementedException())
-        member this.CanGoBack = raise (new NotImplementedException())
-        member this.CanGoForward = raise (new NotImplementedException())
+        member this.CloseDevTools () = ()
+        member this.CanGoBack = wkBrowser.CanGoBack
+        member this.CanGoForward = wkBrowser.CanGoForward
         member this.Engine = BrowserEngine.AppleWebKit
         member this.ExecuteJavascript code = wkBrowser.EvaluateJavaScript (code, null)
         member this.Load address = wkBrowser.LoadRequest (new NSUrlRequest(new NSUrl(address))) |> ignore
         member this.LoadString (html, ?uri) =
             let nsUrl = match uri with | Some uri -> new NSUrl(uri) | None -> null
             wkBrowser.LoadHtmlString (html, nsUrl) |> ignore
-        member this.GoBack () = raise (new NotImplementedException())
-        member this.GoForward () = raise (new NotImplementedException())
-        member this.PageTitle = raise (new NotImplementedException())
+        member this.GoBack () = wkBrowser.GoBack () |> ignore
+        member this.GoForward () = wkBrowser.GoForward () |> ignore
+        member this.PageTitle = wkBrowser.Title
         [<CLIEvent>]
-        member this.PageLoaded : IEvent<_> = raise (new NotImplementedException())
-        member this.Reload () = raise (new NotImplementedException())
+        member this.PageLoaded : IEvent<_> = pageLoaded.Publish
+        member this.Reload () = wkBrowser.Reload () |> ignore
         [<CLIEvent>]
-        member this.PageTitleChanged : IEvent<_> = raise (new NotImplementedException())
-        member this.ShowDevTools () = raise (new NotImplementedException())
+        member this.PageTitleChanged : IEvent<_> = pageTitleChanged.Publish
+        member this.ShowDevTools () = () // there's no way that I know of to programmatically open the WKWebView inspector
