@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net472;netcoreapp3.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.0;net472</TargetFrameworks>
     <CefSharpAnyCpuSupport>true</CefSharpAnyCpuSupport>
   </PropertyGroup>
   <ItemGroup>
