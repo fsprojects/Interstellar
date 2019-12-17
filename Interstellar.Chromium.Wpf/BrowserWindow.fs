@@ -51,6 +51,11 @@ type BrowserWindow(config: BrowserWindowConfig) as this =
                     let! _ = Async.AwaitEvent cefBrowser.IsBrowserInitializedChanged
                     ()
             }
+        member this.Size
+            with get () = base.Width, base.Height
+            and set (width, height) =
+                base.Width <- width
+                base.Height <- height
         [<CLIEvent>] member this.Shown = shown.Publish
         member this.Title
             with get () = (this :> Window).Title

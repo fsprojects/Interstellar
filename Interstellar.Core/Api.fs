@@ -67,6 +67,8 @@ type IBrowserWindow =
     [<CLIEvent>] abstract Closed : IEvent<unit>
     /// <summary>Shows the window, asynchronously returning when <see cref="Browser"/> has finished initializing and is ready to use</summary>
     abstract Show : unit -> Async<unit>
+    /// <summary>The size of the window, in pixels</summary>
+    abstract Size : (float * float) with get, set
     /// <summary>An event handler this is called when the window is shown</summary>
     [<CLIEvent>] abstract Shown : IEvent<unit>
     /// <summary>Gets or sets text in the window's title bar</summary>
