@@ -55,8 +55,6 @@ module SimpleBrowserApp =
     let app = BrowserApp.create (fun mainCtx createWindow -> async {
         do! Async.SwitchToContext mainCtx
         Trace.WriteLine "Opening window"
-        //let window = createWindow { defaultBrowserWindowConfig with address = Some "data:text/html;charset=utf-8;base64,PGh0bWw+PGJvZHk+PHA+SGVsbG8gd29ybGQ8L3A+PC9ib2R5PjwvaHRtbD4=" }
-        //let window = createWindow { defaultBrowserWindowConfig with address = Some "https://google.com/" }
         let page = sprintf "
             <html>
                 <head>
@@ -64,6 +62,7 @@ module SimpleBrowserApp =
                 </head>
                 <body>
                     <p>Here is some static HTML.</p>
+                    <button onclick=\"window.webkit.messageHandlers.interstellarWkBridge.postMessage('JS Message')\">Click me</button>
                     <p id=\"dynamicContent\" />
                     <p id=\"host\" />
                     <p id=\"runtimeFramework\" />
@@ -72,6 +71,9 @@ module SimpleBrowserApp =
                 </body>
             </html>"
         let window = createWindow { defaultBrowserWindowConfig with showDevTools = true; address = Some "https://rendering/"; html = Some page }
+        window.Browser.JavascriptMessageRecieved.Add (fun msg ->
+            printfn "Recieved message: %s" msg
+        )
         startTitleUpdater mainCtx (sprintf "BrowserApp - %s") window
         do! window.Show ()
         do! Async.SwitchToThreadPool ()

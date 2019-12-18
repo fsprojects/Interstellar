@@ -40,6 +40,8 @@ type IBrowser =
     abstract GoBack : unit -> unit
     /// <summary>Attempts to navigate to the next page in the history stack</summary>
     abstract GoForward : unit -> unit
+    /// <summary>Event handler that is called whenever a message sent from Javascript is recieved</summary>
+    [<CLIEvent>] abstract JavascriptMessageRecieved : IEvent<string>
     /// <summary>The title of the currently loaded page</summary>
     abstract PageTitle : string
     [<CLIEvent>]
@@ -48,7 +50,7 @@ type IBrowser =
     /// <summary>Initiates a reload of the current page</summary>
     abstract Reload : unit -> unit
     /// <summary>Event handler that is called whenever <see cref="PageTitle"/></summary> changes
-    [<CLIEvent>] abstract PageTitleChanged: IEvent<string>
+    [<CLIEvent>] abstract PageTitleChanged : IEvent<string>
     /// <summary>Shows the developer tools for this browser if they are not already showing</summary>
     abstract ShowDevTools : unit -> unit
 

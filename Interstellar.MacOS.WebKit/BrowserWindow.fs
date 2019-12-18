@@ -15,16 +15,15 @@ type NiblessViewController(view: NSView) =
 
 type BrowserWindow(config: BrowserWindowConfig) as this =
     inherit NSWindowController("BrowserWindow")
-
-    let wkBrowser = new WKWebView(CGRect.Empty, new WKWebViewConfiguration())
-    let browser = new Browser(config, wkBrowser)
+    
+    let browser = new Browser(config)
 
     let closed = new Event<_>()
     let shown = new Event<_>()
 
     do
         let wkBrowserController = {
-            new NiblessViewController(wkBrowser) with
+            new NiblessViewController(browser.WebKitBrowser) with
                 override this.ViewDidAppear () =
                     base.ViewDidAppear ()
                     shown.Trigger ()
@@ -34,32 +33,16 @@ type BrowserWindow(config: BrowserWindowConfig) as this =
                          NSWindowStyle.Titled ||| NSWindowStyle.Closable ||| NSWindowStyle.Miniaturizable ||| NSWindowStyle.Resizable,
                          NSBackingStore.Buffered, false, Title = "My Window")
         this.Window.WillClose.Add (fun x -> closed.Trigger ())
-        this.Window.ContentView <- wkBrowser
+        this.Window.ContentView <- browser.WebKitBrowser
         this.Window.ContentViewController <- wkBrowserController
-        //wkBrowser.LoadRequest (new NSUrlRequest(new NSUrl("https://google.com/"))) |> ignore
         this.Window.Center ()
         this.Window.AwakeFromNib ()
-
-
-    member this.WKBrowserView = wkBrowser
+    
+    member this.WKBrowserView = browser.WebKitBrowser
     member this.WKBrowser = browser
 
     override this.LoadWindow () =
         base.LoadWindow ()
-
-    //override this.LoadWindow () =
-        ////let window = new NSWindow()
-        ////window.ContentView <- wkBrowser
-        ////window.IsVisible <- true
-
-        ////wkBrowser.AddConstraints [|
-        ////    NSLayoutConstraint.Create(this, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, wkBrowser, NSLayoutAttribute.Leading, nfloat 1., nfloat 0.)
-        ////    NSLayoutConstraint.Create(this, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, wkBrowser, NSLayoutAttribute.Trailing, nfloat 1., nfloat 0.)
-        ////    NSLayoutConstraint.Create(this, NSLayoutAttribute.Top, NSLayoutRelation.Equal, wkBrowser, NSLayoutAttribute.Top, nfloat 1., nfloat 0.)
-        ////    NSLayoutConstraint.Create(this, NSLayoutAttribute.Bottom, NSLayoutRelation.Equal, wkBrowser, NSLayoutAttribute.Bottom, nfloat 1., nfloat 0.)
-        ////|]
-        //base.LoadWindow ()
-        //()
 
     interface IBrowserWindow with
         member this.Browser = upcast browser

@@ -1,14 +1,32 @@
-﻿namespace Interstellar.MacOS.WebKit
+﻿namespace Interstellar.MacOS.Internal
 open System
 open AppKit
+open CoreGraphics
 open Foundation
 open Interstellar
 open WebKit
 
-type Browser(config: BrowserWindowConfig, wkBrowser: WKWebView) =
+type ScriptMessageHandler(handler: ((WKUserContentController * WKScriptMessage) -> unit)) =
+    inherit WKScriptMessageHandler() with
+        override this.DidReceiveScriptMessage (contentController, msg) = handler (contentController, msg)
+
+namespace Interstellar.MacOS.WebKit
+open System
+open AppKit
+open CoreGraphics
+open Foundation
+open Interstellar
+open Interstellar.MacOS.Internal
+open WebKit
+
+type Browser(config: BrowserWindowConfig) =
+    let wkBrowser = new WKWebView(CGRect.Empty, new WKWebViewConfiguration())
     let pageLoaded = new Event<EventArgs>()
     let pageTitleChanged = new Event<string>()
+    let jsMsgRecieved = new Event<string>()
     let mutable pageTitleObserverHandle = null
+
+    static let wkBridgeName = "interstellarWkBridge"
 
     do
         wkBrowser.NavigationDelegate <- {
@@ -16,6 +34,13 @@ type Browser(config: BrowserWindowConfig, wkBrowser: WKWebView) =
                 member this.DidFinishNavigation (view, nav) =
                     pageLoaded.Trigger (new EventArgs())
         }
+
+        let contentController = new WKUserContentController()
+        contentController.AddScriptMessageHandler (
+            new ScriptMessageHandler(fun (_, msg) ->
+                jsMsgRecieved.Trigger (msg.Body.ToString())),
+            wkBridgeName)
+        wkBrowser.Configuration.UserContentController <- contentController
 
         // TODO: dispose this
         pageTitleObserverHandle <-
@@ -48,6 +73,8 @@ type Browser(config: BrowserWindowConfig, wkBrowser: WKWebView) =
             wkBrowser.LoadHtmlString (html, nsUrl) |> ignore
         member this.GoBack () = wkBrowser.GoBack () |> ignore
         member this.GoForward () = wkBrowser.GoForward () |> ignore
+        [<CLIEvent>]
+        member this.JavascriptMessageRecieved = jsMsgRecieved.Publish
         member this.PageTitle = wkBrowser.Title
         [<CLIEvent>]
         member this.PageLoaded : IEvent<_> = pageLoaded.Publish
