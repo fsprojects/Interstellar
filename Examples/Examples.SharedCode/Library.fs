@@ -56,6 +56,7 @@ module SimpleBrowserApp =
         do! Async.SwitchToContext mainCtx
         Trace.WriteLine "Opening window"
         //<!-- <button onclick=\"window.webkit.messageHandlers.interstellarWkBridge.postMessage('JS Message')\">Click me</button> -->
+        //<input type=\"button\" value=\"Click me\" onclick=\"window.webkit.messageHandlers.interstellarWkBridge.postMessage('Hello from Javascript')\" />
         let page = sprintf "
             <html>
                 <head>
@@ -63,7 +64,7 @@ module SimpleBrowserApp =
                 </head>
                 <body>
                     <p>Here is some static HTML.</p>
-                    <input type=\"button\" value=\"Click me\" onclick=\"window.webkit.messageHandlers.interstellarWkBridge.postMessage('Hello from Javascript')\" />
+                    <input type=\"button\" value=\"Click me\" onclick=\"window.interstellarBridge.postMessage('Hello from Javascript')\"/>
                     <p id=\"dynamicContent\" />
                     <p id=\"host\" />
                     <p id=\"runtimeFramework\" />

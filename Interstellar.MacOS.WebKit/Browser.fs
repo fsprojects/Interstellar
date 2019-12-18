@@ -39,12 +39,17 @@ type Browser(config: BrowserWindowConfig) =
         }
         wkBrowser.UIDelegate <- new WebKitViewDialogueHandler()
 
+        // install JS->.Net bridge
         wkBrowser.Configuration.UserContentController.AddScriptMessageHandler ({
             new WKScriptMessageHandler() with
                 member this.DidReceiveScriptMessage (_, msg: WKScriptMessage) =
                     let msgAsString = (msg.Body :?> NSString).ToString()
                     jsMsgRecieved.Trigger msgAsString
         }, wkBridgeName)
+        // make it accessible in JS from window.interstellarBridge
+        wkBrowser.Configuration.UserContentController.AddUserScript
+            (new WKUserScript(new NSString (sprintf "window.interstellarBridge={'postMessage':function(message){window.webkit.messageHandlers.%s.postMessage(message)}}" wkBridgeName),
+                              WKUserScriptInjectionTime.AtDocumentStart, false))
 
         // TODO: dispose this
         pageTitleObserverHandle <-
