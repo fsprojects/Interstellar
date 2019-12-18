@@ -5,10 +5,13 @@ open CoreGraphics
 open Foundation
 open Interstellar
 open WebKit
+type WebKitViewDialogueHandler() =
+    inherit WKUIDelegate()
 
-type ScriptMessageHandler(handler: ((WKUserContentController * WKScriptMessage) -> unit)) =
-    inherit WKScriptMessageHandler() with
-        override this.DidReceiveScriptMessage (contentController, msg) = handler (contentController, msg)
+    override this.RunJavaScriptAlertPanel (webView, message, frame, completionHandler) =
+        let alert = new NSAlert(AlertStyle = NSAlertStyle.Informational, InformativeText = message, MessageText = "Alert")
+        let result = alert.RunModal ()
+        completionHandler.Invoke ()
 
 namespace Interstellar.MacOS.WebKit
 open System
@@ -34,12 +37,16 @@ type Browser(config: BrowserWindowConfig) =
                 member this.DidFinishNavigation (view, nav) =
                     pageLoaded.Trigger (new EventArgs())
         }
+        wkBrowser.UIDelegate <- new WebKitViewDialogueHandler()
 
         let contentController = new WKUserContentController()
+
         contentController.AddScriptMessageHandler (
-            new ScriptMessageHandler(fun (_, msg) ->
-                jsMsgRecieved.Trigger (msg.Body.ToString())),
-            wkBridgeName)
+            { new WKScriptMessageHandler() with
+                    override this.DidReceiveScriptMessage (_, msg: WKScriptMessage) =
+                        let msgAsString = msg.Body.ToString()
+                        jsMsgRecieved.Trigger msgAsString
+            }, wkBridgeName)
         wkBrowser.Configuration.UserContentController <- contentController
 
         // TODO: dispose this

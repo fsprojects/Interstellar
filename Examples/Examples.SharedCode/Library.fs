@@ -55,6 +55,7 @@ module SimpleBrowserApp =
     let app = BrowserApp.create (fun mainCtx createWindow -> async {
         do! Async.SwitchToContext mainCtx
         Trace.WriteLine "Opening window"
+        //<!-- <button onclick=\"window.webkit.messageHandlers.interstellarWkBridge.postMessage('JS Message')\">Click me</button> -->
         let page = sprintf "
             <html>
                 <head>
@@ -62,7 +63,7 @@ module SimpleBrowserApp =
                 </head>
                 <body>
                     <p>Here is some static HTML.</p>
-                    <button onclick=\"window.webkit.messageHandlers.interstellarWkBridge.postMessage('JS Message')\">Click me</button>
+                    <input type=\"button\" value=\"Click me\" onclick=\"alert('hello, world')\" />
                     <p id=\"dynamicContent\" />
                     <p id=\"host\" />
                     <p id=\"runtimeFramework\" />
@@ -71,6 +72,7 @@ module SimpleBrowserApp =
                 </body>
             </html>"
         let window = createWindow { defaultBrowserWindowConfig with showDevTools = true; address = Some "https://rendering/"; html = Some page }
+        //let window = createWindow { defaultBrowserWindowConfig with address = Some "https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_alert" }
         window.Browser.JavascriptMessageRecieved.Add (fun msg ->
             printfn "Recieved message: %s" msg
         )
