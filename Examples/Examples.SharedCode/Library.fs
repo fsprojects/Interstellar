@@ -75,7 +75,7 @@ module SimpleBrowserApp =
         let window = createWindow { defaultBrowserWindowConfig with showDevTools = true; address = Some "https://rendering/"; html = Some page }
         //let window = createWindow { defaultBrowserWindowConfig with address = Some "https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_alert" }
         window.Browser.JavascriptMessageRecieved.Add (fun msg ->
-            printfn "Recieved message: %s" msg
+            Trace.WriteLine (sprintf "Recieved message: %s" msg)
         )
         startTitleUpdater mainCtx (sprintf "BrowserApp - %s") window
         do! window.Show ()

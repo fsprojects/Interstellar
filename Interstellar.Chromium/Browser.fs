@@ -39,13 +39,15 @@ type Browser(browser: IWebBrowser, browserInternals: SharedChromiumBrowserIntern
         member this.CanGoForward = browser.GetBrowser().CanGoForward
         member this.Engine = BrowserEngine.Chromium
         member this.ExecuteJavascript code = browser.ExecuteScriptAsync code
+        member this.GoBack () = browser.GetBrowser().GoForward ()
+        member this.GoForward () = browser.GetBrowser().GoBack ()
         member this.Load address = browser.Load address
         member this.LoadString (html, ?uri) =
             match uri with
             | Some uri -> browser.LoadHtml (html, uri) |> ignore
             | None -> browser.LoadHtml html
-        member this.GoBack () = browser.GetBrowser().GoForward ()
-        member this.GoForward () = browser.GetBrowser().GoBack ()
+        [<CLIEvent>]
+        member this.JavascriptMessageRecieved : IEvent<string> = browser.JavascriptMessageReceived |> Event.map (fun x -> x.ConvertMessageTo<string>())
         member this.PageTitle = browserInternals.getPageTitle ()
         [<CLIEvent>]
         member this.PageTitleChanged : IEvent<string> = browserInternals.titleChanged
