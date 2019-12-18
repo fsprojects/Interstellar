@@ -39,15 +39,12 @@ type Browser(config: BrowserWindowConfig) =
         }
         wkBrowser.UIDelegate <- new WebKitViewDialogueHandler()
 
-        let contentController = new WKUserContentController()
-
-        contentController.AddScriptMessageHandler (
-            { new WKScriptMessageHandler() with
-                    override this.DidReceiveScriptMessage (_, msg: WKScriptMessage) =
-                        let msgAsString = msg.Body.ToString()
-                        jsMsgRecieved.Trigger msgAsString
-            }, wkBridgeName)
-        wkBrowser.Configuration.UserContentController <- contentController
+        wkBrowser.Configuration.UserContentController.AddScriptMessageHandler ({
+            new WKScriptMessageHandler() with
+                member this.DidReceiveScriptMessage (_, msg: WKScriptMessage) =
+                    let msgAsString = (msg.Body :?> NSString).ToString()
+                    jsMsgRecieved.Trigger msgAsString
+        }, wkBridgeName)
 
         // TODO: dispose this
         pageTitleObserverHandle <-

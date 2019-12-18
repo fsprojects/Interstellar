@@ -63,7 +63,7 @@ module SimpleBrowserApp =
                 </head>
                 <body>
                     <p>Here is some static HTML.</p>
-                    <input type=\"button\" value=\"Click me\" onclick=\"alert('hello, world')\" />
+                    <input type=\"button\" value=\"Click me\" onclick=\"window.webkit.messageHandlers.interstellarWkBridge.postMessage('Hello from Javascript')\" />
                     <p id=\"dynamicContent\" />
                     <p id=\"host\" />
                     <p id=\"runtimeFramework\" />
