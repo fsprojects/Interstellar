@@ -74,26 +74,28 @@ module SimpleBrowserApp =
                     <script>console.log('body script executed')</script>
                 </body>
             </html>"
-        let window = createWindow { defaultBrowserWindowConfig with showDevTools = true; address = Some "https://rendering/"; html = Some page }
+        //let window = createWindow { defaultBrowserWindowConfig with showDevTools = true; address = Some "https://rendering/"; html = Some page }
         //let window = createWindow { defaultBrowserWindowConfig with address = Some "https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_alert" }
+        let window = createWindow { defaultBrowserWindowConfig with showDevTools = true }
         window.Browser.JavascriptMessageRecieved.Add (fun msg ->
             Trace.WriteLine (sprintf "Recieved message: %s" msg)
         )
         startTitleUpdater mainCtx (sprintf "BrowserApp - %s") window
         do! window.Show ()
         do! Async.SwitchToThreadPool ()
-        do! Async.Sleep 1_000 // FIXME: introduce some mechanism to let us wait until it is valid to start executing Javascript
+        do! Async.Sleep 5_000 // FIXME: introduce some mechanism to let us wait until it is valid to start executing Javascript
         do! Async.SwitchToContext mainCtx
-        let lines = [
-            "document.getElementById(\"dynamicContent\")               .innerHTML = \"Hello from browser-injected Javascript!\""
-            sprintf "document.getElementById(\"runtimeFramework\")     .innerHTML = \"Runtime framework: %s\"" runtimeFramework
-            sprintf "document.getElementById(\"browserEngine\")        .innerHTML = \"Browser engine: %A\"" window.Browser.Engine
-            sprintf "document.getElementById(\"browserWindowPlatform\").innerHTML = \"BrowserWindow platform: %A\"" window.Platform
-            sprintf "setTimeout(function () { document.title = \"PSYCH, It's actually a Dynamic Javascript Example!\" }, 5000)"
-        ]
-        let script = String.Join (";", lines)
-        Debug.WriteLine (sprintf "Executing script:\n%s" script)
-        window.Browser.ExecuteJavascript script
+        window.Browser.LoadString (page, "https://rendering/")
+        //let lines = [
+        //    "document.getElementById(\"dynamicContent\")               .innerHTML = \"Hello from browser-injected Javascript!\""
+        //    sprintf "document.getElementById(\"runtimeFramework\")     .innerHTML = \"Runtime framework: %s\"" runtimeFramework
+        //    sprintf "document.getElementById(\"browserEngine\")        .innerHTML = \"Browser engine: %A\"" window.Browser.Engine
+        //    sprintf "document.getElementById(\"browserWindowPlatform\").innerHTML = \"BrowserWindow platform: %A\"" window.Platform
+        //    sprintf "setTimeout(function () { document.title = \"PSYCH, It's actually a Dynamic Javascript Example!\" }, 5000)"
+        //]
+        //let script = String.Join (";", lines)
+        //Debug.WriteLine (sprintf "Executing script:\n%s" script)
+        //window.Browser.ExecuteJavascript script
         let w, h = window.Size
         window.Size <- w + 100., h + 100.
         do! Async.SwitchToThreadPool ()

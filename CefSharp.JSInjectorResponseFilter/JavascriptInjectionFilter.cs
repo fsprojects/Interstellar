@@ -1,8 +1,11 @@
 ﻿// Adapted from: https://stackoverflow.com/questions/41745827/cefsharp-inject-javascript-prior-to-any-document-load-processing
-// TODO: translate this to F# to eliminate the need for a C# library, as well as for my own proper comprehension of this code... I hate having to
-// directly copy-paste code from Stackoverflow without completely understanding it. That's bad news!
+// TODO: translate this to F# to eliminate the need for a C# library, as well as for my own proper comprehension of this code... Copy-pasting code
+// directly from StackOverflow is generally not good practice, but I just wanted to get this working for now. It's surprising that there's no 
+// built-in CEF or CefSharp functionality to inject JS before any <script> tags execute (even OnFrameLoadStart is not sufficient for this purpose).
+// Thus here we are.
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using CefSharp;
@@ -10,15 +13,34 @@ using CefSharp.Handler;
 
 namespace CefSharp.JSInjectorResponseFilter
 {
-    public class JavascriptInjectionRequestHandler : RequestHandler
+    public class JSInjectionRequestHandler : RequestHandler
     {
         readonly string injectionPayload;
 
-        public JavascriptInjectionRequestHandler(string injectionPayload) {
+        public JSInjectionRequestHandler(string injectionPayload)
+        {
             this.injectionPayload = injectionPayload;
         }
 
-        public IResponseFilter GetResourceResponseFilter(IWebBrowser browserControl, IBrowser browser, IFrame frame, IRequest request, IResponse response)
+        protected override IResourceRequestHandler GetResourceRequestHandler(IWebBrowser chromiumWebBrowser, IBrowser browser, IFrame frame, IRequest request, bool isNavigation, bool isDownload, string requestInitiator, ref bool disableDefaultHandling)
+        {
+            if (frame.IsMain && request.ResourceType == ResourceType.MainFrame)
+            {
+                return new JSInjectionResourceRequestHandler(injectionPayload);
+            }
+            return null;
+        }
+    }
+
+    public class JSInjectionResourceRequestHandler : ResourceRequestHandler
+    {
+        readonly string injectionPayload;
+
+        public JSInjectionResourceRequestHandler(string injectionPayload) {
+            this.injectionPayload = injectionPayload;
+        }
+
+        override protected IResponseFilter GetResourceResponseFilter(IWebBrowser browserControl, IBrowser browser, IFrame frame, IRequest request, IResponse response)
         {
             if (frame.IsMain && request.ResourceType == ResourceType.MainFrame)
             {
@@ -163,6 +185,7 @@ namespace CefSharp.JSInjectorResponseFilter
                 return FilterStatus.NeedMoreData;
             }
 
+            System.Diagnostics.Trace.WriteLine("injection done");
             return FilterStatus.Done;
         }
 

@@ -1,9 +1,10 @@
 ﻿namespace Interstellar.Chromium
-open Interstellar
-open CefSharp
 open System.Threading
 open System.Diagnostics
 open System
+open CefSharp
+open CefSharp.JSInjectorResponseFilter
+open Interstellar
 
 /// CefSharp has an IBrowser interface which doesn't express all the functionality we need, but the several implementations of it do.
 /// They actually each share a lot of duplicated methods and code which aren't in the interface for some reason. This record extracts
@@ -17,6 +18,7 @@ type SharedChromiumBrowserInternals = {
 type Browser(browser: IWebBrowser, browserInternals: SharedChromiumBrowserInternals, config: BrowserWindowConfig) =
     // (primary) constructor
     do
+        browser.RequestHandler <- new JSInjectionRequestHandler("console.log('Injected script executed')")
         browserInternals.isBrowserInitializedChanged.Add (fun x ->
             if browser.IsBrowserInitialized then
                 match config.address, config.html with
@@ -25,7 +27,6 @@ type Browser(browser: IWebBrowser, browserInternals: SharedChromiumBrowserIntern
                 | None, None -> ()
                 if config.showDevTools then browser.ShowDevTools()
         )
-        
         browser.ExecuteScriptAsyncWhenPageLoaded "console.log('ExecuteScriptAsyncWhenPageLoaded')"
         browser.FrameLoadStart.Add (fun x ->
             browser.GetMainFrame().ExecuteJavaScriptAsync "console.log('FrameLoadStart')"
