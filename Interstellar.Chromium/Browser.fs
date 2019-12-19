@@ -5,6 +5,7 @@ open System
 open CefSharp
 open CefSharp.JSInjectorResponseFilter
 open Interstellar
+open CefSharp.Web
 
 /// CefSharp has an IBrowser interface which doesn't express all the functionality we need, but the several implementations of it do.
 /// They actually each share a lot of duplicated methods and code which aren't in the interface for some reason. This record extracts
@@ -15,32 +16,18 @@ type SharedChromiumBrowserInternals = {
     isBrowserInitializedChanged: IEvent<unit>
 }
 
-type Browser(browser: IWebBrowser, browserInternals: SharedChromiumBrowserInternals, config: BrowserWindowConfig) =
+type Browser(browser: IWebBrowser, browserInternals: SharedChromiumBrowserInternals, config: BrowserWindowConfig) as this =
     // (primary) constructor
     do
-        browser.RequestHandler <- new JSInjectionRequestHandler("window.interstellarBridge={'postMessage':function(message){CefSharp.PostMessage(message)}};console.log('Injected script executed')")
-        browserInternals.isBrowserInitializedChanged.Add (fun x ->
+        browser.RequestHandler <- new JSInjectionRequestHandler("window.interstellarBridge={'postMessage':function(message){CefSharp.PostMessage(message)}}")
+        browserInternals.isBrowserInitializedChanged.Add (fun () ->
             if browser.IsBrowserInitialized then
                 match config.address, config.html with
-                | address, Some html -> browser.LoadHtml (html, Option.toObj address) |> ignore
-                | Some address, None -> browser.Load address
+                | address, Some html -> (this :> IBrowser).LoadString (html, ?uri = address) |> ignore
+                | Some address, None -> (this :> IBrowser).Load address
                 | None, None -> ()
-                if config.showDevTools then browser.ShowDevTools()
+                if config.showDevTools then (this :> IBrowser).ShowDevTools()
         )
-        browser.ExecuteScriptAsyncWhenPageLoaded "console.log('ExecuteScriptAsyncWhenPageLoaded')"
-        browser.FrameLoadStart.Add (fun x ->
-            browser.GetMainFrame().ExecuteJavaScriptAsync "console.log('FrameLoadStart')"
-            ()
-        )
-        browser.RenderProcessMessageHandler <- {
-            new IRenderProcessMessageHandler with
-                member this.OnContextCreated (wb,_,_) =
-                    wb.ExecuteScriptAsync "console.log('OnContextCreated')"
-                    ()
-                member this.OnContextReleased (_,_,_) = ()
-                member this.OnFocusedNodeChanged (_,_,_,_) = ()
-                member this.OnUncaughtException (_,_,_,_) = ()
-        }
 
     member this.ChromiumBrowser = browser
 
@@ -60,8 +47,16 @@ type Browser(browser: IWebBrowser, browserInternals: SharedChromiumBrowserIntern
         member this.Load address = browser.Load address
         member this.LoadString (html, ?uri) =
             match uri with
-            | Some uri -> browser.LoadHtml (html, uri) |> ignore
-            | None -> browser.LoadHtml html
+            | Some uri ->
+                // FIXME: at the moment, we can't use IWebBrowser.LoadHtml(string,string) because it installs a request handler to resolve the given URI,
+                // which conflicts with the request handler _we_ have to install in order to inject Javascript (see JavascriptInjectionFilter and friends).
+                // Not sure how to fix this yet, but I suspect it would involve writing our own handler that basically combines that two.
+                raise (new PlatformNotSupportedException("Providing data along with a given origin URI is not yet supported in Chromium"))
+                //browser.LoadHtml (html, uri) |> ignore
+            | None ->
+                // this one works fine because it still uses real URI behavior, thus not requiring any kind of custom URI handlers
+                let data = new HtmlString(html, true)
+                (this :> IBrowser).Load (data.ToDataUriString())
         [<CLIEvent>]
         member this.JavascriptMessageRecieved : IEvent<string> = browser.JavascriptMessageReceived |> Event.map (fun x -> x.ConvertMessageTo<string>())
         member this.PageTitle = browserInternals.getPageTitle ()

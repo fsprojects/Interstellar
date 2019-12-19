@@ -76,8 +76,13 @@ module SimpleBrowserApp =
             </html>"
         //let window = createWindow { defaultBrowserWindowConfig with showDevTools = true; address = Some "https://rendering/"; html = Some page }
         //let window = createWindow { defaultBrowserWindowConfig with address = Some "https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_alert" }
-        //let window = createWindow { defaultBrowserWindowConfig with showDevTools = true; address = Some "https://gist.githack.com/jwosty/b20d9576ebeeea22aa8b83bba17ae39d/raw/ca60fb811ead52b24a26663ae9001b661b8623c9/simple2.html" }
-        let window = createWindow { defaultBrowserWindowConfig with showDevTools = true; address = Some "https://gist.githack.com/jwosty/239408aaffd106a26dc2161f86caa641/raw/5af54d0f4c51634040ea3859ca86032694afc934/interstellardetector.html"}
+        let interstellarDetectorPageUrl = "https://gist.githack.com/jwosty/239408aaffd106a26dc2161f86caa641/raw/5af54d0f4c51634040ea3859ca86032694afc934/interstellardetector.html"
+        let! page = async {
+            use webClient = new System.Net.WebClient() in
+                return webClient.DownloadString (new Uri(interstellarDetectorPageUrl))
+        }
+        //let window = createWindow { defaultBrowserWindowConfig with showDevTools = true; address = Some interstellarDetectorPageUrl }
+        let window = createWindow { defaultBrowserWindowConfig with showDevTools = true; html = Some page; address = None }
         window.Browser.JavascriptMessageRecieved.Add (fun msg ->
             Trace.WriteLine (sprintf "Recieved message: %s" msg)
         )
