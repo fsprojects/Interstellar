@@ -22,7 +22,7 @@ open Interstellar
 open Interstellar.MacOS.Internal
 open WebKit
 
-type Browser(config: BrowserWindowConfig) =
+type Browser(config: BrowserWindowConfig) as this =
     let wkBrowser = new WKWebView(CGRect.Empty, new WKWebViewConfiguration())
     let pageLoaded = new Event<EventArgs>()
     let pageTitleChanged = new Event<string>()
@@ -58,9 +58,8 @@ type Browser(config: BrowserWindowConfig) =
                     pageTitleChanged.Trigger (wkBrowser.Title))
 
         match config.address, config.html with
-        | Some address, Some html -> wkBrowser.LoadHtmlString (html, new NSUrl(address)) |> ignore
-        | None, Some html -> wkBrowser.LoadHtmlString (html, null) |> ignore
-        | Some address, None -> wkBrowser.LoadRequest (new NSUrlRequest(new NSUrl(address))) |> ignore
+        | address, Some html -> (this :> IBrowser).LoadString (html, ?uri = address) |> ignore
+        | Some address, None -> (this :> IBrowser).Load address.OriginalString |> ignore
         | None, None -> ()
 
     member this.WebKitBrowser = wkBrowser
@@ -76,9 +75,9 @@ type Browser(config: BrowserWindowConfig) =
         member this.CanGoForward = wkBrowser.CanGoForward
         member this.Engine = BrowserEngine.AppleWebKit
         member this.ExecuteJavascript code = wkBrowser.EvaluateJavaScript (code, null)
-        member this.Load address = wkBrowser.LoadRequest (new NSUrlRequest(new NSUrl(address))) |> ignore
+        member this.Load address = wkBrowser.LoadRequest (new NSUrlRequest(new NSUrl(address.OriginalString))) |> ignore
         member this.LoadString (html, ?uri) =
-            let nsUrl = match uri with | Some uri -> new NSUrl(uri) | None -> null
+            let nsUrl = match uri with | Some uri -> new NSUrl(uri.OriginalString) | None -> null
             wkBrowser.LoadHtmlString (html, nsUrl) |> ignore
         member this.GoBack () = wkBrowser.GoBack () |> ignore
         member this.GoForward () = wkBrowser.GoForward () |> ignore
