@@ -18,7 +18,7 @@ type SharedChromiumBrowserInternals = {
 type Browser(browser: IWebBrowser, browserInternals: SharedChromiumBrowserInternals, config: BrowserWindowConfig) =
     // (primary) constructor
     do
-        browser.RequestHandler <- new JSInjectionRequestHandler("console.log('Injected script executed')")
+        browser.RequestHandler <- new JSInjectionRequestHandler("window.interstellarBridge={'postMessage':function(message){CefSharp.PostMessage(message)}};console.log('Injected script executed')")
         browserInternals.isBrowserInitializedChanged.Add (fun x ->
             if browser.IsBrowserInitialized then
                 match config.address, config.html with

@@ -120,7 +120,8 @@ namespace CefSharp.JSInjectorResponseFilter
             if (overflow.Count > 0)
             {
                 var buffersize = Math.Min(overflow.Count, (int)dataOut.Length);
-                dataOut.Write(overflow.ToArray(), 0, buffersize);
+                var x = overflow.ToArray();
+                dataOut.Write(x, 0, buffersize);
                 dataOutWritten += buffersize;
 
                 if (buffersize < overflow.Count)
@@ -132,7 +133,6 @@ namespace CefSharp.JSInjectorResponseFilter
                     overflow.Clear();
                 }
             }
-
 
             for (var i = 0; i < dataInRead; ++i)
             {
@@ -177,7 +177,6 @@ namespace CefSharp.JSInjectorResponseFilter
                 {
                     offset = 0;
                 }
-
             }
 
             if (overflow.Count > 0 || offset > 0)
@@ -185,7 +184,6 @@ namespace CefSharp.JSInjectorResponseFilter
                 return FilterStatus.NeedMoreData;
             }
 
-            System.Diagnostics.Trace.WriteLine("injection done");
             return FilterStatus.Done;
         }
 
