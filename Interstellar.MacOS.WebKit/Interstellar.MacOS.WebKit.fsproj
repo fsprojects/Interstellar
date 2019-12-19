@@ -29,4 +29,5 @@
     <Compile Include="BrowserApp.fs" />
   </ItemGroup>
   <Import Project="..\.paket\Paket.Restore.targets" />
+  <Import Project="..\AssemblyAndPackageInfo.props" />
 </Project>

@@ -16,4 +16,5 @@
     <ProjectReference Include="..\Interstellar.Core\Interstellar.Core.fsproj" />
   </ItemGroup>
   <Import Project="..\.paket\Paket.Restore.targets" />
+  <Import Project="..\AssemblyAndPackageInfo.props" />
 </Project>

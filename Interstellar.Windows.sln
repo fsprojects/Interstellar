@@ -26,6 +26,11 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Interstellar.Chromium", "In
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CefSharp.JSInjectorResponseFilter", "CefSharp.JSInjectorResponseFilter\CefSharp.JSInjectorResponseFilter.csproj", "{54855653-BFA0-419F-8B1D-4ABC1638A67C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{175A1B7C-AC1D-40C7-B857-FA30352D3430}"
+	ProjectSection(SolutionItems) = preProject
+		AssemblyAndPackageInfo.props = AssemblyAndPackageInfo.props
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

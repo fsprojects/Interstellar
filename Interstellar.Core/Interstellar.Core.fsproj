@@ -4,12 +4,14 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <TargetProfile>netcore</TargetProfile>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile></DocumentationFile>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="Api.fs" />
     <Compile Include="IBrowserExtensions.fs" />
-  </ItemGroup>
-  <Import Project="..\.paket\Paket.Restore.targets" />
-  <ItemGroup>
     <None Remove="IBrowserExtensions.fs" />
   </ItemGroup>
+  <Import Project="..\.paket\Paket.Restore.targets" />
+  <Import Project="..\AssemblyAndPackageInfo.props" />
 </Project>
