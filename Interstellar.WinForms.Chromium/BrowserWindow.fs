@@ -1,5 +1,6 @@
 ﻿namespace Interstellar.Chromium.WinForms
 open System
+open System.Drawing
 open System.Windows
 open System.Windows.Forms
 open CefSharp
@@ -51,6 +52,12 @@ type BrowserWindow(config: BrowserWindowConfig) as this =
             }
         [<CLIEvent>]
         member this.Shown = (this :> Form).Shown |> Event.map ignore
+        member this.Size
+            with get () =
+                let size = (this :> Form).Size
+                float size.Width, float size.Height
+            and set (width, height) =
+                (this :> Form).Size <- new Size(int width, int height)
         member this.Title
             with get () = this.Text
             and set title = this.Text <- title
