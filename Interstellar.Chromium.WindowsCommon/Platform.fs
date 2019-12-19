@@ -30,6 +30,7 @@ type Platform private() =
     static member private InitAnyCpuCefSharp () =
         let browserSubpath = Platform.GetPlatformAssemblyPath("CefSharp.BrowserSubprocess.exe")
         let settings = new CefSettings(BrowserSubprocessPath = browserSubpath)
+        //settings.RegisterExtension Browser.bridgeExtension
         Cef.Initialize (settings, false, (null : IBrowserProcessHandler))
 
     static member private ResolveCefSharpAssembly sender (args: ResolveEventArgs) =

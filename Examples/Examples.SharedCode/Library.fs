@@ -61,6 +61,7 @@ module SimpleBrowserApp =
             <html>
                 <head>
                     <title>Static HTML Example</title>
+                    <script>console.log('head script executed')</script>
                 </head>
                 <body>
                     <p>Here is some static HTML.</p>
@@ -70,6 +71,7 @@ module SimpleBrowserApp =
                     <p id=\"runtimeFramework\" />
                     <p id=\"browserWindowPlatform\"/>
                     <p id=\"browserEngine\" />
+                    <script>console.log('body script executed')</script>
                 </body>
             </html>"
         let window = createWindow { defaultBrowserWindowConfig with showDevTools = true; address = Some "https://rendering/"; html = Some page }

@@ -8,6 +8,7 @@
     <Compile Include="Browser.fs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CefSharp.JSInjectorResponseFilter\CefSharp.JSInjectorResponseFilter.csproj" />
     <ProjectReference Include="..\Interstellar.Core\Interstellar.Core.fsproj" />
   </ItemGroup>
   <Import Project="..\.paket\Paket.Restore.targets" />

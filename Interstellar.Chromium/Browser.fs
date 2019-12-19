@@ -25,6 +25,21 @@ type Browser(browser: IWebBrowser, browserInternals: SharedChromiumBrowserIntern
                 | None, None -> ()
                 if config.showDevTools then browser.ShowDevTools()
         )
+        
+        browser.ExecuteScriptAsyncWhenPageLoaded "console.log('ExecuteScriptAsyncWhenPageLoaded')"
+        browser.FrameLoadStart.Add (fun x ->
+            browser.GetMainFrame().ExecuteJavaScriptAsync "console.log('FrameLoadStart')"
+            ()
+        )
+        browser.RenderProcessMessageHandler <- {
+            new IRenderProcessMessageHandler with
+                member this.OnContextCreated (wb,_,_) =
+                    wb.ExecuteScriptAsync "console.log('OnContextCreated')"
+                    ()
+                member this.OnContextReleased (_,_,_) = ()
+                member this.OnFocusedNodeChanged (_,_,_,_) = ()
+                member this.OnUncaughtException (_,_,_,_) = ()
+        }
 
     member this.ChromiumBrowser = browser
 
