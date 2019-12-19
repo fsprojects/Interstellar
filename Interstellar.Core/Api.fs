@@ -30,12 +30,12 @@ type IBrowser =
     /// <summary>Executes some Javascript in the browser, returning immediately.</summary>
     abstract ExecuteJavascript : string -> unit
     /// <summary>Loads a page from a given Uri, returning immediately without waiting for the loading to finish</summary>
-    abstract Load : uri:string -> unit
+    abstract Load : Uri -> unit
     /// <summary>
     ///     Directly loads the string as content for display. If a <see cref="uri"/> is given, it is used as the origin page.
     ///     Any Javascript AJAX calls will communicate using that URI.
     /// </summary>
-    abstract LoadString : html: string * ?uri: string -> unit
+    abstract LoadString : html: string * ?uri: Uri -> unit
     /// <summary>Attempts to navigate to the previous page in the history stack</summary>
     abstract GoBack : unit -> unit
     /// <summary>Attempts to navigate to the next page in the history stack</summary>
@@ -82,7 +82,7 @@ type BrowserWindowConfig =
         ///     When both <see cref="address"/> and <see cref="html"/> are values of Some, they specify the html content to load directly in to a browser instance
         ///     when it first shows.
         /// </summary>
-    {   address: string option;
+    {   address: Uri option;
         /// <summary>
         ///     When set, indicates the html to display in the browser directly when it is first shown. If <see cref="address"/> is also set, <see cref="address"/>
         ///     will be used as the origin URI for any requests made by AJAX calls in Javascript.

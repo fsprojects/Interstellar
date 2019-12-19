@@ -44,7 +44,7 @@ type Browser(browser: IWebBrowser, browserInternals: SharedChromiumBrowserIntern
         member this.ExecuteJavascript code = browser.ExecuteScriptAsync code
         member this.GoBack () = browser.GetBrowser().GoForward ()
         member this.GoForward () = browser.GetBrowser().GoBack ()
-        member this.Load address = browser.Load address
+        member this.Load address = browser.Load address.OriginalString
         member this.LoadString (html, ?uri) =
             match uri with
             | Some uri ->
@@ -56,7 +56,7 @@ type Browser(browser: IWebBrowser, browserInternals: SharedChromiumBrowserIntern
             | None ->
                 // this one works fine because it still uses real URI behavior, thus not requiring any kind of custom URI handlers
                 let data = new HtmlString(html, true)
-                (this :> IBrowser).Load (data.ToDataUriString())
+                (this :> IBrowser).Load (new Uri(data.ToDataUriString()))
         [<CLIEvent>]
         member this.JavascriptMessageRecieved : IEvent<string> = browser.JavascriptMessageReceived |> Event.map (fun x -> x.ConvertMessageTo<string>())
         member this.PageTitle = browserInternals.getPageTitle ()
