@@ -3,8 +3,8 @@
 		<Copyright>© John Wostenberg 2019</Copyright>
     <Company>Interstellar Contributors</Company>
     <Description>Cross-platform F# browser library</Description>
-    <AssemblyVersion>0.0.1</AssemblyVersion>
-    <Version>0.0.1</Version>
+    <Version>0.1.0</Version>
+    <AssemblyVersion>$(Version)</AssemblyVersion>
     <Authors>John Wostenberg</Authors>
     <PackageProjectUrl>https://github.com/jwosty/Interstellar</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>

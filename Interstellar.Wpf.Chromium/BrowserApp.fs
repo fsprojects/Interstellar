@@ -7,6 +7,7 @@ open System.Threading
 module BrowserApp =
     let runAsync mainCtx (app: BrowserApp) = async {
         let windowCreator : BrowserWindowCreator = fun config -> upcast new BrowserWindow(config)
+        do! Async.SwitchToContext mainCtx
         do! app.onStart mainCtx windowCreator
         do! Async.SwitchToContext mainCtx
         Application.Current.Shutdown ()
