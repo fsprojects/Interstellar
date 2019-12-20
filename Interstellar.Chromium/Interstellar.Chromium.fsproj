@@ -5,10 +5,10 @@
     <CefSharpAnyCpuSupport>true</CefSharpAnyCpuSupport>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="JavascriptInjectionFilter.fs" />
     <Compile Include="Browser.fs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CefSharp.JSInjectorResponseFilter\CefSharp.JSInjectorResponseFilter.csproj" />
     <ProjectReference Include="..\Interstellar.Core\Interstellar.Core.fsproj" />
   </ItemGroup>
   <Import Project="..\AssemblyAndPackageInfo.props" />
