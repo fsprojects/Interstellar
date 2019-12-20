@@ -7,6 +7,7 @@
     <Version>0.0.1</Version>
     <Authors>John Wostenberg</Authors>
     <PackageProjectUrl>https://github.com/jwosty/Interstellar</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/jwosty/Interstellar</RepositoryUrl>
     <PackageTags>fsharp;interstellar</PackageTags>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
