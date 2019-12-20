@@ -99,8 +99,8 @@ module SimpleBrowserApp =
                         <select id="operand" onchange="recalculate()">
                             <option value="add">+</option>
                             <option value="sub">-</option>
-                            <option value="mul">×</option>
-                            <option value="div">÷</option>
+                            <option value="mul">&times;</option>
+                            <option value="div">&divide;</option>
                         </select>
                         <input type="number" id="input2" oninput="recalculate()" /t>
                         <span>=</span>

@@ -5,6 +5,7 @@ open System
 open CefSharp
 open Interstellar
 open CefSharp.Web
+open System.Text
 
 /// CefSharp has an IBrowser interface which doesn't express all the functionality we need, but the several implementations of it do.
 /// They actually each share a lot of duplicated methods and code which aren't in the interface for some reason. This record extracts
@@ -54,7 +55,7 @@ type Browser(browser: IWebBrowser, browserInternals: SharedChromiumBrowserIntern
                 //browser.LoadHtml (html, uri) |> ignore
             | None ->
                 // this one works fine because it still uses real URI behavior, thus not requiring any kind of custom URI handlers
-                let data = new HtmlString(html, true)
+                let data = new HtmlString(html, false)
                 (this :> IBrowser).Load (new Uri(data.ToDataUriString()))
         [<CLIEvent>]
         member this.JavascriptMessageRecieved : IEvent<string> = browser.JavascriptMessageReceived |> Event.map (fun x -> x.ConvertMessageTo<string>())
