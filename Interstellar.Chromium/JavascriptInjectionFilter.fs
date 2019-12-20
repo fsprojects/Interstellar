@@ -9,22 +9,31 @@ open CefSharp.Handler
 
 type ScriptLocation = Head | Body
 
+module JSInjectionHelpers =
+    // Dealing with inserting arbitrary contents into a script tag is hard to do right, because there's really no right way to do it, since
+    // the inside of a script tag doesn't recognize HTML entities, meaning we can't just escape it for HTML. Granted, the way that this library
+    // is meant to be used, I don't expect it to be a vulnerability source, but we can at least try this.
+    // see https://blog.uploadcare.com/vulnerability-in-html-design-the-script-tag-33d24642359e
+    // and the HTML spec's recommendations: https://www.w3.org/TR/html52/semantics-scripting.html#restrictions-for-contents-of-script-elements
+    let escapeScriptTagContents (contents: string) =
+        contents
+            .Replace("<!--", "<\\!--")
+            .Replace("<script>", "<\\script>")
+            .Replace("</script>", "<\\/script>")
+
 type JavascriptInjectionFilter(injectionPayload, ?injectionLocation) =
     let searchTag =
         match injectionLocation with
         | Some Head | None -> "<head>"
         | Some Body (* once told me the world is gonna roll me *) -> "<body>"
 
+    let injection = sprintf "<script>%s</script>" (JSInjectionHelpers.escapeScriptTagContents injectionPayload)
     let overflow = new List<byte>()
     let mutable offset = 0
 
     interface IResponseFilter with
         override this.Dispose() = ()
         override this.Filter (dataIn, dataInRead, dataOut, dataOutWritten) =
-            // FIXME: escaping script tags is hard. but we should figure out some way to do that, or at least disallow invalid inputs.
-            // https://blog.uploadcare.com/vulnerability-in-html-design-the-script-tag-33d24642359e
-            let injection = sprintf "<script>%s</script>" injectionPayload
-            
             dataInRead <- if dataIn = null then 0L else dataIn.Length
             dataOutWritten <- 0L
 
