@@ -10,21 +10,24 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{217310
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Interstellar.Core", "Interstellar.Core\Interstellar.Core.fsproj", "{7ADA52C2-A422-44C8-B14F-CE43566F8E03}"
 EndProject
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Interstellar.Chromium.Wpf", "Interstellar.Chromium.Wpf\Interstellar.Chromium.Wpf.fsproj", "{EA841C98-988C-4B47-9FCA-B0CED74EC958}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Interstellar.Wpf.Chromium", "Interstellar.Wpf.Chromium\Interstellar.Wpf.Chromium.fsproj", "{EA841C98-988C-4B47-9FCA-B0CED74EC958}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{96BB8378-7D63-49AF-BEF5-6016E234653D}"
 EndProject
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Examples.Chromium.Wpf", "Examples\Examples.Chromium.Wpf\Examples.Chromium.Wpf.fsproj", "{F8F250AA-A4E3-4DC2-863E-1348C98862D9}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Examples.Wpf.Chromium", "Examples\Examples.Wpf.Chromium\Examples.Wpf.Chromium.fsproj", "{F8F250AA-A4E3-4DC2-863E-1348C98862D9}"
 EndProject
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Interstellar.Chromium.WinForms", "Interstellar.Chromium.WinForms\Interstellar.Chromium.WinForms.fsproj", "{F0D4F963-A6F1-43D1-860C-5CDE07F2244F}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Interstellar.WinForms.Chromium", "Interstellar.WinForms.Chromium\Interstellar.WinForms.Chromium.fsproj", "{F0D4F963-A6F1-43D1-860C-5CDE07F2244F}"
 EndProject
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Examples.Chromium.WinForms", "Examples\Examples.Chromium.WinForms\Examples.Chromium.WinForms.fsproj", "{8FD85916-B47D-4055-8661-718B9ABEFF6B}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Examples.WinForms.Chromium", "Examples\Examples.WinForms.Chromium\Examples.WinForms.Chromium.fsproj", "{8FD85916-B47D-4055-8661-718B9ABEFF6B}"
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Examples.SharedCode", "Examples\Examples.SharedCode\Examples.SharedCode.fsproj", "{7DC66E91-1D5D-4775-BE40-378AA2E432F8}"
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Interstellar.Chromium", "Interstellar.Chromium\Interstellar.Chromium.fsproj", "{58387294-2BDC-4799-919E-9F71883DA9B5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CefSharp.JSInjectorResponseFilter", "CefSharp.JSInjectorResponseFilter\CefSharp.JSInjectorResponseFilter.csproj", "{54855653-BFA0-419F-8B1D-4ABC1638A67C}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{175A1B7C-AC1D-40C7-B857-FA30352D3430}"
+	ProjectSection(SolutionItems) = preProject
+		AssemblyAndPackageInfo.props = AssemblyAndPackageInfo.props
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -60,10 +63,6 @@ Global
 		{58387294-2BDC-4799-919E-9F71883DA9B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58387294-2BDC-4799-919E-9F71883DA9B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58387294-2BDC-4799-919E-9F71883DA9B5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{54855653-BFA0-419F-8B1D-4ABC1638A67C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{54855653-BFA0-419F-8B1D-4ABC1638A67C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{54855653-BFA0-419F-8B1D-4ABC1638A67C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{54855653-BFA0-419F-8B1D-4ABC1638A67C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

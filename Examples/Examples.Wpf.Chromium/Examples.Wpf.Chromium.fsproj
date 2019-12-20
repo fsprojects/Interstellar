@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFrameworks>netcoreapp3.0;net48</TargetFrameworks>
-    <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <ApplicationIcon />
   </PropertyGroup>
@@ -11,7 +11,7 @@
     <Compile Include="App.fs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Interstellar.Chromium.WinForms\Interstellar.Chromium.WinForms.fsproj" />
+    <ProjectReference Include="..\..\Interstellar.Wpf.Chromium\Interstellar.Wpf.Chromium.fsproj" />
     <ProjectReference Include="..\..\Interstellar.Core\Interstellar.Core.fsproj" />
     <ProjectReference Include="..\Examples.SharedCode\Examples.SharedCode.fsproj" />
   </ItemGroup>

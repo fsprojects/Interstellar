@@ -8,7 +8,7 @@
     <TargetProfile>netcore</TargetProfile>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\Interstellar.Chromium.WindowsCommon\Platform.fs" Link="Platform.fs" />
+    <Compile Include="..\Interstellar.WindowsCommon.Chromium\Platform.fs" Link="Platform.fs" />
     <Compile Include="BrowserWindow.fs" />
     <Compile Include="BrowserApp.fs" />
   </ItemGroup>
@@ -16,5 +16,6 @@
     <ProjectReference Include="..\Interstellar.Chromium\Interstellar.Chromium.fsproj" />
     <ProjectReference Include="..\Interstellar.Core\Interstellar.Core.fsproj" />
   </ItemGroup>
+  <Import Project="..\AssemblyAndPackageInfo.props" />
   <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>

@@ -28,5 +28,6 @@
     <ProjectReference Include="..\Interstellar.Core\Interstellar.Core.fsproj" />
     <Compile Include="BrowserApp.fs" />
   </ItemGroup>
+  <Import Project="..\AssemblyAndPackageInfo.props" />
   <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>

@@ -3,7 +3,6 @@ open System.Threading
 open System.Diagnostics
 open System
 open CefSharp
-open CefSharp.JSInjectorResponseFilter
 open Interstellar
 open CefSharp.Web
 

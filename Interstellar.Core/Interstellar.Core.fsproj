@@ -7,9 +7,8 @@
   <ItemGroup>
     <Compile Include="Api.fs" />
     <Compile Include="IBrowserExtensions.fs" />
-  </ItemGroup>
-  <Import Project="..\.paket\Paket.Restore.targets" />
-  <ItemGroup>
     <None Remove="IBrowserExtensions.fs" />
   </ItemGroup>
+  <Import Project="..\AssemblyAndPackageInfo.props" />
+  <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>

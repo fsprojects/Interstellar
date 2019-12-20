@@ -1,0 +1,13 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<PropertyGroup>
+		<Copyright>© John Wostenberg 2019</Copyright>
+        <Company>Interstellar Contributors</Company>
+        <Description>Cross-platform F# browser library</Description>
+        <AssemblyVersion>0.0.1</AssemblyVersion>
+        <Version>0.0.1</Version>
+        <Authors>John Wostenberg</Authors>
+        <PackageProjectUrl>https://github.com/jwosty/Interstellar</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/jwosty/Interstellar</RepositoryUrl>
+        <PackageTags>fsharp;interstellar</PackageTags>
+	</PropertyGroup>
+</Project>
