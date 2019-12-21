@@ -6,9 +6,15 @@ open System.Threading
 open System.Reflection
 open System.Runtime.Versioning
 
+module AppletIds =
+    let [<Literal>] Calculator = "calculator"
+    let [<Literal>] InterstellarDetector = "detector"
+
+
 module SimpleBrowserApp =
     let runtimeFramework = Assembly.GetEntryAssembly().GetCustomAttribute<TargetFrameworkAttribute>().FrameworkName
-    
+    let detectorPageUrl = new Uri("https://gist.githack.com/jwosty/239408aaffd106a26dc2161f86caa641/raw/5af54d0f4c51634040ea3859ca86032694afc934/interstellardetector.html")
+
     //let startTitleUpdater mainCtx mapPageTitle (window: IBrowserWindow) =
     //    let work = async {
     //        use! holder = Async.OnCancel (fun () ->
@@ -71,6 +77,7 @@ module SimpleBrowserApp =
 
     let showCalculatorWindow mainCtx (createWindow: BrowserWindowCreator) = async {
         let page = """
+            <!DOCTYPE html>
             <html>
                 <head>
                     <script>
@@ -108,12 +115,50 @@ module SimpleBrowserApp =
                     </span>
                 </body>
             </html>"""
-        let window = createWindow { defaultBrowserWindowConfig with showDevTools = true; html = Some page }
+        let window = createWindow { defaultBrowserWindowConfig with html = Some page }
         do! window.Show ()
         return window
     }
 
+    let showDetectorWindow mainCtx (createWindow: BrowserWindowCreator) = async {
+        let window = createWindow { defaultBrowserWindowConfig with address = Some detectorPageUrl }
+        do! window.Show ()
+        return window
+    }
+
+    let appletSelectorWindow mainCtx createWindow = async {
+        let page = sprintf """
+            <!DOCTYPE html>
+            <html>
+                <head>
+                    <script>
+                        function ex(which) {
+                            interstellarBridge.postMessage(which)
+                        }
+                    </script>
+                </head>
+                <body>
+                    <button onclick="ex('%s')">Calculator</button>
+                    <br>
+                    <button onclick="ex('%s')">Detector page</button> - %s
+                </body>
+            </html>""" AppletIds.Calculator AppletIds.InterstellarDetector detectorPageUrl.AbsoluteUri
+        let selectorWindow : IBrowserWindow = createWindow { defaultBrowserWindowConfig with html = Some page }
+        do! selectorWindow.Show ()
+        selectorWindow.Browser.JavascriptMessageRecieved.Add (fun msg ->
+            Async.Start <| async {
+                do! Async.SwitchToContext mainCtx
+                let mappings = Map.ofList [AppletIds.Calculator, showCalculatorWindow; AppletIds.InterstellarDetector, showDetectorWindow]
+                match Map.tryFind msg mappings with
+                | Some f ->
+                    let! _ = f mainCtx createWindow
+                    ()
+                | None -> Trace.WriteLine (sprintf "Bad message: %s" msg)
+            })
+        return selectorWindow
+    }
+
     let app = BrowserApp.create (fun mainCtx createWindow -> async {
-        let! calcWindow = showCalculatorWindow mainCtx createWindow
-        do! Async.AwaitEvent calcWindow.Closed
+        let! mainWindow = appletSelectorWindow mainCtx createWindow
+        do! Async.AwaitEvent mainWindow.Closed
     })
