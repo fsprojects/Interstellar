@@ -114,6 +114,7 @@ module BrowserApp =
             do! Async.SwitchToContext mainCtx
             let window = createWindow { BrowserWindowConfig.DefaultValue with address = Some address }
             do! window.Show ()
+            do! Async.AwaitEvent window.Closed
         }
     }
 
