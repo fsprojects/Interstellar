@@ -8,6 +8,7 @@ open Foundation
 
 module BrowserApp =
     let runAsync mainCtx (app: BrowserApp) = async {
+        do! Async.SwitchToContext mainCtx
         let windowCreator : BrowserWindowCreator = fun config -> upcast new BrowserWindow(config)
         do! app.onStart mainCtx windowCreator
         do! Async.SwitchToContext mainCtx
