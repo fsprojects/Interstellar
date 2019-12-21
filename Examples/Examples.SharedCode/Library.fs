@@ -9,7 +9,7 @@ open System.Runtime.Versioning
 module AppletIds =
     let [<Literal>] Calculator = "calculator"
     let [<Literal>] InterstellarDetector = "detector"
-
+    let [<Literal>] InterWindowCommunication = "interwindow"
 
 module SimpleBrowserApp =
     let runtimeFramework = Assembly.GetEntryAssembly().GetCustomAttribute<TargetFrameworkAttribute>().FrameworkName
@@ -33,47 +33,6 @@ module SimpleBrowserApp =
     //        Trace.WriteLine "Window closed"
     //        cancellation.Cancel ()
     //    }
-
-    //let app = BrowserApp.create (fun mainCtx createWindow -> async {
-    //    do! Async.SwitchToContext mainCtx
-    //    Trace.WriteLine "Opening window"
-    //    let page = sprintf "
-    //        <html>
-    //            <head>
-    //                <title>Static HTML Example</title>
-    //                <script>console.log('head script executed')</script>
-    //            </head>
-    //            <body>
-    //                <p>Here is some static HTML.</p>
-    //                <input type=\"button\" value=\"Click me\" onclick=\"window.interstellarBridge.postMessage('Hello from Javascript')\"/>
-    //                <p id=\"dynamicContent\" />
-    //                <p id=\"host\" />
-    //                <p id=\"runtimeFramework\" />
-    //                <p id=\"browserWindowPlatform\"/>
-    //                <p id=\"browserEngine\" />
-    //                <script>console.log('body script executed')</script>
-    //            </body>
-    //        </html>"
-    //    let interstellarDetectorPageUri = Uri "https://gist.githack.com/jwosty/239408aaffd106a26dc2161f86caa641/raw/5af54d0f4c51634040ea3859ca86032694afc934/interstellardetector.html"
-    //    let! page = async {
-    //        use webClient = new System.Net.WebClient() in
-    //            return webClient.DownloadString interstellarDetectorPageUri
-    //    }
-    //    let window = createWindow { defaultBrowserWindowConfig with showDevTools = true; html = Some page; address = None }
-    //    window.Browser.JavascriptMessageRecieved.Add (fun msg ->
-    //        Trace.WriteLine (sprintf "Recieved message: %s" msg)
-    //    )
-    //    startTitleUpdater mainCtx (sprintf "BrowserApp - %s") window
-    //    do! window.Show ()
-    //    do! Async.SwitchToThreadPool ()
-    //    do! Async.Sleep 1_000 // FIXME: introduce some mechanism to let us wait until it is valid to start executing Javascript
-    //    do! Async.SwitchToContext mainCtx
-    //    let w, h = window.Size
-    //    window.Size <- w + 100., h + 100.
-    //    do! Async.SwitchToThreadPool ()
-    //    do! Async.AwaitEvent window.Closed
-    //})
-
 
     let showCalculatorWindow mainCtx (createWindow: BrowserWindowCreator) = async {
         let page = """
@@ -126,6 +85,50 @@ module SimpleBrowserApp =
         return window
     }
 
+    let runCodependentWindows mainCtx (createWindow: BrowserWindowCreator) = async {
+        let inputPage = """
+            <!DOCTYPE html>
+            <html>
+                <head>
+                    <title>Input window</title>
+                    <script>
+                        function sendToOtherWindow() {
+                            interstellarBridge.postMessage(document.getElementById("theInput").value)
+                        }
+                    </script>
+                </head>
+                <body>
+                    <input id="theInput" placeholder="Enter some text here" oninput="sendToOtherWindow()" />
+                </body>
+            </html>"""
+        let outputPage = """
+            <!DOCTYPE html>
+            <html>
+                <head>
+                    <title>Output window</title>
+                    <script>
+                        function updateOutput(newText) {
+                            document.getElementById("theOutput").textContent = newText
+                        }
+                    </script>
+                </head>
+                <body>
+                    <p id="theOutput" />
+                </body>
+            </html>"""
+        let inputWindow = createWindow { defaultBrowserWindowConfig with html = Some inputPage }
+        let outputWindow = createWindow { defaultBrowserWindowConfig with html = Some outputPage }
+
+        inputWindow.Browser.JavascriptMessageRecieved.Add (fun msg ->
+            outputWindow.Browser.ExecuteJavascript (sprintf "updateOutput('%s')" (String (Array.rev (msg.ToCharArray ()))))
+        )
+
+        do! inputWindow.Show ()
+        do! outputWindow.Show ()
+        let! bothClosed = Async.Parallel [Async.AwaitEvent inputWindow.Closed; Async.AwaitEvent outputWindow.Closed]
+        ()
+    }
+
     let appletSelectorWindow mainCtx createWindow = async {
         let page = sprintf """
             <!DOCTYPE html>
@@ -140,20 +143,23 @@ module SimpleBrowserApp =
                 <body>
                     <button onclick="ex('%s')">Calculator</button>
                     <br>
-                    <button onclick="ex('%s')">Detector page</button> - %s
+                    <button onclick="ex('%s')">Interstellar detector</button> - %s
+                    <br>
+                    <button onclick="ex('%s')">Inter window communication</button>
                 </body>
-            </html>""" AppletIds.Calculator AppletIds.InterstellarDetector detectorPageUrl.AbsoluteUri
+            </html>""" AppletIds.Calculator AppletIds.InterstellarDetector detectorPageUrl.AbsoluteUri AppletIds.InterWindowCommunication
         let selectorWindow : IBrowserWindow = createWindow { defaultBrowserWindowConfig with html = Some page }
         do! selectorWindow.Show ()
         selectorWindow.Browser.JavascriptMessageRecieved.Add (fun msg ->
             Async.Start <| async {
                 do! Async.SwitchToContext mainCtx
-                let mappings = Map.ofList [AppletIds.Calculator, showCalculatorWindow; AppletIds.InterstellarDetector, showDetectorWindow]
-                match Map.tryFind msg mappings with
-                | Some f ->
-                    let! _ = f mainCtx createWindow
+                match msg with
+                | AppletIds.Calculator -> do! Async.Ignore (showCalculatorWindow mainCtx createWindow)
+                | AppletIds.InterstellarDetector -> do! Async.Ignore (showDetectorWindow mainCtx createWindow)
+                | AppletIds.InterWindowCommunication ->
+                    do! runCodependentWindows mainCtx createWindow
                     ()
-                | None -> Trace.WriteLine (sprintf "Bad message: %s" msg)
+                | msg -> Trace.WriteLine (sprintf "Bad message: %s" msg)
             })
         return selectorWindow
     }
