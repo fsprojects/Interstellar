@@ -63,6 +63,8 @@ type IBrowserWindow =
     abstract Browser : IBrowser
     /// <summary>Closes the window</summary>
     abstract Close : unit -> unit
+    /// <summary>Whether or not the window has been shown but not yet closed.</summary>
+    abstract IsShowing : bool
     /// <summary>Indicates the GUI platform that is hosting this window</summary>
     abstract Platform : BrowserWindowPlatform
     /// <summary>An event handler that is called when the window closes for any reason. It is safe to reference this event from a non-main thread.</summary>

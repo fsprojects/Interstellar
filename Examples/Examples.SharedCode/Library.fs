@@ -85,7 +85,7 @@ module SimpleBrowserApp =
         return window
     }
 
-    let runCrossCommunicatingWindows mainCtx (createWindow: BrowserWindowCreator) = async {
+    let runCrossCommunicatingWindows (mainCtx: SynchronizationContext) (createWindow: BrowserWindowCreator) = async {
         let inputPage = """
             <!DOCTYPE html>
             <html>
@@ -120,7 +120,10 @@ module SimpleBrowserApp =
         let outputWindow = createWindow { defaultBrowserWindowConfig with html = Some outputPage }
 
         inputWindow.Browser.JavascriptMessageRecieved.Add (fun msg ->
-            outputWindow.Browser.ExecuteJavascript (sprintf "updateOutput('%s')" (String (Array.rev (msg.ToCharArray ()))))
+            mainCtx.Post (SendOrPostCallback(fun _ ->
+                if outputWindow.IsShowing then
+                    outputWindow.Browser.ExecuteJavascript (sprintf "updateOutput('%s')" (String (Array.rev (msg.ToCharArray ()))))
+            ), null)   
         )
 
         do! inputWindow.Show ()
