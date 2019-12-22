@@ -85,7 +85,7 @@ module SimpleBrowserApp =
         return window
     }
 
-    let runCodependentWindows mainCtx (createWindow: BrowserWindowCreator) = async {
+    let runCrossCommunicatingWindows mainCtx (createWindow: BrowserWindowCreator) = async {
         let inputPage = """
             <!DOCTYPE html>
             <html>
@@ -157,7 +157,7 @@ module SimpleBrowserApp =
                 | AppletIds.Calculator -> do! Async.Ignore (showCalculatorWindow mainCtx createWindow)
                 | AppletIds.InterstellarDetector -> do! Async.Ignore (showDetectorWindow mainCtx createWindow)
                 | AppletIds.InterWindowCommunication ->
-                    do! runCodependentWindows mainCtx createWindow
+                    do! runCrossCommunicatingWindows mainCtx createWindow
                     ()
                 | msg -> Trace.WriteLine (sprintf "Bad message: %s" msg)
             })
