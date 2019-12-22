@@ -29,13 +29,25 @@ type IBrowser =
     abstract Engine : BrowserEngine
     /// <summary>Executes some Javascript in the browser, returning immediately.</summary>
     abstract ExecuteJavascript : string -> unit
-    /// <summary>Loads a page from a given Uri, returning immediately without waiting for the loading to finish</summary>
+    /// <summary>
+    ///     Loads a page from a given Uri, returning nested asyncs to signal changes in state relating to loading status of the page: the first async calls back when the
+    ///     page finishes loading, and the second async calls back when the page is ready to start executing Javascript.
+    /// </summary>
+    abstract LoadAsync : Uri -> Async<Async<unit>>
+    /// <summary>Starts loading a page from a given Uri, returning immediately.</summary>
     abstract Load : Uri -> unit
     /// <summary>
     ///     Directly loads the string as content for display. If a <see cref="uri"/> is given, it is used as the origin page.
-    ///     Any Javascript AJAX calls will communicate using that URI.
+    ///     Any Javascript AJAX calls will communicate using that URI. This method rturns nested asyncs to signal changes in
+    ///     state relating to loading status of the page: the first async calls back when the page finishes loading, and the
+    ///     second async calls back when the page is ready to start executing Javascript.
     /// </summary>
-    abstract LoadString : html: string * ?uri: Uri -> unit
+    abstract LoadStringAsync : html: string * ?uri: Uri -> Async<Async<unit>>
+    /// <summary>
+    ///     Directly loads the string as content for display, returning immediately. If a <see cref="uri"/> is given, it is
+    ///     used as the origin page. Any Javascript AJAX calls will communicate using that URI.
+    /// </summary>
+    abstract LoadString : html:string * ?uri: Uri -> unit
     /// <summary>Attempts to navigate to the previous page in the history stack</summary>
     abstract GoBack : unit -> unit
     /// <summary>Attempts to navigate to the next page in the history stack</summary>

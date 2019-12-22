@@ -17,19 +17,36 @@ type SharedChromiumBrowserInternals = {
 }
 
 type Browser(browser: IWebBrowser, browserInternals: SharedChromiumBrowserInternals, config: BrowserWindowConfig) as this =
+    let jsContextCreatedEvt = new Event<_>()
+    
     // (primary) constructor
     do
         browser.RequestHandler <- new JSInjectionRequestHandler("window.interstellarBridge={'postMessage':function(message){CefSharp.PostMessage(message)}}")
         browserInternals.isBrowserInitializedChanged.Add (fun () ->
             if browser.IsBrowserInitialized then
                 match config.address, config.html with
-                | address, Some html -> (this :> IBrowser).LoadString (html, ?uri = address) |> ignore
+                | address, Some html -> (this :> IBrowser).LoadString (html, ?uri = address)
                 | Some address, None -> (this :> IBrowser).Load address
                 | None, None -> ()
                 if config.showDevTools then (this :> IBrowser).ShowDevTools()
         )
+        browser.RenderProcessMessageHandler <- {
+            new IRenderProcessMessageHandler with
+                member this.OnContextCreated(chromiumWebBrowser, browser, frame) = jsContextCreatedEvt.Trigger ()
+                member this.OnContextReleased(chromiumWebBrowser, browser, frame) = ()
+                member this.OnFocusedNodeChanged(chromiumWebBrowser, browser, frame, node) = ()
+                member this.OnUncaughtException(chromiumWebBrowser, browser, frame, exn) = ()
+        }
 
     member this.ChromiumBrowser = browser
+
+    member this.AwaitPageLoadedThenReadyForJS () : Async<Async<unit>> = async {
+        if browser.IsLoading then
+            do! Async.Ignore <| Async.AwaitEvent (this :> IBrowser).PageLoaded
+        if not (browser.CanExecuteJavascriptInMainFrame) then
+            return Async.AwaitEvent <| jsContextCreatedEvt.Publish
+        else return async { () }
+    }
 
     interface Interstellar.IBrowser with
         member this.AreDevToolsShowing = browser.GetBrowserHost().HasDevTools
@@ -45,6 +62,10 @@ type Browser(browser: IWebBrowser, browserInternals: SharedChromiumBrowserIntern
         member this.GoBack () = browser.GetBrowser().GoForward ()
         member this.GoForward () = browser.GetBrowser().GoBack ()
         member this.Load address = browser.Load address.OriginalString
+        member this.LoadAsync address = async {
+            (this :> IBrowser).Load address
+            return! this.AwaitPageLoadedThenReadyForJS ()
+        }
         member this.LoadString (html, ?uri) =
             match uri with
             | Some uri ->
@@ -57,6 +78,10 @@ type Browser(browser: IWebBrowser, browserInternals: SharedChromiumBrowserIntern
                 // this one works fine because it still uses real URI behavior, thus not requiring any kind of custom URI handlers
                 let data = new HtmlString(html, false)
                 (this :> IBrowser).Load (new Uri(data.ToDataUriString()))
+        member this.LoadStringAsync (html, ?uri) = async {
+            (this :> IBrowser).LoadString (html, ?uri = uri)
+            return! this.AwaitPageLoadedThenReadyForJS ()
+        }
         // note all the usages of member val to prevent cross-thread access issues
         [<CLIEvent>]
         member val JavascriptMessageRecieved = browser.JavascriptMessageReceived |> Event.map (fun x -> x.ConvertMessageTo<string>())

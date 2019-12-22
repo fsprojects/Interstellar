@@ -1,13 +1,15 @@
 ﻿namespace Examples.SharedCode
 open System
 open System.Diagnostics
-open Interstellar
-open System.Threading
+open System.IO
 open System.Reflection
 open System.Runtime.Versioning
+open System.Threading
+open Interstellar
 
 module AppletIds =
     let [<Literal>] Calculator = "calculator"
+    let [<Literal>] InjectedContent = "injectedContent"
     let [<Literal>] InterstellarDetector = "detector"
     let [<Literal>] InterWindowCommunication = "interwindow"
 
@@ -79,6 +81,41 @@ module SimpleBrowserApp =
         return window
     }
 
+    let fileWriteTextAsync path (string: string) = async {
+        use fileOut = File.CreateText path
+        do! Async.AwaitTask (fileOut.WriteAsync string)
+    }
+
+    let showInjectedContentWindow mainCtx (createWindow: BrowserWindowCreator) = async {
+        // to make this one a little more interesting, lets show the content from a temp file instead of the data-style URI like the other examples,
+        // so it can feel a bit more like a "real page"
+        let filePath = Path.Combine (Path.GetTempPath(), Path.ChangeExtension (Guid.NewGuid().ToString(), ".html"))
+        let fileUri = Uri(filePath)
+        let content = sprintf """
+            <!DOCTYPE html>
+            <html>
+                <head>
+                    <meta charset="utf-8" />
+                </head>
+                <body>
+                    <p>This file can be found at <a href="%s">%s</a>
+                    <p>UI host: <span id="platform">Unknown</span></p>
+                    <p>Browser engine: <span id="browserEngine">Unknown</span></p>
+                    <p>Runtime framework: <span id="runtimeFramework">Unknown</span></p>
+                </body>
+            </html>""" fileUri.AbsoluteUri fileUri.AbsoluteUri
+        Trace.WriteLine (sprintf "temp html file path: %s" filePath)
+        do! fileWriteTextAsync filePath content
+        let window = createWindow defaultBrowserWindowConfig
+        do! window.Show ()
+        let! handleToAwaitJSReady = window.Browser.LoadAsync fileUri
+        do! handleToAwaitJSReady
+        window.Browser.ExecuteJavascript
+            (sprintf "document.getElementById('runtimeFramework').textContent='%s';document.getElementById('platform').textContent='%A';document.getElementById('browserEngine').textContent='%A'"
+                runtimeFramework window.Platform window.Browser.Engine)
+        return window
+    }
+
     let showDetectorWindow mainCtx (createWindow: BrowserWindowCreator) = async {
         let window = createWindow { defaultBrowserWindowConfig with address = Some detectorPageUrl }
         do! window.Show ()
@@ -128,11 +165,11 @@ module SimpleBrowserApp =
 
         do! inputWindow.Show ()
         do! outputWindow.Show ()
-        let! bothClosed = Async.Parallel [Async.AwaitEvent inputWindow.Closed; Async.AwaitEvent outputWindow.Closed]
-        ()
+        // await both closed
+        do! Async.Ignore <| Async.Parallel [Async.AwaitEvent inputWindow.Closed; Async.AwaitEvent outputWindow.Closed]
     }
 
-    let appletSelectorWindow mainCtx createWindow = async {
+    let appletSelectorWindow mainCtx (createWindow: BrowserWindowCreator) = async {
         let page = sprintf """
             <!DOCTYPE html>
             <html>
@@ -146,22 +183,23 @@ module SimpleBrowserApp =
                 <body>
                     <button onclick="ex('%s')">Calculator</button>
                     <br>
+                    <button onclick="ex('%s')">App-injected content</button>
+                    <br>
                     <button onclick="ex('%s')">Interstellar detector</button> - %s
                     <br>
                     <button onclick="ex('%s')">Inter window communication</button>
                 </body>
-            </html>""" AppletIds.Calculator AppletIds.InterstellarDetector detectorPageUrl.AbsoluteUri AppletIds.InterWindowCommunication
-        let selectorWindow : IBrowserWindow = createWindow { defaultBrowserWindowConfig with html = Some page }
+            </html>""" AppletIds.Calculator AppletIds.InjectedContent AppletIds.InterstellarDetector detectorPageUrl.AbsoluteUri AppletIds.InterWindowCommunication
+        let selectorWindow = createWindow { defaultBrowserWindowConfig with html = Some page }
         do! selectorWindow.Show ()
         selectorWindow.Browser.JavascriptMessageRecieved.Add (fun msg ->
             Async.Start <| async {
                 do! Async.SwitchToContext mainCtx
                 match msg with
                 | AppletIds.Calculator -> do! Async.Ignore (showCalculatorWindow mainCtx createWindow)
+                | AppletIds.InjectedContent -> do! Async.Ignore (showInjectedContentWindow mainCtx createWindow)
                 | AppletIds.InterstellarDetector -> do! Async.Ignore (showDetectorWindow mainCtx createWindow)
-                | AppletIds.InterWindowCommunication ->
-                    do! runCrossCommunicatingWindows mainCtx createWindow
-                    ()
+                | AppletIds.InterWindowCommunication -> do! runCrossCommunicatingWindows mainCtx createWindow
                 | msg -> Trace.WriteLine (sprintf "Bad message: %s" msg)
             })
         return selectorWindow
