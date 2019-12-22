@@ -40,7 +40,7 @@ type BrowserWindow(config: BrowserWindowConfig) as this =
     interface IBrowserWindow with
         member this.Browser = upcast browser
         member this.Close () = (this :> Window).Close ()
-        [<CLIEvent>] member this.Closed = (this :> Window).Closed |> Event.map ignore
+        [<CLIEvent>] member val Closed = (this :> Window).Closed |> Event.map ignore
         member this.Platform = BrowserWindowPlatform.Wpf
         member this.Show () =
             if owningThreadId <> Thread.CurrentThread.ManagedThreadId then
@@ -56,7 +56,7 @@ type BrowserWindow(config: BrowserWindowConfig) as this =
             and set (width, height) =
                 base.Width <- width
                 base.Height <- height
-        [<CLIEvent>] member this.Shown = shown.Publish
+        [<CLIEvent>] member val Shown = shown.Publish
         member this.Title
             with get () = (this :> Window).Title
             and set title = (this :> Window).Title <- title

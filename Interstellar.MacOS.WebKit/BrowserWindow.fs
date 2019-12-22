@@ -49,12 +49,12 @@ type BrowserWindow(config: BrowserWindowConfig) as this =
         member this.Close () = (this :> NSWindowController).Close ()
         member this.Platform = BrowserWindowPlatform.MacOS
         [<CLIEvent>]
-        member this.Closed = closed.Publish
+        member val Closed = closed.Publish
         member this.Show () = async {
             (this :> NSWindowController).ShowWindow this
         }
         [<CLIEvent>]
-        member this.Shown = shown.Publish
+        member val Shown = shown.Publish
         member this.Size
             with get () =
                 let size = this.Window.Frame.Size

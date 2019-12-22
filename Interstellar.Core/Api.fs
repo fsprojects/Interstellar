@@ -40,16 +40,16 @@ type IBrowser =
     abstract GoBack : unit -> unit
     /// <summary>Attempts to navigate to the next page in the history stack</summary>
     abstract GoForward : unit -> unit
-    /// <summary>Event handler that is called whenever a message sent from Javascript is recieved</summary>
+    /// <summary>Event handler that is called whenever a message sent from Javascript is recieved. It is safe to reference this event from a non-main thread.</summary>
     [<CLIEvent>] abstract JavascriptMessageRecieved : IEvent<string>
     /// <summary>The title of the currently loaded page</summary>
     abstract PageTitle : string
     [<CLIEvent>]
-    /// <summary>Event handler that is called whenever a page load is completed</summary>
+    /// <summary>Event handler that is called whenever a page load is completed. It is safe to reference this event from a non-main thread.</summary>
     abstract PageLoaded : IEvent<EventArgs>
     /// <summary>Initiates a reload of the current page</summary>
     abstract Reload : unit -> unit
-    /// <summary>Event handler that is called whenever <see cref="PageTitle"/></summary> changes
+    /// <summary>Event handler that is called whenever <see cref="PageTitle"/> changes. It is safe to reference this event from a non-main thread.</summary>
     [<CLIEvent>] abstract PageTitleChanged : IEvent<string>
     /// <summary>Shows the developer tools for this browser if they are not already showing</summary>
     abstract ShowDevTools : unit -> unit
@@ -65,13 +65,13 @@ type IBrowserWindow =
     abstract Close : unit -> unit
     /// <summary>Indicates the GUI platform that is hosting this window</summary>
     abstract Platform : BrowserWindowPlatform
-    /// <summary>An event handler that is called when the window closes for any reason</summary>
+    /// <summary>An event handler that is called when the window closes for any reason. It is safe to reference this event from a non-main thread.</summary>
     [<CLIEvent>] abstract Closed : IEvent<unit>
     /// <summary>Shows the window, asynchronously returning when <see cref="Browser"/> has finished initializing and is ready to use</summary>
     abstract Show : unit -> Async<unit>
     /// <summary>The size of the window, in pixels</summary>
     abstract Size : (float * float) with get, set
-    /// <summary>An event handler this is called when the window is shown</summary>
+    /// <summary>An event handler this is called when the window is shown. It is safe to reference this event from a non-main thread.</summary>
     [<CLIEvent>] abstract Shown : IEvent<unit>
     /// <summary>Gets or sets text in the window's title bar</summary>
     abstract Title : string with get, set

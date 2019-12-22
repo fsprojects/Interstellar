@@ -38,7 +38,7 @@ type BrowserWindow(config: BrowserWindowConfig) as this =
         member this.Browser = upcast browser
         member this.Close () = (this :> Form).Close ()
         [<CLIEvent>]
-        member this.Closed : IEvent<unit> = (this :> Form).FormClosed |> Event.map ignore
+        member val Closed : IEvent<unit> = (this :> Form).FormClosed |> Event.map ignore
         member this.Platform = BrowserWindowPlatform.WinForms
         member this.Show () =
             if (Thread.CurrentThread.ManagedThreadId <> owningThreadId) then
@@ -51,7 +51,7 @@ type BrowserWindow(config: BrowserWindowConfig) as this =
                     ()
             }
         [<CLIEvent>]
-        member this.Shown = (this :> Form).Shown |> Event.map ignore
+        member val Shown = (this :> Form).Shown |> Event.map ignore
         member this.Size
             with get () =
                 let size = (this :> Form).Size

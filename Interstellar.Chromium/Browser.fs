@@ -57,12 +57,13 @@ type Browser(browser: IWebBrowser, browserInternals: SharedChromiumBrowserIntern
                 // this one works fine because it still uses real URI behavior, thus not requiring any kind of custom URI handlers
                 let data = new HtmlString(html, false)
                 (this :> IBrowser).Load (new Uri(data.ToDataUriString()))
+        // note all the usages of member val to prevent cross-thread access issues
         [<CLIEvent>]
-        member this.JavascriptMessageRecieved : IEvent<string> = browser.JavascriptMessageReceived |> Event.map (fun x -> x.ConvertMessageTo<string>())
+        member val JavascriptMessageRecieved = browser.JavascriptMessageReceived |> Event.map (fun x -> x.ConvertMessageTo<string>())
         member this.PageTitle = browserInternals.getPageTitle ()
         [<CLIEvent>]
-        member this.PageTitleChanged : IEvent<string> = browserInternals.titleChanged
+        member val PageTitleChanged = browserInternals.titleChanged
         [<CLIEvent>]
-        member this.PageLoaded : IEvent<EventArgs> = browser.FrameLoadEnd |> Event.map (fun x -> upcast x)
+        member val PageLoaded = browser.FrameLoadEnd |> Event.map (fun x -> x :> EventArgs)
         member this.Reload () = browser.Reload ()
         member this.ShowDevTools () = browser.ShowDevTools ()

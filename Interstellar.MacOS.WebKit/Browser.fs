@@ -82,11 +82,11 @@ type Browser(config: BrowserWindowConfig) as this =
         member this.GoBack () = wkBrowser.GoBack () |> ignore
         member this.GoForward () = wkBrowser.GoForward () |> ignore
         [<CLIEvent>]
-        member this.JavascriptMessageRecieved = jsMsgRecieved.Publish
+        member val JavascriptMessageRecieved = jsMsgRecieved.Publish
         member this.PageTitle = wkBrowser.Title
         [<CLIEvent>]
-        member this.PageLoaded : IEvent<_> = pageLoaded.Publish
+        member val PageLoaded : IEvent<_> = pageLoaded.Publish
         member this.Reload () = wkBrowser.Reload () |> ignore
         [<CLIEvent>]
-        member this.PageTitleChanged : IEvent<_> = pageTitleChanged.Publish
+        member val PageTitleChanged : IEvent<_> = pageTitleChanged.Publish
         member this.ShowDevTools () = () // there's no way that I know of to programmatically open the WKWebView inspector
