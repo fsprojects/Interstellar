@@ -22,7 +22,15 @@ open Interstellar
 open Interstellar.MacOS.Internal
 open WebKit
 
-type Browser(config: BrowserWindowConfig) as this =
+module internal BrowserHelpers =
+    let inline loadString (wkBrowser: WKWebView, html: string, (uri: Uri option)) =
+        let nsUrl = match uri with | Some uri -> new NSUrl(uri.OriginalString) | None -> null
+        wkBrowser.LoadHtmlString (html, nsUrl) |> ignore
+
+    let inline load (wkBrowser: WKWebView, address: Uri) =
+        wkBrowser.LoadRequest (new NSUrlRequest(new NSUrl(address.OriginalString))) |> ignore
+
+type Browser(config: BrowserWindowConfig) =
     let wkBrowser = new WKWebView(CGRect.Empty, new WKWebViewConfiguration())
     let pageLoaded = new Event<EventArgs>()
     let pageTitleChanged = new Event<string>()
@@ -58,11 +66,19 @@ type Browser(config: BrowserWindowConfig) as this =
                     pageTitleChanged.Trigger (wkBrowser.Title))
 
         match config.address, config.html with
-        | address, Some html -> (this :> IBrowser).LoadString (html, ?uri = address) |> ignore
-        | Some address, None -> (this :> IBrowser).Load address.OriginalString |> ignore
+        | address, Some html -> BrowserHelpers.loadString (wkBrowser, html, address)
+        | Some address, None -> BrowserHelpers.load (wkBrowser, address)
         | None, None -> ()
 
     member this.WebKitBrowser = wkBrowser
+
+    member this.AwaitLoadedThenJSReady () = async {
+        if wkBrowser.IsLoading then
+            let! _ = Async.AwaitEvent (this :> IBrowser).PageLoaded
+            ()
+        // it appears that in WebKit it's safe to execute JS right away, so I guess we're good
+        return async { () }
+    }
 
     interface IBrowser with
         member this.Address =
@@ -75,10 +91,16 @@ type Browser(config: BrowserWindowConfig) as this =
         member this.CanGoForward = wkBrowser.CanGoForward
         member this.Engine = BrowserEngine.AppleWebKit
         member this.ExecuteJavascript code = wkBrowser.EvaluateJavaScript (code, null)
-        member this.Load address = wkBrowser.LoadRequest (new NSUrlRequest(new NSUrl(address.OriginalString))) |> ignore
-        member this.LoadString (html, ?uri) =
-            let nsUrl = match uri with | Some uri -> new NSUrl(uri.OriginalString) | None -> null
-            wkBrowser.LoadHtmlString (html, nsUrl) |> ignore
+        member this.Load address = BrowserHelpers.load (wkBrowser, address)
+        member this.LoadAsync address = async {
+            (this :> IBrowser).Load address
+            return! this.AwaitLoadedThenJSReady ()
+        }
+        member this.LoadString (html, ?uri) = BrowserHelpers.loadString (wkBrowser, html, uri)
+        member this.LoadStringAsync (html, ?uri) = async {
+            (this :> IBrowser).LoadString (html, ?uri = uri)
+            return! this.AwaitLoadedThenJSReady ()
+        }
         member this.GoBack () = wkBrowser.GoBack () |> ignore
         member this.GoForward () = wkBrowser.GoForward () |> ignore
         [<CLIEvent>]

@@ -47,6 +47,9 @@ type BrowserWindow(config: BrowserWindowConfig) as this =
     interface IBrowserWindow with
         member this.Browser = upcast browser
         member this.Close () = (this :> NSWindowController).Close ()
+        member this.IsShowing =
+            let w = (this :> NSWindowController).Window
+            w.IsVisible || w.IsMiniaturized
         member this.Platform = BrowserWindowPlatform.MacOS
         [<CLIEvent>]
         member val Closed = closed.Publish
