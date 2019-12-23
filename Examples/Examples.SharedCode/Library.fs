@@ -126,13 +126,15 @@ module SimpleBrowserApp =
                     <meta charset="utf-8"/>
                     <title>Input window</title>
                     <script>
-                        function sendToOtherWindow() {
-                            interstellarBridge.postMessage(document.getElementById("theInput").value)
+                        function updateOutputs() {
+                            var inputValue = document.getElementById("theInput").value
+                            document.title = ("Input window (" + inputValue + ")")
+                            interstellarBridge.postMessage(inputValue)
                         }
                     </script>
                 </head>
                 <body>
-                    <input id="theInput" placeholder="Enter some text here" oninput="sendToOtherWindow()" />
+                    <input id="theInput" placeholder="Enter some text here" oninput="updateOutputs()" />
                 </body>
             </html>"""
         let outputPage = """
@@ -140,15 +142,19 @@ module SimpleBrowserApp =
             <html>
                 <head>
                     <meta charset="utf-8"/>
-                    <title>Output window</title>
                     <script>
                         function updateOutput(newText) {
+                            console.log(newText)
                             document.getElementById("theOutput").textContent = newText
+                            document.title = ("Output window (" + newText + ")")
                         }
                     </script>
                 </head>
                 <body>
                     <p>Reversed input text: <span id="theOutput"/></p>
+                    <script>
+                        updateOutput("")
+                    </script>
                 </body>
             </html>"""
         let inputWindow = createWindow { defaultBrowserWindowConfig with html = Some inputPage }
@@ -163,6 +169,18 @@ module SimpleBrowserApp =
 
         do! inputWindow.Show ()
         do! outputWindow.Show ()
+
+        Async.Start <| async {
+            do! Async.AwaitEvent inputWindow.Closed
+            do! Async.SwitchToContext mainCtx
+            outputWindow.Close ()
+        }
+        Async.Start <| async {
+            do! Async.AwaitEvent outputWindow.Closed
+            do! Async.SwitchToContext mainCtx
+            inputWindow.Close ()
+        }
+
         // await both closed
         do! Async.Ignore <| Async.Parallel [Async.AwaitEvent inputWindow.Closed; Async.AwaitEvent outputWindow.Closed]
     }
