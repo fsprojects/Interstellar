@@ -24,13 +24,11 @@ type BrowserWindow(config: BrowserWindowConfig) as this =
               isBrowserInitializedChanged = cefBrowser.IsBrowserInitializedChanged |> Event.map ignore},
             config)
 
+    let titleChangedHandle = cefBrowser.TitleChanged.Subscribe (fun e -> lastKnownPageTitle <- e.Title)
+
     // (primary) constructor
     do
         this.Controls.Add cefBrowser
-        // TODO: dispose event handlers if necessary
-        cefBrowser.TitleChanged.Add (fun e ->
-            lastKnownPageTitle <- e.Title
-        )
 
     member this.ChromiumBrowser = browser
 
@@ -65,16 +63,7 @@ type BrowserWindow(config: BrowserWindowConfig) as this =
             with get () = this.Text
             and set title = this.Text <- title
 
-    member private this._Dispose disposing =
-        if not disposed then
-            if disposing then
-                cefBrowser.Dispose ()
-                base.Dispose ()
-            disposed <- true
-
-    interface IDisposable with
-        override this.Dispose () =
-            let token = this.BeginInvoke (Action(fun () ->
-                this._Dispose true
-            ))
-            ()
+    override this.Dispose disposing =
+        if disposing then
+            titleChangedHandle.Dispose ()
+        base.Dispose disposing

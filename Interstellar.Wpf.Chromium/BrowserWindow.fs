@@ -32,7 +32,7 @@ type BrowserWindow(config: BrowserWindowConfig) as this =
 
     interface IDisposable with
         member this.Dispose () =
-            Async.Start <| async {
+            Async.StartImmediate <| async {
                 do! Async.SwitchToContext mainCtx
                 this.Close ()
             }
