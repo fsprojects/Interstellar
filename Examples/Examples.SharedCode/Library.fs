@@ -150,7 +150,7 @@ module SimpleBrowserApp =
                     </script>
                 </head>
                 <body>
-                    <p id="theOutput" />
+                    <p>Reversed input text: <span id="theOutput"/></p>
                 </body>
             </html>"""
         let inputWindow = createWindow { defaultBrowserWindowConfig with html = Some inputPage }

@@ -90,21 +90,51 @@ type IBrowserWindow =
     /// <summary>Gets or sets text in the window's title bar</summary>
     abstract Title : string with get, set
 
-type BrowserWindowConfig =
-        /// <summary>
-        ///     When set to Some on its own with a value of None for <see cref="html"/>, it specifies the address for an <see cref="IBrowser"/> to initially load.
-        ///     When both <see cref="address"/> and <see cref="html"/> are values of Some, they specify the html content to load directly in to a browser instance
-        ///     when it first shows.
-        /// </summary>
-    {   address: Uri option;
-        /// <summary>
-        ///     When set, indicates the html to display in the browser directly when it is first shown. If <see cref="address"/> is also set, <see cref="address"/>
-        ///     will be used as the origin URI for any requests made by AJAX calls in Javascript.
-        /// </summary>
-        html: string option
-        /// <summary>Whether or not to show the dev tools when the browser window first opens</summary>
-        showDevTools: bool }
-    static member DefaultValue = { address = None; html = None; showDevTools = false }
+type BrowserWindowConfig = {
+    /// <summary>
+    ///     When set to Some on its own with a value of None for <see cref="html"/>, it specifies the address for an <see cref="IBrowser"/> to initially load.
+    ///     When both <see cref="address"/> and <see cref="html"/> are values of Some, they specify the html content to load directly in to a browser instance
+    ///     when it first shows.
+    /// </summary>
+    address: Uri option;
+    /// <summary>
+    ///     When set, indicates the html to display in the browser directly when it is first shown. If <see cref="address"/> is also set, <see cref="address"/>
+    ///     will be used as the origin URI for any requests made by AJAX calls in Javascript.
+    /// </summary>
+    html: string option
+    /// <summary>Whether or not to show the dev tools when the browser window first opens</summary>
+    showDevTools: bool
+    /// <summary>A function that, when set, defines what the window title should be</summary>
+    titleMapping: option<string -> IBrowserWindow -> Async<string>>
+}
+
+module BrowserWindowConfig =
+    let defaultValue = {
+        address = None
+        html = None
+        showDevTools = false
+        titleMapping = Some(fun title _ -> async.Return title )
+    }
+    /// <summary>
+    ///     Intended for use by platform implementations; applications generally shouldn't need this function. Attaches
+    ///     a title mapping function to a browser window, making sure that the installed event handler gets cleaned up
+    /// </summary>
+    let attachTitleMappingHandler mainCtx (browserWindow: IBrowserWindow) (disposed: IEvent<_,_>) titleMapping =
+        let titleMappingHandler = Handler(fun sender pageTitle ->
+            Async.StartImmediate <| async {
+                let! newTitle = titleMapping pageTitle browserWindow
+                do! Async.SwitchToContext mainCtx
+                browserWindow.Title <- newTitle
+            }
+        )
+        let pageTitleChanged = browserWindow.Browser.PageTitleChanged
+        pageTitleChanged.AddHandler titleMappingHandler
+        // I believe this is necessary because out titleMapping function definitely references some other objects
+        disposed.Add (fun _ ->
+            try pageTitleChanged.RemoveHandler titleMappingHandler
+            // if this log line ever shows up, I'm betting that we've gotten some threading wrong or something
+            with e -> eprintfn "Exception while removing titleMappingHandler. This is likely indicates a bug in the library and may cause other issues; please contact the Interstellar maintainer(s) or add an issue on GitHub to fix the problem: https://github.com/jwosty/Interstellar\nFull exception: %A" e
+        )
 
 /// <summary>Represents a factory function that is used to instantiate a browser window for some host platform and engine</summary>
 type BrowserWindowCreator = BrowserWindowConfig -> IBrowserWindow
@@ -126,7 +156,7 @@ module BrowserApp =
     let create onStart = { onStart = onStart }
     let openAddress address = { onStart = fun mainCtx createWindow -> async {
             do! Async.SwitchToContext mainCtx
-            let window = createWindow { BrowserWindowConfig.DefaultValue with address = Some address }
+            let window = createWindow { BrowserWindowConfig.defaultValue with address = Some address }
             do! window.Show ()
             do! Async.AwaitEvent window.Closed
         }
@@ -134,4 +164,4 @@ module BrowserApp =
 
 [<AutoOpen>]
 module Core =
-    let defaultBrowserWindowConfig = BrowserWindowConfig.DefaultValue
+    let defaultBrowserWindowConfig = BrowserWindowConfig.defaultValue
