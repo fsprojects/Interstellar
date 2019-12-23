@@ -17,6 +17,12 @@ module SimpleBrowserApp =
     let runtimeFramework = Assembly.GetEntryAssembly().GetCustomAttribute<TargetFrameworkAttribute>().FrameworkName
     let detectorPageUrl = new Uri("https://gist.githack.com/jwosty/239408aaffd106a26dc2161f86caa641/raw/5af54d0f4c51634040ea3859ca86032694afc934/interstellardetector.html")
 
+    let defaultBrowserWindowConfig = {
+        defaultBrowserWindowConfig with title = WindowTitle.FromPageTitle (fun pageTitle w -> async {
+                                            return sprintf "InterstellarApp (%A) - %s" w.Browser.Engine pageTitle
+                                        })
+    }
+
     let showCalculatorWindow mainCtx (createWindow: BrowserWindowCreator) = async {
         let page = """
             <!DOCTYPE html>
@@ -78,6 +84,14 @@ module SimpleBrowserApp =
             <html>
                 <head>
                     <meta charset="utf-8" />
+                    <title>If you see this title, Javascript isn't working</title>
+                    <!-- just a little bit of title updating code to make things interesting -->
+                    <script>
+                        counter=0
+                        function updateTitle() { document.title="Counter = "+String(counter) }
+                        updateTitle()
+                        setInterval(function() { counter++; updateTitle(); }, 1000)
+                    </script>
                 </head>
                 <body>
                     <p>This file can be found at <a href="%s">%s</a>
@@ -88,7 +102,7 @@ module SimpleBrowserApp =
             </html>""" fileUri.AbsoluteUri fileUri.AbsoluteUri
         Trace.WriteLine (sprintf "temp html file path: %s" filePath)
         do! fileWriteTextAsync filePath content
-        let window = createWindow defaultBrowserWindowConfig
+        let window = createWindow { defaultBrowserWindowConfig with showDevTools = true }
         do! window.Show ()
         let! handleToAwaitJSReady = window.Browser.LoadAsync fileUri
         do! handleToAwaitJSReady
