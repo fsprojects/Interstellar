@@ -106,8 +106,14 @@ module SimpleBrowserApp =
         do! window.Show ()
         let! handleToAwaitJSReady = window.Browser.LoadAsync fileUri
         do! handleToAwaitJSReady
+        // NOTE: it's not safe to start accessing the DOM right after the JS context has been created (sometimes you will
+        // get lucky and the DOM will be created quickly enough). We must wait for it to be created by subscribing to the
+        // DOMContentLoaded event first.
         window.Browser.ExecuteJavascript
-            (sprintf "document.getElementById('runtimeFramework').textContent='%s';document.getElementById('platform').textContent='%A';document.getElementById('browserEngine').textContent='%A'"
+            (sprintf "document.addEventListener('DOMContentLoaded', function() {
+                            document.getElementById('runtimeFramework').textContent='%s'
+                            document.getElementById('platform').textContent='%A'
+                            document.getElementById('browserEngine').textContent='%A' })"
                 runtimeFramework window.Platform window.Browser.Engine)
         return window
     }
