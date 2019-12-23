@@ -90,6 +90,15 @@ type IBrowserWindow =
     /// <summary>Gets or sets text in the window's title bar</summary>
     abstract Title : string with get, set
 
+[<RequireQualifiedAccess>]
+type WindowTitle =
+    /// <summary>Specifies an undefined/unset window title.</summary>
+    | Unset
+    /// Specifies an ordinary string to use for the window title. This is only set once upon window initialization.
+    | FromString of string
+    /// Specifies a function to be used to determine the window title as a function of the page title
+    | FromPageTitle of titleMapping: (string -> IBrowserWindow -> Async<string>)
+
 type BrowserWindowConfig = {
     /// <summary>
     ///     When set to Some on its own with a value of None for <see cref="html"/>, it specifies the address for an <see cref="IBrowser"/> to initially load.
@@ -104,8 +113,8 @@ type BrowserWindowConfig = {
     html: string option
     /// <summary>Whether or not to show the dev tools when the browser window first opens</summary>
     showDevTools: bool
-    /// <summary>A function that, when set, defines what the window title should be</summary>
-    titleMapping: option<string -> IBrowserWindow -> Async<string>>
+    /// <summary>Defines how the window title should be determined</summary>
+    title: WindowTitle
 }
 
 module BrowserWindowConfig =
@@ -113,11 +122,12 @@ module BrowserWindowConfig =
         address = None
         html = None
         showDevTools = false
-        titleMapping = Some(fun title _ -> async.Return title )
+        title = WindowTitle.FromPageTitle(fun title _ -> async.Return title )
     }
     /// <summary>
     ///     Intended for use by platform implementations; applications generally shouldn't need this function. Attaches
-    ///     a title mapping function to a browser window, making sure that the installed event handler gets cleaned up
+    ///     a title mapping function to a browser window, making sure that the installed event handler gets cleaned up.
+    ///     Must be called from the UI thread.
     /// </summary>
     let attachTitleMappingHandler mainCtx (browserWindow: IBrowserWindow) (disposed: IEvent<_,_>) titleMapping =
         let titleMappingHandler = Handler(fun sender pageTitle ->
@@ -135,6 +145,16 @@ module BrowserWindowConfig =
             // if this log line ever shows up, I'm betting that we've gotten some threading wrong or something
             with e -> eprintfn "Exception while removing titleMappingHandler. This is likely indicates a bug in the library and may cause other issues; please contact the Interstellar maintainer(s) or add an issue on GitHub to fix the problem: https://github.com/jwosty/Interstellar\nFull exception: %A" e
         )
+    /// <summary>
+    ///     Intended for use by platform implementations; applications generally shouldn't need this function. Applies
+    ///     a WindowTitle to a BrowserWindow, attaching any event handlers and setting up clean up operations if necessary.
+    ///     Must be called from the UI thread.
+    /// </summary>
+    let applyWindowTitle mainCtx browserWindow disposed title =
+        match title with
+        | WindowTitle.Unset -> ()
+        | WindowTitle.FromPageTitle titleMapping -> attachTitleMappingHandler mainCtx browserWindow disposed titleMapping
+        | WindowTitle.FromString title -> browserWindow.Title <- title
 
 /// <summary>Represents a factory function that is used to instantiate a browser window for some host platform and engine</summary>
 type BrowserWindowCreator = BrowserWindowConfig -> IBrowserWindow
