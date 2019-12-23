@@ -17,30 +17,12 @@ module SimpleBrowserApp =
     let runtimeFramework = Assembly.GetEntryAssembly().GetCustomAttribute<TargetFrameworkAttribute>().FrameworkName
     let detectorPageUrl = new Uri("https://gist.githack.com/jwosty/239408aaffd106a26dc2161f86caa641/raw/5af54d0f4c51634040ea3859ca86032694afc934/interstellardetector.html")
 
-    //let startTitleUpdater mainCtx mapPageTitle (window: IBrowserWindow) =
-    //    let work = async {
-    //        use! holder = Async.OnCancel (fun () ->
-    //            Trace.WriteLine "Window title updater cancelled")
-    //        while true do
-    //            let! pageTitle = Async.AwaitEvent window.Browser.PageTitleChanged
-    //            Trace.WriteLine (sprintf "Browser page title is: %s" pageTitle)
-    //            do! Async.SwitchToContext mainCtx
-    //            window.Title <- mapPageTitle pageTitle
-    //            do! Async.SwitchToThreadPool ()
-    //    }
-    //    let cancellation = new CancellationTokenSource()
-    //    Async.Start (work, cancellation.Token)
-    //    Async.Start <| async {
-    //        do! Async.AwaitEvent window.Closed
-    //        Trace.WriteLine "Window closed"
-    //        cancellation.Cancel ()
-    //    }
-
     let showCalculatorWindow mainCtx (createWindow: BrowserWindowCreator) = async {
         let page = """
             <!DOCTYPE html>
             <html>
                 <head>
+                    <meta charset="utf-8"/>
                     <script>
                         function isNumeric(x) {
                             return !isNaN(x)
@@ -67,8 +49,8 @@ module SimpleBrowserApp =
                         <select id="operand" onchange="recalculate()">
                             <option value="add">+</option>
                             <option value="sub">-</option>
-                            <option value="mul">&times;</option>
-                            <option value="div">&divide;</option>
+                            <option value="mul">×</option>
+                            <option value="div">÷</option>
                         </select>
                         <input type="number" id="input2" oninput="recalculate()" /t>
                         <span>=</span>
@@ -127,6 +109,7 @@ module SimpleBrowserApp =
             <!DOCTYPE html>
             <html>
                 <head>
+                    <meta charset="utf-8"/>
                     <title>Input window</title>
                     <script>
                         function sendToOtherWindow() {
@@ -142,6 +125,7 @@ module SimpleBrowserApp =
             <!DOCTYPE html>
             <html>
                 <head>
+                    <meta charset="utf-8"/>
                     <title>Output window</title>
                     <script>
                         function updateOutput(newText) {
@@ -174,6 +158,7 @@ module SimpleBrowserApp =
             <!DOCTYPE html>
             <html>
                 <head>
+                    <meta charset="utf-8"/>
                     <script>
                         function ex(which) {
                             interstellarBridge.postMessage(which)
