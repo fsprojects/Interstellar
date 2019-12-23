@@ -23,12 +23,17 @@ open Interstellar.MacOS.Internal
 open WebKit
 
 module internal BrowserHelpers =
-    let inline loadString (wkBrowser: WKWebView, html: string, (uri: Uri option)) =
+    let loadString (wkBrowser: WKWebView, html: string, (uri: Uri option)) =
         let nsUrl = match uri with | Some uri -> new NSUrl(uri.OriginalString) | None -> null
         wkBrowser.LoadHtmlString (html, nsUrl) |> ignore
 
-    let inline load (wkBrowser: WKWebView, address: Uri) =
-        wkBrowser.LoadRequest (new NSUrlRequest(new NSUrl(address.OriginalString))) |> ignore
+    let load (wkBrowser: WKWebView, uri: Uri) =
+        printfn "loading uri: %A" uri
+        let nsUrl = new NSUrl(uri.OriginalString)
+        if uri.Scheme = "file" then
+            wkBrowser.LoadFileUrl (nsUrl, nsUrl) |> ignore
+        else
+            wkBrowser.LoadRequest (new NSUrlRequest(nsUrl)) |> ignore
 
 type Browser(config: BrowserWindowConfig) =
     let wkBrowser = new WKWebView(CGRect.Empty, new WKWebViewConfiguration())
