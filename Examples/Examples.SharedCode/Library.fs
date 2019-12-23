@@ -19,7 +19,8 @@ module SimpleBrowserApp =
 
     let defaultBrowserWindowConfig = {
         defaultBrowserWindowConfig with title = WindowTitle.FromPageTitle (fun pageTitle w -> async {
-                                            return sprintf "InterstellarApp (%A) - %s" w.Browser.Engine pageTitle
+                                            let tail = if String.IsNullOrWhiteSpace pageTitle then "" else sprintf " - %s" pageTitle
+                                            return sprintf "InterstellarApp (%A)%s" w.Browser.Engine tail
                                         })
     }
 

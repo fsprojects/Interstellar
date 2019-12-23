@@ -44,6 +44,7 @@ type Browser(config: BrowserWindowConfig) =
             new WKNavigationDelegate() with
                 member this.DidFinishNavigation (view, nav) =
                     pageLoaded.Trigger (new EventArgs())
+                    pageTitleChanged.Trigger view.Title
         }
         wkBrowser.UIDelegate <- new WebKitViewDialogueHandler()
 
