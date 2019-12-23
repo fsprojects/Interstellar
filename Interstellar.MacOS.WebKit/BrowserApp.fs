@@ -9,7 +9,10 @@ open Foundation
 module BrowserApp =
     let runAsync mainCtx (app: BrowserApp) = async {
         do! Async.SwitchToContext mainCtx
-        let windowCreator : BrowserWindowCreator = fun config -> upcast new BrowserWindow(config)
+        let windowCreator : BrowserWindowCreator = fun config ->
+            let w = new BrowserWindow(config)
+            BrowserWindowConfig.applyWindowTitle mainCtx w (w :> IBrowserWindow).Closed config.title
+            upcast w
         do! app.onStart mainCtx windowCreator
         do! Async.SwitchToContext mainCtx
     }

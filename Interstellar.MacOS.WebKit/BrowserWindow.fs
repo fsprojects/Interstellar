@@ -18,21 +18,22 @@ type BrowserWindow(config: BrowserWindowConfig) as this =
     
     let browser = new Browser(config)
 
-    let closed = new Event<_>()
-    let shown = new Event<_>()
+    let closedEvt = new Event<_>()
+    let shownEvt = new Event<_>()
+    let disposedEvt = new Event<_>()
 
     do
         let wkBrowserController = {
             new NiblessViewController(browser.WebKitBrowser) with
                 override this.ViewDidAppear () =
                     base.ViewDidAppear ()
-                    shown.Trigger ()
+                    shownEvt.Trigger ()
         }
         this.Window <-
             new NSWindow(new CGRect (0., 0., 1000., 500.),
                          NSWindowStyle.Titled ||| NSWindowStyle.Closable ||| NSWindowStyle.Miniaturizable ||| NSWindowStyle.Resizable,
-                         NSBackingStore.Buffered, false, Title = "My Window")
-        this.Window.WillClose.Add (fun x -> closed.Trigger ())
+                         NSBackingStore.Buffered, false)
+        this.Window.WillClose.Add (fun x -> closedEvt.Trigger ())
         this.Window.ContentView <- browser.WebKitBrowser
         this.Window.ContentViewController <- wkBrowserController
         this.Window.Center ()
@@ -52,12 +53,12 @@ type BrowserWindow(config: BrowserWindowConfig) as this =
             w.IsVisible || w.IsMiniaturized
         member this.Platform = BrowserWindowPlatform.MacOS
         [<CLIEvent>]
-        member val Closed = closed.Publish
+        member val Closed = closedEvt.Publish
         member this.Show () = async {
             (this :> NSWindowController).ShowWindow this
         }
         [<CLIEvent>]
-        member val Shown = shown.Publish
+        member val Shown = shownEvt.Publish
         member this.Size
             with get () =
                 let size = this.Window.Frame.Size
