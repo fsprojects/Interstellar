@@ -9,7 +9,7 @@ open Interstellar
 open System.Threading
 open System.Diagnostics
 
-type BrowserWindow(config: BrowserWindowConfig) as this =
+type BrowserWindow(config: BrowserWindowConfig<Form>) as this =
     inherit Form(Visible = false)
 
     let mutable disposed = false
@@ -17,7 +17,7 @@ type BrowserWindow(config: BrowserWindowConfig) as this =
     let owningThreadId = Thread.CurrentThread.ManagedThreadId
     let cefBrowser = new ChromiumWebBrowser(null: string)
     let browser =
-        new Interstellar.Chromium.Browser(
+        new Interstellar.Chromium.Browser<Form>(
             cefBrowser,
             { getPageTitle = fun () -> lastKnownPageTitle
               titleChanged = cefBrowser.TitleChanged |> Event.map (fun x -> x.Title)
@@ -32,15 +32,16 @@ type BrowserWindow(config: BrowserWindowConfig) as this =
 
     member this.ChromiumBrowser = browser
 
-    interface IBrowserWindow with
+    interface IBrowserWindow<Form> with
         member this.Browser = upcast browser
         member this.Close () = (this :> Form).Close ()
         [<CLIEvent>]
         member val Closed : IEvent<unit> = (this :> Form).FormClosed |> Event.map ignore
-        member this.Platform = BrowserWindowPlatform.WinForms
         member this.IsShowing =
             seq { for frm in Application.OpenForms -> frm }
             |> Seq.contains (this :> Form)
+        member this.NativeWindow = this :> Form
+        member this.Platform = BrowserWindowPlatform.WinForms
         member this.Show () =
             if (Thread.CurrentThread.ManagedThreadId <> owningThreadId) then
                 raise (new InvalidOperationException("Show() called from a thread other than the thread on which the BrowserWindow was constructed."))

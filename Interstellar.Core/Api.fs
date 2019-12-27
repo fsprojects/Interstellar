@@ -69,7 +69,7 @@ type IBrowser =
 /// <summary>
 ///     A natively-hosted graphical window that hosts a <see cref="Interstellar.IBrowser"/>
 /// </summary>
-type IBrowserWindow =
+type IBrowserWindow<'TWindow> =
     inherit IDisposable
     /// <summary>The browser instance that this window is hosting</summary>
     abstract Browser : IBrowser
@@ -77,6 +77,8 @@ type IBrowserWindow =
     abstract Close : unit -> unit
     /// <summary>Whether or not the window has been shown but not yet closed.</summary>
     abstract IsShowing : bool
+    /// <summary>Gets the underlying platform window object</summary>
+    abstract NativeWindow : 'TWindow
     /// <summary>Indicates the GUI platform that is hosting this window</summary>
     abstract Platform : BrowserWindowPlatform
     /// <summary>An event handler that is called when the window closes for any reason. It is safe to reference this event from a non-main thread.</summary>
@@ -91,15 +93,15 @@ type IBrowserWindow =
     abstract Title : string with get, set
 
 [<RequireQualifiedAccess>]
-type WindowTitle =
+type WindowTitle<'TWindow> =
     /// <summary>Specifies an undefined/unset window title.</summary>
     | Unset
     /// Specifies an ordinary string to use for the window title. This is only set once upon window initialization.
     | FromString of string
     /// Specifies a function to be used to determine the window title as a function of the page title
-    | FromPageTitle of titleMapping: (string -> IBrowserWindow -> Async<string>)
+    | FromPageTitle of titleMapping: (string -> IBrowserWindow<'TWindow> -> Async<string>)
 
-type BrowserWindowConfig = {
+type BrowserWindowConfig<'TWindow> = {
     /// <summary>
     ///     When set to Some on its own with a value of None for <see cref="html"/>, it specifies the address for an <see cref="IBrowser"/> to initially load.
     ///     When both <see cref="address"/> and <see cref="html"/> are values of Some, they specify the html content to load directly in to a browser instance
@@ -114,11 +116,11 @@ type BrowserWindowConfig = {
     /// <summary>Whether or not to show the dev tools when the browser window first opens</summary>
     showDevTools: bool
     /// <summary>Defines how the window title should be determined</summary>
-    title: WindowTitle
+    title: WindowTitle<'TWindow>
 }
 
 module BrowserWindowConfig =
-    let defaultValue = {
+    let defaultValue<'TWindow> : BrowserWindowConfig<'TWindow> = {
         address = None
         html = None
         showDevTools = false
@@ -129,7 +131,7 @@ module BrowserWindowConfig =
     ///     a title mapping function to a browser window, making sure that the installed event handler gets cleaned up.
     ///     Must be called from the UI thread.
     /// </summary>
-    let attachTitleMappingHandler mainCtx (browserWindow: IBrowserWindow) (disposed: IEvent<_,_>) titleMapping =
+    let attachTitleMappingHandler mainCtx (browserWindow: IBrowserWindow<'TWindow>) (disposed: IEvent<_,_>) titleMapping =
         let titleMappingHandler = Handler(fun sender pageTitle ->
             Async.StartImmediate <| async {
                 let! newTitle = titleMapping pageTitle browserWindow
@@ -157,23 +159,23 @@ module BrowserWindowConfig =
         | WindowTitle.FromString title -> browserWindow.Title <- title
 
 /// <summary>Represents a factory function that is used to instantiate a browser window for some host platform and engine</summary>
-type BrowserWindowCreator = BrowserWindowConfig -> IBrowserWindow
+type BrowserWindowCreator<'TWindow>  = BrowserWindowConfig<'TWindow> -> IBrowserWindow<'TWindow>
 
-type BrowserApp = {
+type BrowserApp<'TWindow> = {
     /// <summary>
     ///     A function that describes the entire asynchronous lifecycle of an browser application. Once all libraries and dependencies have loaded, and the program is
     ///     ready to create browser windows, this function will be called to kick off the user application's behavior. The first <see cref="SynchronizationContext"/>
     ///     parameter captures the GUI thread context, which can be used to safely call <see cref="IBrowserWindow"/> methods. The second paramter is a function which
     ///     can be used to instantiate browser windows for a given platform host and engine combination.
     /// </summary>
-    onStart : SynchronizationContext -> BrowserWindowCreator -> Async<unit>
+    onStart : SynchronizationContext -> BrowserWindowCreator<'TWindow> -> Async<unit>
 }
 
 module BrowserApp =
     /// A do-nothing application
     let zero = { onStart = fun _ _ -> async { () } }
     /// Creates an application with the given onStart function
-    let create onStart = { onStart = onStart }
+    let create onStart : BrowserApp<'TWindow> = { onStart = onStart }
     let openAddress address = { onStart = fun mainCtx createWindow -> async {
             do! Async.SwitchToContext mainCtx
             let window = createWindow { BrowserWindowConfig.defaultValue with address = Some address }
@@ -184,4 +186,4 @@ module BrowserApp =
 
 [<AutoOpen>]
 module Core =
-    let defaultBrowserWindowConfig = BrowserWindowConfig.defaultValue
+    let defaultBrowserWindowConfig<'TWindow> = BrowserWindowConfig.defaultValue<'TWindow>

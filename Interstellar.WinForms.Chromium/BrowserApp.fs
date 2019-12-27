@@ -6,8 +6,8 @@ open System.Threading
 open System.Diagnostics
 
 module BrowserApp =    
-    let runAsync mainCtx (app: BrowserApp) = async {
-        let windowCreator : BrowserWindowCreator = fun config ->
+    let runAsync mainCtx (app: BrowserApp<Form>) = async {
+        let windowCreator : BrowserWindowCreator<Form> = fun config ->
             let w = new BrowserWindow(config)
             BrowserWindowConfig.applyWindowTitle mainCtx w w.Disposed config.title
             upcast w

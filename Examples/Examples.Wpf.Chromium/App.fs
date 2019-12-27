@@ -15,7 +15,11 @@ type App() =
 
     override this.OnStartup (e: StartupEventArgs) =
         base.OnStartup e
-        BrowserApp.run SimpleBrowserApp.app
+        let onMainWindowCreated (w: IBrowserWindow<Window>) =
+            let nativeWindow = w.NativeWindow
+            // This is where you could call some WPF-specific APIs on this window
+            ()
+        BrowserApp.run (SimpleBrowserApp.app onMainWindowCreated)
         Trace.WriteLine "returning from OnStartup"
 
 module Main =

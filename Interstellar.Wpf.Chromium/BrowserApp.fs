@@ -5,8 +5,8 @@ open Interstellar
 open System.Threading
 
 module BrowserApp =
-    let runAsync mainCtx (app: BrowserApp) = async {
-        let windowCreator : BrowserWindowCreator = fun config ->
+    let runAsync mainCtx (app: BrowserApp<Window>) = async {
+        let windowCreator : BrowserWindowCreator<Window> = fun config ->
             let w = new BrowserWindow(config)
             BrowserWindowConfig.applyWindowTitle mainCtx w w.Unloaded config.title
             upcast w

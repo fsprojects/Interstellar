@@ -14,7 +14,11 @@ module Main =
     let runApp () =
         Application.EnableVisualStyles ()
         Application.SetCompatibleTextRenderingDefault true
-        BrowserApp.run SimpleBrowserApp.app
+        let onMainWindowCreated (w: IBrowserWindow<Form>) =
+            let nativeWindow = w.NativeWindow
+            // This is where you could call some WinForms-specific APIs on this window
+            ()
+        BrowserApp.run (SimpleBrowserApp.app onMainWindowCreated)
     
     [<EntryPoint; STAThread>]
     let main argv =

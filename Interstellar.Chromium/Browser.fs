@@ -16,7 +16,7 @@ type SharedChromiumBrowserInternals = {
     isBrowserInitializedChanged: IEvent<unit>
 }
 
-type Browser(browser: IWebBrowser, browserInternals: SharedChromiumBrowserInternals, config: BrowserWindowConfig) as this =
+type Browser<'TWindow>(browser: IWebBrowser, browserInternals: SharedChromiumBrowserInternals, config: BrowserWindowConfig<'TWindow>) as this =
     let jsContextCreatedEvt = new Event<_>()
     
     // (primary) constructor

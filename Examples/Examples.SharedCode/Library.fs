@@ -17,14 +17,15 @@ module SimpleBrowserApp =
     let runtimeFramework = Assembly.GetEntryAssembly().GetCustomAttribute<TargetFrameworkAttribute>().FrameworkName
     let detectorPageUrl = new Uri("https://gist.githack.com/jwosty/239408aaffd106a26dc2161f86caa641/raw/5af54d0f4c51634040ea3859ca86032694afc934/interstellardetector.html")
 
-    let defaultBrowserWindowConfig = {
-        defaultBrowserWindowConfig with title = WindowTitle.FromPageTitle (fun pageTitle w -> async {
-                                            let tail = if String.IsNullOrWhiteSpace pageTitle then "" else sprintf " - %s" pageTitle
-                                            return sprintf "InterstellarApp (%A)%s" w.Browser.Engine tail
-                                        })
+    let defaultBrowserWindowConfig<'TWindow> = {
+        defaultBrowserWindowConfig<'TWindow> with
+            title = WindowTitle.FromPageTitle (fun pageTitle w -> async {
+                let tail = if String.IsNullOrWhiteSpace pageTitle then "" else sprintf " - %s" pageTitle
+                return sprintf "InterstellarApp (%A)%s" w.Browser.Engine tail
+            })
     }
 
-    let showCalculatorWindow mainCtx (createWindow: BrowserWindowCreator) = async {
+    let showCalculatorWindow mainCtx (createWindow: BrowserWindowCreator<_>) = async {
         let page = """
             <!DOCTYPE html>
             <html>
@@ -75,7 +76,7 @@ module SimpleBrowserApp =
         do! Async.AwaitTask (fileOut.WriteAsync string)
     }
 
-    let showInjectedContentWindow mainCtx (createWindow: BrowserWindowCreator) = async {
+    let showInjectedContentWindow mainCtx (createWindow: BrowserWindowCreator<_>) = async {
         // to make this one a little more interesting, lets show the content from a temp file instead of the data-style URI like the other examples,
         // so it can feel a bit more like a "real page"
         let filePath = Path.Combine (Path.GetTempPath(), Path.ChangeExtension (Guid.NewGuid().ToString(), ".html"))
@@ -124,13 +125,13 @@ module SimpleBrowserApp =
         return window
     }
 
-    let showDetectorWindow mainCtx (createWindow: BrowserWindowCreator) = async {
+    let showDetectorWindow mainCtx (createWindow: BrowserWindowCreator<_>) = async {
         let window = createWindow { defaultBrowserWindowConfig with address = Some detectorPageUrl }
         do! window.Show ()
         return window
     }
 
-    let runCrossCommunicatingWindows (mainCtx: SynchronizationContext) (createWindow: BrowserWindowCreator) = async {
+    let runCrossCommunicatingWindows (mainCtx: SynchronizationContext) (createWindow: BrowserWindowCreator<_>) = async {
         let inputPage = """
             <!DOCTYPE html>
             <html>
@@ -197,7 +198,7 @@ module SimpleBrowserApp =
         do! Async.Ignore <| Async.Parallel [Async.AwaitEvent inputWindow.Closed; Async.AwaitEvent outputWindow.Closed]
     }
 
-    let appletSelectorWindow mainCtx (createWindow: BrowserWindowCreator) = async {
+    let appletSelectorWindow onMainWindowCreated mainCtx (createWindow: BrowserWindowCreator<_>) = async {
         let page = sprintf """
             <!DOCTYPE html>
             <html>
@@ -220,6 +221,7 @@ module SimpleBrowserApp =
                 </body>
             </html>""" AppletIds.Calculator AppletIds.InjectedContent AppletIds.InterstellarDetector detectorPageUrl.AbsoluteUri AppletIds.InterWindowCommunication
         let selectorWindow = createWindow { defaultBrowserWindowConfig with html = Some page }
+        onMainWindowCreated selectorWindow
         do! selectorWindow.Show ()
         selectorWindow.Browser.JavascriptMessageRecieved.Add (fun msg ->
             Async.Start <| async {
@@ -234,7 +236,7 @@ module SimpleBrowserApp =
         return selectorWindow
     }
 
-    let app = BrowserApp.create (fun mainCtx createWindow -> async {
-        let! mainWindow = appletSelectorWindow mainCtx createWindow
+    let app onMainWindowCreated : BrowserApp<'TWindow> = BrowserApp.create (fun mainCtx createWindow -> async {
+        let! mainWindow = appletSelectorWindow onMainWindowCreated mainCtx createWindow
         do! Async.AwaitEvent mainWindow.Closed
     })

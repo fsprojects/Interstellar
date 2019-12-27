@@ -9,13 +9,13 @@ open CefSharp.Wpf
 open Interstellar
 open Interstellar.Chromium
 
-type BrowserWindow(config: BrowserWindowConfig) as this =
+type BrowserWindow(config: BrowserWindowConfig<Window>) as this =
     inherit Window()
 
     let mainCtx = SynchronizationContext.Current
     let cefBrowser = new CefSharp.Wpf.ChromiumWebBrowser()
     let browser =
-        new Interstellar.Chromium.Browser(
+        new Interstellar.Chromium.Browser<_>(
             cefBrowser,
             { getPageTitle = fun () -> cefBrowser.Title
               titleChanged = cefBrowser.TitleChanged |> Event.map (fun x -> x.NewValue :?> string)
@@ -37,14 +37,15 @@ type BrowserWindow(config: BrowserWindowConfig) as this =
                 this.Close ()
             }
 
-    interface IBrowserWindow with
+    interface IBrowserWindow<Window> with
         member this.Browser = upcast browser
         member this.Close () = (this :> Window).Close ()
         [<CLIEvent>] member val Closed = (this :> Window).Closed |> Event.map ignore
-        member this.Platform = BrowserWindowPlatform.Wpf
         member this.IsShowing =
             seq { for w in Application.Current.Windows -> w }
             |> Seq.contains (this :> Window)
+        member this.NativeWindow = this :> Window
+        member this.Platform = BrowserWindowPlatform.Wpf
         member this.Show () =
             if owningThreadId <> Thread.CurrentThread.ManagedThreadId then
                 raise (new InvalidOperationException("Show() called from a thread other than the thread on which the BrowserWindow was constructed."))
