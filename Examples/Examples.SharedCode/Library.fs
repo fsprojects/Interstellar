@@ -110,18 +110,18 @@ module SimpleBrowserApp =
         do! handleToAwaitJSReady
         // NOTE: depending on the exact platform, it may or may not be safe to assume that the DOM exists right after the
         // JS context has been created. We must first check whether or not it's loaded. In the event it is, we just execute
-        // the code directly. Otherwise, we add our code in a handler to DOMContentLoaded.
-        window.Browser.ExecuteJavascript
-            (sprintf   "function injectValues() {
-                            document.getElementById('runtimeFramework').textContent='%s'
-                            document.getElementById('platform').textContent='%A'
-                            document.getElementById('browserEngine').textContent='%A' }
-                        if (document.readyState !== 'loading') {
-                            injectValues()
-                        } else {
-                            document.addEventListener('DOMContentLoaded', injectValues, false)
-                        }"
-                runtimeFramework window.Platform window.Browser.Engine)
+        // the code directly. Otherwise, we add our cofde in a handler to DOMContentLoaded.
+        window.Browser.ExecuteJavascriptf
+            "function injectValues() {
+                    document.getElementById('runtimeFramework').textContent='%s'
+                    document.getElementById('platform').textContent='%A'
+                    document.getElementById('browserEngine').textContent='%A' }
+                if (document.readyState !== 'loading') {
+                    injectValues()
+                } else {
+                    document.addEventListener('DOMContentLoaded', injectValues, false)
+                }"
+            runtimeFramework window.Platform window.Browser.Engine
         return window
     }
 
