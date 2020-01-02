@@ -224,6 +224,10 @@ module Printf =
     let javascriptf (format: StringFormat<'T, string>) =
         doPrintf format (fun n -> TextEncoderPrintfEnv(id, JavaScriptEncoder.Default))
 
+    /// <summary>Like ksprintf, but escapes the format parameters for Javascript to prevent code injection, allowing you to safely deal with untrusted format parameters. Think SQL prepared statements.</summary>
+    let kjavascriptf (continuation: string -> 'Result) (format: StringFormat<'T, 'Result>) =
+        doPrintf format (fun n -> TextEncoderPrintfEnv(continuation, JavaScriptEncoder.Default))
+
     /// <summary>Printf-style function that executes some Javascript code on a browser instance, sanitizing format parameters using <see cref="javascriptf"/>. It is safe to pass in untrusted format parameters from the outside world. Think SQL prepared statements.</summary>
     let executeJavascriptf (browser: IBrowser) (format: StringFormat<_,_>) =
         doPrintf format (fun n ->
