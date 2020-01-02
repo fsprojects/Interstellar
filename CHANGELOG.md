@@ -4,6 +4,7 @@
 
 * Add a generic parameter to IBrowserWindow that carries the type of the underlying window implementation, allowing for usages of native APIs within an Interstellar application without requiring dynamic casting
     * This also affects all types and functions that depend on IBrowserWindow -- so just about everything except IBrowser 
+* Add executeJavascriptf, javascriptf, and IBrowser.ExecuteJavascriptf, which make it easy to safely format untrusted inputs into Javascript scripts for execution (a form of code injection)
 
 ## 0.1.0
 

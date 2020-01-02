@@ -27,7 +27,18 @@ type IBrowser =
     abstract CloseDevTools : unit -> unit
     /// Identifies the browser engine that this Browser is using
     abstract Engine : BrowserEngine
-    /// <summary>Executes some Javascript in the browser, returning immediately.</summary>
+    /// <summary>
+    ///     Executes some Javascript in the browser, returning immediately. NOTE: Prefer the printf-style ExecuteJavascriptf extension method whenever possible.
+    /// </summary>
+    /// <remarks>
+    ///     NOTE: Prefer ExecuteJavascriptf (notice the "f") for formatting untrusted inputs into the script, as using ExecuteJavascript directly could
+    ///     render your app vulnerable to script injection. For example, instead of doing this:
+    ///     <code>browser.ExecuteJavascript (sprintf "console.log('%s')" unsafeUserInput)</code>
+    ///     which is not safe, do this:
+    ///     <code>browser.ExecuteJavascriptf "console.log('%s')" unsafeUserInput</code>
+    ///     which is safe. Or, equivalently:
+    ///     <code>executeJavascriptf browser "console.log('%s')" unsafeUserInput</code>
+    /// </remarks>
     abstract ExecuteJavascript : string -> unit
     /// <summary>
     ///     Loads a page from a given Uri, returning nested asyncs to signal changes in state relating to loading status of the page: the first async calls back when the
@@ -187,3 +198,34 @@ module BrowserApp =
 [<AutoOpen>]
 module Core =
     let defaultBrowserWindowConfig<'TWindow> = BrowserWindowConfig.defaultValue<'TWindow>
+
+[<AutoOpen>]
+module Printf =
+    open System.Text
+    open System.Text.Encodings.Web
+    open BlackFox.MasterOfFoo
+    open FSharp.Core.Printf
+
+    type private TextEncoderPrintfEnv<'Result>(k: string -> 'Result, encoder: TextEncoder) =
+        inherit PrintfEnv<unit, string, 'Result>()
+        
+        let sb = new StringBuilder()
+
+        override this.Finalize () = k (sb.ToString ())
+        override this.Write (s: PrintableElement) =
+            let value =
+                match s.ElementType with
+                | PrintableElementType.FromFormatSpecifier -> encoder.Encode (s.FormatAsPrintF ())
+                | _ -> s.FormatAsPrintF ()
+            sb.Append value |> ignore
+        override this.WriteT (s: string) = sb.Append (encoder.Encode s) |> ignore
+    
+    /// <summary>Like sprintf, but escapes the format parameters for Javascript to prevent code injection, allowing you to safely deal with untrusted format parameters. Think SQL prepared statements.</summary>
+    let javascriptf (format: StringFormat<'T, string>) =
+        doPrintf format (fun n -> TextEncoderPrintfEnv(id, JavaScriptEncoder.Default))
+
+    /// <summary>Printf-style function that executes some Javascript code on a browser instance, sanitizing format parameters using <see cref="javascriptf"/>. It is safe to pass in untrusted format parameters from the outside world. Think SQL prepared statements.</summary>
+    let executeJavascriptf (browser: IBrowser) (format: StringFormat<_,_>) =
+        doPrintf format (fun n ->
+            TextEncoderPrintfEnv<unit>(browser.ExecuteJavascript, JavaScriptEncoder.Default) :> PrintfEnv<_,_,_>
+        )

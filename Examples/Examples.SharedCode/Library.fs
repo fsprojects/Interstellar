@@ -176,7 +176,10 @@ module SimpleBrowserApp =
         inputWindow.Browser.JavascriptMessageRecieved.Add (fun msg ->
             mainCtx.Post (SendOrPostCallback(fun _ ->
                 if outputWindow.IsShowing then
-                    outputWindow.Browser.ExecuteJavascript (sprintf "updateOutput('%s')" (String (Array.rev (msg.ToCharArray ()))))
+                    // if we didn't use a function that escapes the payload for us, it's possible to inject arbitrary javascript.
+                    // For example, modify this line to use Browser.ExecuteJavascript and sprintf instead of ExecuteJavascriptf,
+                    // then paste this malicous payload into the input text box when you run the app: //;)'olleh'(trela;)'oof
+                    outputWindow.Browser.ExecuteJavascriptf "updateOutput('%s')" (String (Array.rev (msg.ToCharArray ())))
             ), null)   
         )
 

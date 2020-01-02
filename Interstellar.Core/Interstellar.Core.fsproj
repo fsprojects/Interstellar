@@ -6,10 +6,13 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="Script1.fsx" />
+    <None Include="paket.references" />
     <Compile Include="Api.fs" />
     <Compile Include="IBrowserExtensions.fs" />
     <None Remove="IBrowserExtensions.fs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="..\AssemblyAndPackageInfo.props" />
   <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>
