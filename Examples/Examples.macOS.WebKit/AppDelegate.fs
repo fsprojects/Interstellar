@@ -19,7 +19,11 @@ type AppDelegate() =
 
         let mainCtx = SynchronizationContext.Current
         Async.Start <| async {
-            do! BrowserApp.runAsync mainCtx SimpleBrowserApp.app
+            let onMainWindowCreated (w: IBrowserWindow<NSWindow>) =
+                let nsWindow = w.NativeWindow
+                // This is where you could call some Cocoa-specific APIs on this window
+                ()
+            do! BrowserApp.runAsync mainCtx (SimpleBrowserApp.app ignore)
             NSApplication.SharedApplication.Terminate null
         }
 

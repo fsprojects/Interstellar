@@ -13,7 +13,7 @@ type NiblessViewController(view: NSView) =
     override this.LoadView () =
         base.View <- view
 
-type BrowserWindow(config: BrowserWindowConfig) as this =
+type BrowserWindow(config: BrowserWindowConfig<NSWindow>) as this =
     inherit NSWindowController("BrowserWindow")
     
     let browser = new Browser(config)
@@ -45,18 +45,19 @@ type BrowserWindow(config: BrowserWindowConfig) as this =
     override this.LoadWindow () =
         base.LoadWindow ()
 
-    interface IBrowserWindow with
+    interface IBrowserWindow<NSWindow> with
         member this.Browser = upcast browser
         member this.Close () = (this :> NSWindowController).Close ()
+        [<CLIEvent>]
+        member val Closed = closedEvt.Publish
         member this.IsShowing =
             let w = (this :> NSWindowController).Window
             w.IsVisible || w.IsMiniaturized
-        member this.Platform = BrowserWindowPlatform.MacOS
-        [<CLIEvent>]
-        member val Closed = closedEvt.Publish
         member this.Show () = async {
             (this :> NSWindowController).ShowWindow this
         }
+        member this.NativeWindow = this.Window
+        member this.Platform = BrowserWindowPlatform.MacOS
         [<CLIEvent>]
         member val Shown = shownEvt.Publish
         member this.Size

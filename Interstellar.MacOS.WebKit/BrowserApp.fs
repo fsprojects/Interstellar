@@ -7,11 +7,11 @@ open Interstellar.MacOS.WebKit.Internal
 open Foundation
 
 module BrowserApp =
-    let runAsync mainCtx (app: BrowserApp) = async {
+    let runAsync mainCtx (app: BrowserApp<NSWindow>) = async {
         do! Async.SwitchToContext mainCtx
-        let windowCreator : BrowserWindowCreator = fun config ->
+        let windowCreator : BrowserWindowCreator<NSWindow> = fun config ->
             let w = new BrowserWindow(config)
-            BrowserWindowConfig.applyWindowTitle mainCtx w (w :> IBrowserWindow).Closed config.title
+            BrowserWindowConfig.applyWindowTitle mainCtx w (w :> IBrowserWindow<_>).Closed config.title
             upcast w
         do! app.onStart mainCtx windowCreator
         do! Async.SwitchToContext mainCtx

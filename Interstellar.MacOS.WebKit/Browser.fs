@@ -35,7 +35,7 @@ module internal BrowserHelpers =
         else
             wkBrowser.LoadRequest (new NSUrlRequest(nsUrl)) |> ignore
 
-type Browser(config: BrowserWindowConfig) =
+type Browser(config: BrowserWindowConfig<NSWindow>) =
     let wkBrowser = new WKWebView(CGRect.Empty, new WKWebViewConfiguration())
     let pageLoaded = new Event<EventArgs>()
     let pageTitleChanged = new Event<string>()
