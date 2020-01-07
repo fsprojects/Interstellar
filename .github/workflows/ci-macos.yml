@@ -1,0 +1,20 @@
+name: CI (macOS)
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Restore
+      run: |
+        dotnet tool restore
+        mono .paket/paket.exe restore
+    - name: Build
+      run: dotnet fake run build.fsx
+    - name: Test
+      run: dotnet fake run build.fsx -t test
+    - name: Pack
+      run: dotnet fake run build.fsx -t pack
