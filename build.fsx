@@ -73,6 +73,12 @@ let addVersionInfo (versionInfo: PackageVersionInfo) (defaults: MSBuildParams) =
 
 let addProperties props defaults = { defaults with Properties = [yield! defaults.Properties; yield! props]}
 
+let projects = [
+        yield Projects.coreLib
+        if Environment.isWindows then yield! [Projects.chromiumLib; Projects.winFormsLib; Projects.wpfLib]
+        if Environment.isMacOS then yield! [Projects.macosWkLib ]       
+    ]
+
 let msbuild setParams project =
     let buildMode = Environment.environVarOrDefault "buildMode" "Release"
     project |> MSBuild.build (
@@ -91,8 +97,21 @@ Target.create "PackageDescription" (fun _ ->
     Trace.log str
 )
 
+let doRestore msbParams = { msbParams with DoRestore = true }
+
+let getNupkgPath version projPath =
+    let vstr = match version with Some v -> sprintf ".%s" v | None -> ""
+    let projDir = Path.GetDirectoryName projPath
+    Path.Combine ([|projDir; "bin"; "Release";
+                    sprintf "%s%s.nupkg" (Path.GetFileNameWithoutExtension projPath) vstr|])
+
+let getNupkgArtifactPath proj = Path.Combine ("artifacts", sprintf "%s.nupkg" (Path.GetFileNameWithoutExtension proj))
+
 Target.create "Clean" (fun _ ->
     Trace.log " --- Cleaning --- "
+    for proj in projects do
+        File.Delete (getNupkgPath (Some currentVersionInfo.versionName) proj)
+        File.Delete (getNupkgArtifactPath proj)
     if Environment.isWindows then
         msbuild (addTarget "Clean") Projects.winFormsLib
         msbuild (addTarget "Clean") Projects.wpfLib
@@ -107,10 +126,10 @@ Target.create "Build" (fun _ ->
     else
         msbuild (addTarget "Restore") Solutions.macos
     if Environment.isWindows then
-        msbuild (addTarget "Build") Projects.winFormsLib
-        msbuild (addTarget "Build") Projects.wpfLib
+        msbuild (doRestore << addTarget "Build") Projects.winFormsLib
+        msbuild (doRestore << addTarget "Build") Projects.wpfLib
     else if Environment.isMacOS then
-        msbuild (addTarget "Restore;Build") Projects.macosWkLib    
+        msbuild (doRestore << addTarget "Build") Projects.macosWkLib    
 )
 
 Target.create "Test" (fun _ ->
@@ -118,27 +137,16 @@ Target.create "Test" (fun _ ->
     // TODO: add some tests!
 )
 
-let getNupkgPath version projPath =
-        let vstr = match version with Some v -> sprintf ".%s" v | None -> ""
-        let projDir = Path.GetDirectoryName projPath
-        Path.Combine ([|projDir; "bin"; "Release";
-                        sprintf "%s%s.nupkg" (Path.GetFileNameWithoutExtension projPath) vstr|])
-
 Target.create "Pack" (fun _ ->
     Trace.log " --- Packing NuGet packages --- "
-    let msbuild f = msbuild (addTargets ["Restore"; "Pack"] << addProperties ["SolutionDir", __SOURCE_DIRECTORY__] << f)
-    let projects = [
-        yield Projects.coreLib
-        if Environment.isWindows then yield! [Projects.chromiumLib; Projects.winFormsLib; Projects.wpfLib]
-        if Environment.isMacOS then yield! [Projects.macosWkLib ]       
-    ]
+    let msbuild f = msbuild (doRestore << addTargets ["Pack"] << addProperties ["SolutionDir", __SOURCE_DIRECTORY__] << f)
     Trace.log (sprintf "PROJECT LIST: %A" projects)
     for proj in projects do
         msbuild id proj
         // Strip version stuff from the file name, and collect all generated package archives into a common folder
         let oldNupkgPath = getNupkgPath (Some currentVersionInfo.versionName) proj
         Directory.CreateDirectory "artifacts" |> ignore
-        let nupkgArtifact = Path.Combine ("artifacts", sprintf "%s.nupkg" (Path.GetFileNameWithoutExtension proj))
+        let nupkgArtifact = getNupkgArtifactPath proj
         Trace.log (sprintf "Moving %s -> %s" oldNupkgPath nupkgArtifact)
         File.Delete nupkgArtifact
         File.Copy (oldNupkgPath, nupkgArtifact)
