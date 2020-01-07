@@ -16,6 +16,8 @@ open Fake.Core
 open Fake.DotNet
 
 module Projects =
+    let coreLib = "Interstellar.Core"
+    let chromiumLib = "Interstellar.Chromium"
     let winFormsLib = "Interstellar.WinForms.Chromium/Interstellar.WinForms.Chromium.fsproj"
     let wpfLib = "Interstellar.Wpf.Chromium/Interstellar.Wpf.Chromium.fsproj"
 
@@ -47,7 +49,7 @@ let scrapeChangelog () =
                     m.Groups.["Changes"].Value.Trim()
                         .Replace("    *", "    ◦")
                         .Replace("*", "•")
-                        .Replace("    ", "\t") }
+                        .Replace("    ", "\u00A0\u00A0\u00A0\u00A0") }
     }
     result
 
@@ -101,9 +103,10 @@ Target.create "Build" (fun _ ->
 
 Target.create "Pack" (fun _ ->
     Trace.log " --- Packing NuGet packages --- "
+    let msbuild f = msbuild (addTarget "Pack" << addProperties ["SolutionDir", __SOURCE_DIRECTORY__] << f)
+    msbuild id Projects.coreLib
+    msbuild id Projects.chromiumLib
     if Environment.isWindows then
-        //msbuild (addTargets ["Pack"; projAsTarget Projects.winFormsLib; projAsTarget Projects.wpfLib]) Solutions.windows
-        let msbuild f = msbuild (addTarget "Pack" << addProperties ["SolutionDir", __SOURCE_DIRECTORY__] << f)
         msbuild id Projects.winFormsLib
         msbuild id Projects.wpfLib
 )
