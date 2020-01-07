@@ -405,3 +405,6 @@ ASALocalRun/
 
 # Local History for Visual Studio
 .localhistory/
+
+# Ionide for Visual Studio Code
+.ionide/

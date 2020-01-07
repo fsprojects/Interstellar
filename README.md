@@ -13,4 +13,12 @@ Interstellar is an F# library providing a standard, mixed-paradigm API for acces
 
 I intend to create a Windows package that uses the built-in Windows browser control (likely Edge with Chromium), as well as a macOS package that uses CEF (however this is a bigger undertaking as there are no .NET bindings for CEF that work on macOS). Contributions for either of these are welcome, as well as any other possible targets! Linux would be nice to support, but I don't have GTK experience (or whatever you'd use to wrap a browser control).
 
-Finally, please note that this API is not yet guarenteed to be stable or backward-compatible until v1.0, so breaking changes may occur.
+This API is not yet guarenteed to be stable or backward-compatible until v1.0, so breaking changes may occur at any time.
+
+# Building
+
+```bash
+dotnet fake run build.fsx
+```
+
+The fake script is supposed to perform a restore, you may need to perform a `paket restore` when in doubt.
