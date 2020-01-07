@@ -11,6 +11,7 @@ nuget Fake.DotNet.Paket //"
     #r "Facades/netstandard" // https://github.com/ionide/ionide-vscode-fsharp/issues/839#issuecomment-396296095
 #endif
 
+open System
 open System.Text.RegularExpressions
 open System.IO
 open Fake.Core
@@ -59,9 +60,16 @@ let changelog = scrapeChangelog () |> Seq.toList
 let currentVersionInfo = changelog.[0]
 
 let addVersionInfo (versionInfo: PackageVersionInfo) (defaults: MSBuildParams) =
-    { defaults with
-        Properties = defaults.Properties @ ["Version", versionInfo.versionName
-                                            "PackageReleaseNotes", versionInfo.versionChanges] }
+    let versionPrefix, versionSuffix =
+        match String.splitStr "-" versionInfo.versionName with
+        | [hd] -> hd, None
+        | hd::tl -> hd, Some (String.Join ("-", tl))
+        | [] -> failwith "Version name is missing"
+    let props =
+        ["VersionPrefix", versionPrefix
+         match versionSuffix with Some versionSuffix -> "VersionSuffix", versionSuffix | _ -> ()
+         "PackageReleaseNotes", versionInfo.versionChanges]    
+    { defaults with Properties = defaults.Properties @ props }
 
 let addProperties props defaults = { defaults with Properties = [yield! defaults.Properties; yield! props]}
 
