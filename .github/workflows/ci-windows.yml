@@ -1,0 +1,25 @@
+name: CI (Windows)
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Restore
+      run: |
+        dotnet tool restore
+        .paket\paket.exe restore
+    - name: Build
+      run: dotnet fake run build.fsx
+    - name: Test
+      run: dotnet fake run build.fsx -t test
+    - name: Pack
+      run: dotnet fake run build.fsx -t pack
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        name: artifacts-windows
+        path: artifacts/

@@ -11,16 +11,18 @@ nuget Fake.DotNet.Paket //"
     #r "Facades/netstandard" // https://github.com/ionide/ionide-vscode-fsharp/issues/839#issuecomment-396296095
 #endif
 
+open System
 open System.Text.RegularExpressions
+open System.IO
 open Fake.Core
 open Fake.DotNet
 
 module Projects =
-    let coreLib = "Interstellar.Core"
-    let chromiumLib = "Interstellar.Chromium"
-    let winFormsLib = "Interstellar.WinForms.Chromium/Interstellar.WinForms.Chromium.fsproj"
-    let wpfLib = "Interstellar.Wpf.Chromium/Interstellar.Wpf.Chromium.fsproj"
-    let macosWkLib = "Interstellar.macOS.WebKit/Interstellar.macOS.WebKit.fsproj"
+    let coreLib = Path.Combine ("Interstellar.Core", "Interstellar.Core.fsproj")
+    let chromiumLib = Path.Combine ("Interstellar.Chromium", "Interstellar.Chromium.fsproj")
+    let winFormsLib = Path.Combine ("Interstellar.WinForms.Chromium", "Interstellar.WinForms.Chromium.fsproj")
+    let wpfLib = Path.Combine ("Interstellar.Wpf.Chromium", "Interstellar.Wpf.Chromium.fsproj")
+    let macosWkLib = Path.Combine ("Interstellar.macOS.WebKit", "Interstellar.macOS.WebKit.fsproj")
 
 module Solutions =
     let windows = "Interstellar.Windows.sln"
@@ -41,11 +43,11 @@ let quiet (defaults: MSBuildParams) = { defaults with Verbosity = Some MSBuildVe
 type PackageVersionInfo = { versionName: string; versionChanges: string }
 
 let scrapeChangelog () =
-    let changelog = Fake.IO.File.readAsString "CHANGELOG.md"
+    let changelog = System.IO.File.ReadAllText "CHANGELOG.md"
     let regex = Regex("""## (?<Version>.*)\n+(?<Changes>(.|\n)*?)##""")
     let result = seq {
         for m in regex.Matches changelog ->
-            {   versionName = m.Groups.["Version"].Value
+            {   versionName = m.Groups.["Version"].Value.Trim()
                 versionChanges =
                     m.Groups.["Changes"].Value.Trim()
                         .Replace("    *", "    ◦")
@@ -55,22 +57,29 @@ let scrapeChangelog () =
     result
 
 let changelog = scrapeChangelog () |> Seq.toList
+let currentVersionInfo = changelog.[0]
 
 let addVersionInfo (versionInfo: PackageVersionInfo) (defaults: MSBuildParams) =
-    { defaults with
-        Properties = defaults.Properties @ ["Version", versionInfo.versionName
-                                            "PackageReleaseNotes", versionInfo.versionChanges] }
+    let versionPrefix, versionSuffix =
+        match String.splitStr "-" versionInfo.versionName with
+        | [hd] -> hd, None
+        | hd::tl -> hd, Some (String.Join ("-", tl))
+        | [] -> failwith "Version name is missing"
+    let props =
+        ["VersionPrefix", versionPrefix
+         match versionSuffix with Some versionSuffix -> "VersionSuffix", versionSuffix | _ -> ()
+         "PackageReleaseNotes", versionInfo.versionChanges]    
+    { defaults with Properties = defaults.Properties @ props }
 
 let addProperties props defaults = { defaults with Properties = [yield! defaults.Properties; yield! props]}
 
 let msbuild setParams project =
-    let versionInfo = changelog |> List.head
     let buildMode = Environment.environVarOrDefault "buildMode" "Release"
     project |> MSBuild.build (
         quiet <<
         setParams <<
         addProperties ["Configuration", buildMode] <<
-        addVersionInfo versionInfo << setParams
+        addVersionInfo currentVersionInfo << setParams
     )
     
 
@@ -109,16 +118,30 @@ Target.create "Test" (fun _ ->
     // TODO: add some tests!
 )
 
+let getNupkgPath version projPath =
+        let vstr = match version with Some v -> sprintf ".%s" v | None -> ""
+        let projDir = Path.GetDirectoryName projPath
+        Path.Combine ([|projDir; "bin"; "Release";
+                        sprintf "%s%s.nupkg" (Path.GetFileNameWithoutExtension projPath) vstr|])
+
 Target.create "Pack" (fun _ ->
     Trace.log " --- Packing NuGet packages --- "
     let msbuild f = msbuild (addTargets ["Restore"; "Pack"] << addProperties ["SolutionDir", __SOURCE_DIRECTORY__] << f)
-    msbuild id Projects.coreLib
-    msbuild id Projects.chromiumLib
-    if Environment.isWindows then
-        msbuild id Projects.winFormsLib
-        msbuild id Projects.wpfLib
-    else if Environment.isMacOS then
-        msbuild id Projects.macosWkLib    
+    let projects = [
+        yield Projects.coreLib
+        if Environment.isWindows then yield! [Projects.chromiumLib; Projects.winFormsLib; Projects.wpfLib]
+        if Environment.isMacOS then yield! [Projects.macosWkLib ]       
+    ]
+    Trace.log (sprintf "PROJECT LIST: %A" projects)
+    for proj in projects do
+        msbuild id proj
+        // Strip version stuff from the file name, and collect all generated package archives into a common folder
+        let oldNupkgPath = getNupkgPath (Some currentVersionInfo.versionName) proj
+        Directory.CreateDirectory "artifacts" |> ignore
+        let nupkgArtifact = Path.Combine ("artifacts", sprintf "%s.nupkg" (Path.GetFileNameWithoutExtension proj))
+        Trace.log (sprintf "Moving %s -> %s" oldNupkgPath nupkgArtifact)
+        File.Delete nupkgArtifact
+        File.Copy (oldNupkgPath, nupkgArtifact)
 )
 
 open Fake.Core.TargetOperators
