@@ -18,3 +18,8 @@ jobs:
       run: dotnet fake run build.fsx -t test
     - name: Pack
       run: dotnet fake run build.fsx -t pack
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        name: artifacts
+        path: artifacts/
