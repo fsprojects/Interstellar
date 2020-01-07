@@ -104,6 +104,11 @@ Target.create "Build" (fun _ ->
         msbuild (addTarget "Restore;Build") Projects.macosWkLib    
 )
 
+Target.create "Test" (fun _ ->
+    Trace.log " --- Running tests --- "
+    // TODO: add some tests!
+)
+
 Target.create "Pack" (fun _ ->
     Trace.log " --- Packing NuGet packages --- "
     let msbuild f = msbuild (addTargets ["Restore"; "Pack"] << addProperties ["SolutionDir", __SOURCE_DIRECTORY__] << f)
