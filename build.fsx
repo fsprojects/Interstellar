@@ -20,6 +20,7 @@ module Projects =
     let chromiumLib = "Interstellar.Chromium"
     let winFormsLib = "Interstellar.WinForms.Chromium/Interstellar.WinForms.Chromium.fsproj"
     let wpfLib = "Interstellar.Wpf.Chromium/Interstellar.Wpf.Chromium.fsproj"
+    let macosWkLib = "Interstellar.macOS.WebKit/Interstellar.macOS.WebKit.fsproj"
 
 module Solutions =
     let windows = "Interstellar.Windows.sln"
@@ -32,8 +33,8 @@ let runDotNet cmd workingDir =
         DotNet.exec (DotNet.Options.withWorkingDirectory workingDir) cmd ""
     if result.ExitCode <> 0 then failwithf "'dotnet %s' failed in %s" cmd workingDir
 
-let addTargets targets (defaults: MSBuildParams) = { defaults with Targets = defaults.Targets @ targets }
-let addTarget target (defaults: MSBuildParams) = { defaults with Targets = defaults.Targets @ [target] }
+let addTargets targets (defaults: MSBuildParams) = { defaults with Targets = targets @ defaults.Targets }
+let addTarget target (defaults: MSBuildParams) = { defaults with Targets = target :: defaults.Targets }
 
 let quiet (defaults: MSBuildParams) = { defaults with Verbosity = Some MSBuildVerbosity.Quiet }
 
@@ -99,16 +100,20 @@ Target.create "Build" (fun _ ->
     if Environment.isWindows then
         msbuild (addTarget "Build") Projects.winFormsLib
         msbuild (addTarget "Build") Projects.wpfLib
+    else if Environment.isMacOS then
+        msbuild (addTarget "Restore;Build") Projects.macosWkLib    
 )
 
 Target.create "Pack" (fun _ ->
     Trace.log " --- Packing NuGet packages --- "
-    let msbuild f = msbuild (addTarget "Pack" << addProperties ["SolutionDir", __SOURCE_DIRECTORY__] << f)
+    let msbuild f = msbuild (addTargets ["Restore"; "Pack"] << addProperties ["SolutionDir", __SOURCE_DIRECTORY__] << f)
     msbuild id Projects.coreLib
     msbuild id Projects.chromiumLib
     if Environment.isWindows then
         msbuild id Projects.winFormsLib
         msbuild id Projects.wpfLib
+    else if Environment.isMacOS then
+        msbuild id Projects.macosWkLib    
 )
 
 open Fake.Core.TargetOperators

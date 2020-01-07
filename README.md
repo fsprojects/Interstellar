@@ -1,5 +1,7 @@
 # Interstellar
+
 Interstellar is an F# library providing a standard, mixed-paradigm API for accessing browser controls on various platforms. Refer the Examples/ folder for sample projects. Currently, there are 3 combinations platform and browser hosts available. Here's a breakdown of the NuGet packages and what they correspond to (though they should be pretty self-explanatory):
+
 - Interstellar.Core
   - Contains all the shared code, as well as the API definitions for all Interstellar platform implementations. It contains everything you need to define the lifecycle for a browser-based application, agnostic to host platform and browser engine. Interstellar.Core is to Interstellar.macOS.WebKit and Interstellar.Wpf.Chromium as .Net Standard is to .Net Framework and .Net Core.
 - Interstellar.macOS.WebKit
@@ -15,10 +17,20 @@ I intend to create a Windows package that uses the built-in Windows browser cont
 
 This API is not yet guarenteed to be stable or backward-compatible until v1.0, so breaking changes may occur at any time.
 
-# Building
+## Building
+
+In a Unix shell, or PowerShell:
 
 ```bash
+dotnet tool restore
+paket restore
 dotnet fake run build.fsx
 ```
 
-The fake script is supposed to perform a restore, you may need to perform a `paket restore` when in doubt.
+## Creating the NuGet package
+
+After building, run:
+
+```bash
+dotnet fake run build.fsx -t pack
+```
