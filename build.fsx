@@ -127,12 +127,13 @@ Target.create "Pack" (fun _ ->
     Trace.log (sprintf "PROJECT LIST: %A" projects)
     for proj in projects do
         msbuild id proj
-        // massage the nupkg to remove the version info from the file name so dealing with these artifacts in GitHub actions is easer
+        // Strip version stuff from the file name, and collect all generated package archives into a common folder
         let oldNupkgPath = getNupkgPath (Some currentVersionInfo.versionName) proj
-        let newNupkgPath = getNupkgPath None proj
-        Trace.log (sprintf "Moving %s -> %s" oldNupkgPath newNupkgPath)
-        File.Delete newNupkgPath
-        File.Move (oldNupkgPath, newNupkgPath)
+        Directory.CreateDirectory "artifacts" |> ignore
+        let nupkgArtifact = Path.Combine ("artifacts", sprintf "%s.nupkg" (Path.GetFileNameWithoutExtension proj))
+        Trace.log (sprintf "Moving %s -> %s" oldNupkgPath nupkgArtifact)
+        File.Delete nupkgArtifact
+        File.Copy (oldNupkgPath, nupkgArtifact)
 )
 
 open Fake.Core.TargetOperators
