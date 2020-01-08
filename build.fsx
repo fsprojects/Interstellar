@@ -111,8 +111,8 @@ let getNupkgArtifactPath proj = Path.Combine ("artifacts", sprintf "%s.nupkg" (P
 Target.create "Clean" (fun _ ->
     Trace.log " --- Cleaning --- "
     for proj in projects do
-        File.Delete (getNupkgPath (Some currentVersionInfo.versionName) proj)
-        File.Delete (getNupkgArtifactPath proj)
+        try File.Delete (getNupkgPath (Some currentVersionInfo.versionName) proj) with _ -> ()
+        try File.Delete (getNupkgArtifactPath proj) with _ -> ()
     if Environment.isWindows then
         msbuild (addTarget "Clean") Projects.winFormsLib
         msbuild (addTarget "Clean") Projects.wpfLib
@@ -149,7 +149,7 @@ Target.create "Pack" (fun _ ->
         Directory.CreateDirectory "artifacts" |> ignore
         let nupkgArtifact = getNupkgArtifactPath proj
         Trace.log (sprintf "Moving %s -> %s" oldNupkgPath nupkgArtifact)
-        File.Delete nupkgArtifact
+        try File.Delete nupkgArtifact with _ -> ()
         File.Copy (oldNupkgPath, nupkgArtifact)
         ``Nupkg-hack``.hackNupkgAtPath nupkgArtifact
 
