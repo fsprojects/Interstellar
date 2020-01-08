@@ -2,7 +2,8 @@
 nuget Fake.Core.Target
 nuget Fake.DotNet.Cli
 nuget Fake.DotNet.MSBuild
-nuget Fake.DotNet.Paket //"
+nuget Fake.DotNet.Paket
+nuget Fake.Tools.Git //"
 #load "./.fake/build.fsx/intellisense.fsx"
 #load "nupkg-hack.fsx"
 // include Fake modules, see Fake modules section
@@ -17,6 +18,7 @@ open System.Text.RegularExpressions
 open System.IO
 open Fake.Core
 open Fake.DotNet
+open Fake.Tools
 
 module Projects =
     let coreLib = Path.Combine ("Interstellar.Core", "Interstellar.Core.fsproj")
@@ -60,25 +62,25 @@ let scrapeChangelog () =
 let changelog = scrapeChangelog () |> Seq.toList
 let currentVersionInfo = changelog.[0]
 
-let addVersionInfo (versionInfo: PackageVersionInfo) (defaults: MSBuildParams) =
+let addProperties props defaults = { defaults with Properties = [yield! defaults.Properties; yield! props]}
+
+let addVersionInfo (versionInfo: PackageVersionInfo) =
     let versionPrefix, versionSuffix =
         match String.splitStr "-" versionInfo.versionName with
         | [hd] -> hd, None
         | hd::tl -> hd, Some (String.Join ("-", tl))
         | [] -> failwith "Version name is missing"
-    let props =
-        ["VersionPrefix", versionPrefix
-         match versionSuffix with Some versionSuffix -> "VersionSuffix", versionSuffix | _ -> ()
-         "PackageReleaseNotes", versionInfo.versionChanges]    
-    { defaults with Properties = defaults.Properties @ props }
-
-let addProperties props defaults = { defaults with Properties = [yield! defaults.Properties; yield! props]}
+    addProperties [
+        "VersionPrefix", versionPrefix
+        match versionSuffix with Some versionSuffix -> "VersionSuffix", versionSuffix | _ -> ()
+        "PackageReleaseNotes", versionInfo.versionChanges
+    ]    
 
 let projects = [
-        yield Projects.coreLib
-        if Environment.isWindows then yield! [Projects.chromiumLib; Projects.winFormsLib; Projects.wpfLib]
-        if Environment.isMacOS then yield! [Projects.macosWkLib ]       
-    ]
+    yield Projects.coreLib
+    if Environment.isWindows then yield! [Projects.chromiumLib; Projects.winFormsLib; Projects.wpfLib]
+    if Environment.isMacOS then yield! [Projects.macosWkLib ]       
+]
 
 let msbuild setParams project =
     let buildMode = Environment.environVarOrDefault "buildMode" "Release"
@@ -88,7 +90,6 @@ let msbuild setParams project =
         addProperties ["Configuration", buildMode] <<
         addVersionInfo currentVersionInfo << setParams
     )
-    
 
 // *** Define Targets ***
 Target.create "PackageDescription" (fun _ ->
@@ -140,7 +141,8 @@ Target.create "Test" (fun _ ->
 
 Target.create "Pack" (fun _ ->
     Trace.log " --- Packing NuGet packages --- "
-    let msbuild f = msbuild (doRestore << addTargets ["Pack"] << addProperties ["SolutionDir", __SOURCE_DIRECTORY__] << f)
+    let props = ["SolutionDir", __SOURCE_DIRECTORY__; "RepositoryCommit", Git.Information.getCurrentSHA1 __SOURCE_DIRECTORY__]
+    let msbuild f = msbuild (doRestore << addTargets ["Pack"] << addProperties props << f)
     Trace.log (sprintf "PROJECT LIST: %A" projects)
     for proj in projects do
         msbuild id proj
@@ -151,8 +153,7 @@ Target.create "Pack" (fun _ ->
         Trace.log (sprintf "Moving %s -> %s" oldNupkgPath nupkgArtifact)
         try File.Delete nupkgArtifact with _ -> ()
         File.Copy (oldNupkgPath, nupkgArtifact)
-        ``Nupkg-hack``.hackNupkgAtPath nupkgArtifact
-
+        ``Nupkg-hack``.hackNupkgAtPath nupkgArtifact // see #3
 )
 
 open Fake.Core.TargetOperators

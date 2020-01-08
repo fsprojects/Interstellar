@@ -12,7 +12,6 @@
     <Compile Include="IBrowserExtensions.fs" />
     <None Remove="IBrowserExtensions.fs" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="..\AssemblyAndPackageInfo.props" />
   <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>
