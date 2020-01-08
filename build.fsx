@@ -4,6 +4,7 @@ nuget Fake.DotNet.Cli
 nuget Fake.DotNet.MSBuild
 nuget Fake.DotNet.Paket //"
 #load "./.fake/build.fsx/intellisense.fsx"
+#load "nupkg-hack.fsx"
 // include Fake modules, see Fake modules section
 
 #if !FAKE
@@ -150,6 +151,8 @@ Target.create "Pack" (fun _ ->
         Trace.log (sprintf "Moving %s -> %s" oldNupkgPath nupkgArtifact)
         File.Delete nupkgArtifact
         File.Copy (oldNupkgPath, nupkgArtifact)
+        ``Nupkg-hack``.hackNupkgAtPath nupkgArtifact
+
 )
 
 open Fake.Core.TargetOperators
