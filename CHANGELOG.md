@@ -1,5 +1,7 @@
 # Changelog
 
+## 0.3.0-alpha
+
 ## 0.2.0
 
 * Add a generic parameter to IBrowserWindow that carries the type of the underlying window implementation, allowing for usages of native APIs within an Interstellar application without requiring dynamic casting
