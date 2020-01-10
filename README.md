@@ -2,10 +2,10 @@
 
 > NOTE: This API is not yet guarenteed to be stable or backward-compatible until v1.0, so breaking changes may occur at any time.
 
-Interstellar is an F# library providing a standard, mixed-paradigm API for accessing browser controls on various platforms. Refer the Examples/ folder for sample projects. Currently, there are 3 combinations platform and browser hosts available.
+Interstellar is an F# library providing a standard, mixed-paradigm API for accessing browser controls on various platforms. Currently, there are 3 combinations platform and browser hosts available. See [Examples](Examples) for a simple sample application. See https://github.com/jwosty/InterstellarFableHelloWorld for an example of combining Interstellar with [Fable](https://fable.io/), achieving a cross-platform desktop app built completely in F#.
 
 ## Project breakdown
-This project is composed of several NuGet packages. Let's enumerate them and describe their purposes:
+This project is composed of several NuGet packages. Let's break them down and describe their purposes:
 
 - [Interstellar.Core](https://www.nuget.org/packages/Interstellar.Core/)
   - Core API definition. All Interstellar apps reference this. It contains everything you need to define the lifecycle for a browser-based application, agnostic to host platform and browser engine. Interstellar.Core is to Interstellar.macOS.WebKit and Interstellar.Wpf.Chromium as .Net Standard is to .Net Framework and .Net Core (though not a perfect analogy, it's helpful to think of it in that way).
@@ -22,7 +22,7 @@ I intend to create a Windows package that uses the built-in Windows browser cont
 
 ## Building
 
-In a Unix shell, or PowerShell:
+In a Unix shell, or PowerShell where `paket` is however you choose invoke [Paket](https://fsprojects.github.io/Paket/) (there _is_ a magic-mode paket at ./.paket/paket.exe):
 
 ```bash
 dotnet tool restore
