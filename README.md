@@ -24,8 +24,6 @@ I intend to create a Windows package that uses the built-in Windows browser cont
 
 ## Building
 
-In a Unix shell, or PowerShell where `paket` is however you choose invoke [Paket](https://fsprojects.github.io/Paket/) (there _is_ a magic-mode paket at ./.paket/paket.exe):
-
 ```bash
 dotnet tool restore
 dotnet paket restore
@@ -37,5 +35,7 @@ dotnet fake run
 After building, run:
 
 ```bash
-dotnet fake run -t pack
+dotnet fake run build.fsx -t pack
 ```
+
+The resuling *.nupkg files will end up in ``./artifacts/``
