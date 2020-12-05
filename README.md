@@ -28,8 +28,8 @@ In a Unix shell, or PowerShell where `paket` is however you choose invoke [Paket
 
 ```bash
 dotnet tool restore
-paket restore
-dotnet fake run build.fsx
+dotnet paket restore
+dotnet fake run
 ```
 
 ## Creating the NuGet package
@@ -37,5 +37,5 @@ dotnet fake run build.fsx
 After building, run:
 
 ```bash
-dotnet fake run build.fsx -t pack
+dotnet fake run -t pack
 ```

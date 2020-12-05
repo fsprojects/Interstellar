@@ -1,4 +1,6 @@
+// F# 4.7 due to: https://github.com/fsharp/FAKE/issues/2001
 #r "paket:
+nuget FSharp.Core 4.7
 nuget Fake.Core.Target
 nuget Fake.DotNet.Cli
 nuget Fake.DotNet.MSBuild
