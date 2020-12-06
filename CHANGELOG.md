@@ -1,6 +1,9 @@
 # Changelog
 
-## 0.3.0-alpha
+## 0.2.1-alpha
+
+* Interstellar.MacOS.WebKit
+    * Remove some unnecessary assembly references
 
 ## 0.2.0
 
