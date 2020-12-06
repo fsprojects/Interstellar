@@ -11,7 +11,7 @@ jobs:
     - name: Restore
       run: |
         dotnet tool restore
-        .paket\paket.exe restore
+        dotnet paket restore
     - name: Build
       run: dotnet fake run build.fsx
     - name: Test
