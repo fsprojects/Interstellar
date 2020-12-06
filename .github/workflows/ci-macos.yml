@@ -7,7 +7,7 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '5.0.100'
@@ -22,7 +22,7 @@ jobs:
     - name: Pack
       run: dotnet fake run build.fsx -t pack
     - name: Upload artifacts
-      uses: actions/upload-artifact@v1.0.0
+      uses: actions/upload-artifact@v2
       with:
         name: artifacts-macos
         path: artifacts/
