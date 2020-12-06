@@ -57,6 +57,7 @@ type Browser<'TWindow>(browser: IWebBrowser, browserInternals: SharedChromiumBro
         member this.CloseDevTools () = browser.CloseDevTools ()
         member this.CanGoBack = browser.GetBrowser().CanGoBack
         member this.CanGoForward = browser.GetBrowser().CanGoForward
+        member this.CanShowDevTools = true
         member this.Engine = BrowserEngine.Chromium
         member this.ExecuteJavascript code = browser.ExecuteScriptAsync code
         member this.GoBack () = browser.GetBrowser().GoForward ()

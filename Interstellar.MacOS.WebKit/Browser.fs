@@ -95,6 +95,7 @@ type Browser(config: BrowserWindowConfig<NSWindow>) =
         member this.CloseDevTools () = ()
         member this.CanGoBack = wkBrowser.CanGoBack
         member this.CanGoForward = wkBrowser.CanGoForward
+        member this.CanShowDevTools = false
         member this.Engine = BrowserEngine.AppleWebKit
         member this.ExecuteJavascript code = wkBrowser.EvaluateJavaScript (code, null)
         member this.Load address = BrowserHelpers.load (wkBrowser, address)
@@ -117,4 +118,5 @@ type Browser(config: BrowserWindowConfig<NSWindow>) =
         member this.Reload () = wkBrowser.Reload () |> ignore
         [<CLIEvent>]
         member val PageTitleChanged : IEvent<_> = pageTitleChanged.Publish
-        member this.ShowDevTools () = () // there's no way that I know of to programmatically open the WKWebView inspector
+        // there's no way that I know of to programmatically open the WKWebView inspector: https://stackoverflow.com/questions/25200116/how-to-show-the-inspector-within-your-wkwebview-based-desktop-app
+        member this.ShowDevTools () = ()

@@ -23,6 +23,8 @@ type IBrowser =
     abstract CanGoBack : bool
     /// <summary>Indicates whether or not there is a next page to go to</summary>
     abstract CanGoForward : bool
+    /// <summary>Whether or not this browser supports dynamic showing of dev tools. macOS WebKit browsers do not seem to support this.</summary>
+    abstract CanShowDevTools : bool
     /// <summary>Closes the developer tools for this browser if they are open</summary>
     abstract CloseDevTools : unit -> unit
     /// Identifies the browser engine that this Browser is using
@@ -74,7 +76,7 @@ type IBrowser =
     abstract Reload : unit -> unit
     /// <summary>Event handler that is called whenever <see cref="PageTitle"/> changes. It is safe to reference this event from a non-main thread.</summary>
     [<CLIEvent>] abstract PageTitleChanged : IEvent<string>
-    /// <summary>Shows the developer tools for this browser if they are not already showing</summary>
+    /// <summary>Shows the developer tools for this browser if they are not already showing. Does nothing if this feature is not supported on the current environment (see <see cref="CanShowDevTools"/>)</summary>
     abstract ShowDevTools : unit -> unit
 
 /// <summary>
