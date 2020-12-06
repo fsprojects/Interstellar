@@ -8,6 +8,7 @@
     <TargetProfile>netcore</TargetProfile>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="paket.references" />
     <Compile Include="..\Interstellar.WindowsCommon.Chromium\Platform.fs" Link="Platform.fs" />
     <Compile Include="BrowserWindow.fs" />
     <Compile Include="BrowserApp.fs" />
