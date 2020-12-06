@@ -20,7 +20,7 @@ module BrowserApp =
 
     let run app =
         // call a Control ctor in order to initialize SynchronizationContext.Current. Constructing a Form, or calling Application.Run also does this.
-        let dummyControl = new Control()
+        use dummyControl = new Control() in ()
         Debug.WriteLine (sprintf "DummyControl thread: %A" Thread.CurrentThread.ManagedThreadId)
         Async.Start <| runAsync SynchronizationContext.Current app
         Application.Run ()
