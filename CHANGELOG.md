@@ -2,8 +2,9 @@
 
 ## 0.2.1-alpha
 
+* Add IBrowser.CanShowDevTools
 * Interstellar.MacOS.WebKit
-    * Remove some unnecessary assembly references
+    * Remove unnecessary assembly references
 
 ## 0.2.0
 
