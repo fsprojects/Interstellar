@@ -11,7 +11,6 @@ type BrowserWindow(config: BrowserWindowConfig<Window>) as this =
     inherit Window()
 
     let mainCtx = SynchronizationContext.Current
-    //let cefBrowser = new CefSharp.Wpf.ChromiumWebBrowser()
     let msBrowser = new Microsoft.Web.WebView2.Wpf.WebView2()
     //let browser =
     //    new Interstellar.Wpf.Browser<_>(
@@ -20,7 +19,7 @@ type BrowserWindow(config: BrowserWindowConfig<Window>) as this =
     //          titleChanged = cefBrowser.TitleChanged |> Event.map (fun x -> x.NewValue :?> string)
     //          isBrowserInitializedChanged = cefBrowser.IsBrowserInitializedChanged |> Event.map ignore},
     //        config)
-    let browser = Unchecked.defaultof<IBrowser>
+    let browser = new Interstellar.Wpf.Browser(msBrowser)
     let owningThreadId = Thread.CurrentThread.ManagedThreadId
 
     let mutable alreadyShown = false
@@ -38,7 +37,7 @@ type BrowserWindow(config: BrowserWindowConfig<Window>) as this =
             }
 
     interface IBrowserWindow<Window> with
-        member this.Browser = browser
+        member this.Browser = upcast browser
         member this.Close () = (this :> Window).Close ()
         [<CLIEvent>] member val Closed = (this :> Window).Closed |> Event.map ignore
         member this.IsShowing =

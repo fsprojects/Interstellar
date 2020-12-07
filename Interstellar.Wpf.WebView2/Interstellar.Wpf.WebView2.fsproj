@@ -7,6 +7,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="paket.references" />
+    <Compile Include="Browser.fs" />
     <Compile Include="BrowserWindow.fs" />
     <Compile Include="BrowserApp.fs" />
   </ItemGroup>

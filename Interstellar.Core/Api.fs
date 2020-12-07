@@ -41,14 +41,14 @@ type IBrowser =
     ///     which is safe. Or, equivalently:
     ///     <code>executeJavascriptf browser "console.log('%s')" unsafeUserInput</code>
     /// </remarks>
-    abstract ExecuteJavascript : string -> unit
+    abstract ExecuteJavascript : script:string -> unit
     /// <summary>
     ///     Loads a page from a given Uri, returning nested asyncs to signal changes in state relating to loading status of the page: the first async calls back when the
     ///     page finishes loading, and the second async calls back when the page is ready to start executing Javascript.
     /// </summary>
-    abstract LoadAsync : Uri -> Async<Async<unit>>
+    abstract LoadAsync : uri:Uri -> Async<Async<unit>>
     /// <summary>Starts loading a page from a given Uri, returning immediately.</summary>
-    abstract Load : Uri -> unit
+    abstract Load : uri:Uri -> unit
     /// <summary>
     ///     Directly loads the string as content for display. If a <see cref="uri"/> is given, it is used as the origin page.
     ///     Any Javascript AJAX calls will communicate using that URI. This method rturns nested asyncs to signal changes in
