@@ -1,11 +1,13 @@
 ﻿namespace Interstellar.Wpf.WebView2
 open System
 open System.Threading
+open System.Threading.Tasks
 open System.Windows
-open Microsoft.Web.WebView2.Core
-open Microsoft.Web.WebView2.Wpf
+open FSharp.Control.Tasks
 open Interstellar
 open Interstellar.Core
+open Microsoft.Web.WebView2.Core
+open Microsoft.Web.WebView2.Wpf
 
 type BrowserWindow(config: BrowserWindowConfig<Window>) as this =
     inherit Window()
@@ -19,7 +21,8 @@ type BrowserWindow(config: BrowserWindowConfig<Window>) as this =
     //          titleChanged = cefBrowser.TitleChanged |> Event.map (fun x -> x.NewValue :?> string)
     //          isBrowserInitializedChanged = cefBrowser.IsBrowserInitializedChanged |> Event.map ignore},
     //        config)
-    let browser = new Interstellar.Wpf.Browser(msBrowser)
+    //let browser = new Interstellar.Wpf.Browser(msBrowser)
+    let mutable _browser = None
     let owningThreadId = Thread.CurrentThread.ManagedThreadId
 
     let mutable alreadyShown = false
@@ -27,6 +30,10 @@ type BrowserWindow(config: BrowserWindowConfig<Window>) as this =
 
     // (primary) constructor
     do
+        msBrowser.CoreWebView2Ready.Add (fun args ->
+            let cwv2 = msBrowser.CoreWebView2
+            printfn "CoreWebView2 ready: %O" cwv2
+        )
         this.Content <- msBrowser
 
     interface IDisposable with
@@ -37,7 +44,28 @@ type BrowserWindow(config: BrowserWindowConfig<Window>) as this =
             }
 
     interface IBrowserWindow<Window> with
-        member this.Browser = upcast browser
+        member this.Browser =
+            match _browser with
+            | Some b -> b
+            | None ->
+                let t = task {
+                    try
+                        do! msBrowser.EnsureCoreWebView2Async()
+                        return Ok msBrowser.CoreWebView2
+                    with e ->
+                        return Error e
+                }
+                //msBrowser.EnsureCoreWebView2Async().Wait()
+                //let b = new Interstellar.Wpf.Browser(msBrowser, msBrowser.CoreWebView2)
+                t.Wait()
+                match t.Result with
+                | Ok cwv2 ->
+                    let b = new Interstellar.Wpf.Browser(msBrowser, cwv2) :> IBrowser
+                    _browser <- Some b
+                    b
+                | Error e ->
+                    raise (new BrowserInitializationException("Failed to initialize WebView2 (Edge) browser", e))
+
         member this.Close () = (this :> Window).Close ()
         [<CLIEvent>] member val Closed = (this :> Window).Closed |> Event.map ignore
         member this.IsShowing =

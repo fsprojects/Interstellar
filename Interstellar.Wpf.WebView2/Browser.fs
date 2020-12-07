@@ -8,18 +8,27 @@ open Interstellar
 open Microsoft.Web.WebView2.Core
 open Microsoft.Web.WebView2.Wpf
 
-type Browser(msBrowser: WebView2) =
+type Browser(msBrowser: WebView2, cwv2: CoreWebView2) =
     // fire-and-forget method to get the CoreWebView2 and then do something with it possibly sometime in the future
-    let withCwv2 (lambda: CoreWebView2 -> unit) =
-        msBrowser.EnsureCoreWebView2Async().ContinueWith(fun _ ->
-            lambda msBrowser.CoreWebView2)
-        |> ignore
+    //let withCwv2 (lambda: CoreWebView2 -> unit) =
+        // TODO: would be nice to use a native task builder
+        //Async.RunSynchronously <|
+        //    async {
+        //        try
+        //            let x = Async.AwaitTask (msBrowser.EnsureCoreWebView2Async ())
+        //            ()
+        //        with :? EdgeNotFoundException as e ->
+        //            reraise ()
+        //    }
+        //msBrowser.EnsureCoreWebView2Async().ContinueWith(fun _ ->
+        //    lambda msBrowser.CoreWebView2)
+        //|> ignore
 
     // gets the CoreWebView2, potentially blocking until it has initialized if it hasn't yet
-    let getCwv2 () =
-        if msBrowser.CoreWebView2 = null then
-            msBrowser.EnsureCoreWebView2Async().Wait()
-        msBrowser.CoreWebView2
+    //let getCwv2 () =
+    //    if msBrowser.CoreWebView2 = null then
+    //        msBrowser.EnsureCoreWebView2Async().Wait()
+    //    msBrowser.CoreWebView2
     
     let mutable areDevToolsShowing = false
 
@@ -48,7 +57,7 @@ type Browser(msBrowser: WebView2) =
         member this.GoForward () = msBrowser.GoForward ()
         [<CLIEvent>]
         member val JavascriptMessageRecieved = javascriptMessageRecieved.Publish
-        member this.Load uri = msBrowser.Source <- uri
+        member this.Load uri = cwv2.Navigate (string uri)
         member this.LoadAsync uri =
             msBrowser.Source <- uri
             async {
@@ -60,24 +69,21 @@ type Browser(msBrowser: WebView2) =
             | Some _ ->
                 // FIXME: is implementing this possible?
                 raise (new NotImplementedException())
-            | _ -> withCwv2 (fun cwv2 -> cwv2.NavigateToString html)
+            | _ -> cwv2.NavigateToString html
         member this.LoadStringAsync (html, uri) =
             match uri with
             | Some _ ->
                 // look up ^^
                 raise (new NotImplementedException())
             | _ -> async {
-                let cwv2 = getCwv2 ()
                 cwv2.NavigateToString html
                 let! _ = Async.AwaitEvent cwv2.NavigationCompleted
                 return this.AwaitJavascriptReady ()
             }
         [<CLIEvent>]
         member val PageLoaded = msBrowser.NavigationCompleted |> Event.map (fun e -> e :> EventArgs)
-        member this.PageTitle =
-            let cwv2 = getCwv2 ()
-            cwv2.DocumentTitle
+        member this.PageTitle = cwv2.DocumentTitle
         [<CLIEvent>]
         member val PageTitleChanged = pageTitleChanged.Publish
         member this.Reload() = msBrowser.Reload ()
-        member this.ShowDevTools() = withCwv2 (fun cwv2 -> cwv2.OpenDevToolsWindow ())
+        member this.ShowDevTools() = cwv2.OpenDevToolsWindow ()

@@ -14,6 +14,10 @@ type BrowserEngine =
 /// <summary>Indicates a host GUI framework, which is whatever will be used to create new windows and interact with the graphical system of the OS.</summary>
 type BrowserWindowPlatform = | Wpf = 0b01 | WinForms = 0b11 | MacOS = 0b100
 
+/// <summary>The exception that is thrown when the browser fails to initialize</summary>
+type BrowserInitializationException(message: string, innerException: exn) =
+    inherit Exception(message, innerException)
+
 type IBrowser =
     /// <summary>The address which the browser is currently displaying, if any</summary>
     abstract Address : Uri option
@@ -85,6 +89,7 @@ type IBrowser =
 type IBrowserWindow<'TWindow> =
     inherit IDisposable
     /// <summary>The browser instance that this window is hosting</summary>
+    /// <exception cref="Interstellar.BrowserInitializationException">Thrown when the underlying implementation fails to initialize the browser. Some implementations will throw this when their runtime dependencies are missing.</exception>
     abstract Browser : IBrowser
     /// <summary>Closes the window</summary>
     abstract Close : unit -> unit

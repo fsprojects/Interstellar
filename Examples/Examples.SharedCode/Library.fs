@@ -241,7 +241,11 @@ module SimpleBrowserApp =
 
     let app onMainWindowCreated : BrowserApp<'TWindow> = BrowserApp.create (fun mainCtx createWindow -> async {
         //let! mainWindow = appletSelectorWindow onMainWindowCreated mainCtx createWindow
-        let mainWindow = createWindow { defaultBrowserWindowConfig with address = Some (Uri("https://wikipedia.org/")) }
+        //let mainWindow = createWindow { defaultBrowserWindowConfig with address = Some (Uri("https://wikipedia.org/")) }
+        let mainWindow = createWindow defaultBrowserWindowConfig
+        mainWindow.Browser.Load (Uri("https://wikipedia.org"))
         do! mainWindow.Show ()
+        //let! awaitJsReady = mainWindow.Browser.LoadAsync (Uri("https://wikipedia.org"))
+        //do! awaitJsReady
         do! Async.AwaitEvent mainWindow.Closed
     })
