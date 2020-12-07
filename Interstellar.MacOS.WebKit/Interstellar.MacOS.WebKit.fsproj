@@ -12,15 +12,6 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <UseSGen>false</UseSGen>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="mscorlib" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Threading" />
-    <Reference Include="System.Threading.Tasks" />
-    <Reference Include="Xamarin.Mac" />
-  </ItemGroup>
   <Target Name="BeforeBuild">
     <ItemGroup>
       <AssemblyAttributes Include="AssemblyVersion">

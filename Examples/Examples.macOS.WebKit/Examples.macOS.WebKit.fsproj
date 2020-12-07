@@ -19,14 +19,6 @@
     <UseSGen>false</UseSGen>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Threading" />
-    <Reference Include="Xamarin.Mac" />
-    <Reference Include="mscorlib" />
-    <Reference Include="System.Numerics" />
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="Resources\" />
   </ItemGroup>
   <ItemGroup>
