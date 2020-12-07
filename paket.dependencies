@@ -5,4 +5,5 @@ nuget BlackFox.MasterOfFoo
 nuget CefSharp.WinForms
 nuget CefSharp.Wpf >= 75.1.143
 nuget FSharp.Core >= 4.2.3
+nuget Microsoft.Web.WebView2 1.0.664.37
 nuget System.Text.Encodings.Web

@@ -4,7 +4,9 @@ open System.IO
 open System.Reflection
 open CefSharp
 #if WPF
+#if CEFSHARP
 open CefSharp.Wpf
+#endif
 #endif
 #if WINFORMS
 open CefSharp.WinForms

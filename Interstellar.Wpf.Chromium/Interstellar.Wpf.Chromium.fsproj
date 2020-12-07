@@ -4,7 +4,7 @@
     <TargetFrameworks>netcoreapp3.0;net472</TargetFrameworks>
     <CefSharpAnyCpuSupport>true</CefSharpAnyCpuSupport>
     <UseWPF>true</UseWPF>
-    <DefineConstants>WPF</DefineConstants>
+    <DefineConstants>WPF;CEFSHARP</DefineConstants>
     <TargetProfile>netcore</TargetProfile>
   </PropertyGroup>
   <ItemGroup>

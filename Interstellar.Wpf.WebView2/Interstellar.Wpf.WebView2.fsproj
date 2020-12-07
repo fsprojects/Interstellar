@@ -2,21 +2,16 @@
 <Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
     <TargetFrameworks>netcoreapp3.0;net472</TargetFrameworks>
-    <CefSharpAnyCpuSupport>true</CefSharpAnyCpuSupport>
-    <UseWindowsForms>true</UseWindowsForms>
-    <DefineConstants>WINFORMS;CEFSHARP</DefineConstants>
-    <TargetProfile>netcore</TargetProfile>
+    <UseWPF>true</UseWPF>
+    <DefineConstants>WPF;WEBVIEW2</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <None Include="paket.references" />
-    <Compile Include="..\Interstellar.WindowsCommon.Chromium\Platform.fs" Link="Platform.fs" />
     <Compile Include="BrowserWindow.fs" />
     <Compile Include="BrowserApp.fs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Interstellar.Chromium\Interstellar.Chromium.fsproj" />
     <ProjectReference Include="..\Interstellar.Core\Interstellar.Core.fsproj" />
   </ItemGroup>
-  <Import Project="..\AssemblyAndPackageInfo.props" />
   <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>
