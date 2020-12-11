@@ -123,6 +123,11 @@ Target.create "Clean" (fun _ ->
         msbuild (addTarget "Clean") Solutions.macos
 )
 
+Target.create "Restore" (fun _ ->
+    DotNet.exec id "tool" "restore" |> ignore
+    DotNet.restore id |> ignore
+)
+
 Target.create "Build" (fun _ ->
     Trace.log " --- Building --- "
     if Environment.isWindows then
@@ -139,6 +144,19 @@ Target.create "Build" (fun _ ->
 Target.create "Test" (fun _ ->
     Trace.log " --- Running tests --- "
     // TODO: add some tests!
+)
+
+Target.create "BuildDocs" (fun _ ->
+    Trace.log " --- Building documentation --- "
+    try Directory.Delete (".fsdocs", true) with _ -> ()
+    try Directory.Delete ("output/", true) with _ -> ()
+    let result = DotNet.exec id "fsdocs" ("build --projects=" + Projects.coreLib)
+    Trace.logfn "%s" (result.ToString())
+)
+
+Target.create "ReleaseDocs" (fun _ ->
+    Trace.log "--- Releasing documentation --- "
+    
 )
 
 Target.create "Pack" (fun _ ->
@@ -162,8 +180,13 @@ open Fake.Core.TargetOperators
 
 // *** Define Dependencies ***
 "Clean"
+    ==> "Restore"
     ==> "Build"
     ==> "Pack"
+
+"Restore"
+    ==> "BuildDocs"
+    ==> "ReleaseDocs"
 
 // *** Start Build ***
 Target.runOrDefault "Build"

@@ -356,6 +356,7 @@ _Pvt_Extensions
 paket-files/
 .paket/Paket.Restore.targets
 .paket/load/
+.paket/
 
 # FAKE - F# Make
 .fake/
@@ -407,3 +408,7 @@ ASALocalRun/
 
 # Ionide for Visual Studio Code
 .ionide/
+
+# fsdocs
+.fsdocs/
+output/

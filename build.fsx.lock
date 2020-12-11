@@ -493,7 +493,7 @@ NUGET
       System.Security.Cryptography.Primitives (>= 4.3)
       System.Text.Encoding (>= 4.3)
     System.Security.Cryptography.OpenSsl (5.0)
-    System.Security.Cryptography.Pkcs (5.0)
+    System.Security.Cryptography.Pkcs (5.0.1)
       System.Buffers (>= 4.5.1)
       System.Formats.Asn1 (>= 5.0)
       System.Memory (>= 4.5.4)
