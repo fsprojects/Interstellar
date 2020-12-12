@@ -196,7 +196,7 @@ open Fake.Core.TargetOperators
     ==> "Build"
     ==> "Pack"
 
-"Restore"
+"Build"
     ==> "BuildDocs"
     ==> "ReleaseDocs"
 
