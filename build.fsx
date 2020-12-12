@@ -164,11 +164,11 @@ Target.create "ReleaseDocs" (fun _ ->
     Git.CommandHelper.runSimpleGitCommand "." (sprintf "clone %s temp/gh-pages --depth 1 -b gh-pages" projectRepo) |> ignore
     Shell.copyRecursive "output" "temp/gh-pages" true |> printfn "%A"
     Git.CommandHelper.runSimpleGitCommand "temp/gh-pages" "add ." |> printfn "%s"
-    let commit = Git.Information.getCurrentHash
+    let commit = Git.Information.getCurrentHash ()
     Git.CommandHelper.runSimpleGitCommand "temp/gh-pages"
         (sprintf """commit -a -m "Update generated docs for version %s from %s" """ currentVersionInfo.versionName commit)
     |> printfn "%s"
-    Git.Branches.push "temp/gh-pages"
+    Git.Branches.pushBranch "temp/gh-pages" "origin" "gh-pages"
 )
 
 Target.create "Pack" (fun _ ->
