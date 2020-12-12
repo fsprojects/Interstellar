@@ -20,6 +20,8 @@ open System.Text.RegularExpressions
 open System.IO
 open Fake.Core
 open Fake.DotNet
+open Fake.IO
+open Fake.IO.FileSystemOperators
 open Fake.Tools
 
 module Projects =
@@ -32,6 +34,8 @@ module Projects =
 module Solutions =
     let windows = "Interstellar.Windows.sln"
     let macos = "Interstellar.MacOS.sln"
+
+let projectRepo = "https://github.com/jwosty/Interstellar"
 
 let projAsTarget (projFileName: string) = projFileName.Split('/').[0].Replace(".", "_")
 
@@ -81,7 +85,7 @@ let addVersionInfo (versionInfo: PackageVersionInfo) =
 let projects = [
     yield Projects.coreLib
     if Environment.isWindows then yield! [Projects.chromiumLib; Projects.winFormsLib; Projects.wpfLib]
-    if Environment.isMacOS then yield! [Projects.macosWkLib ]       
+    if Environment.isMacOS then yield! [Projects.macosWkLib ]
 ]
 
 let msbuild setParams project =
@@ -121,6 +125,9 @@ Target.create "Clean" (fun _ ->
         msbuild (addTarget "Clean") Projects.wpfLib
     else
         msbuild (addTarget "Clean") Solutions.macos
+    Shell.deleteDir ".fsdocs"
+    Shell.deleteDir "output"
+    Shell.deleteDir "temp"
 )
 
 Target.create "Restore" (fun _ ->
@@ -138,7 +145,7 @@ Target.create "Build" (fun _ ->
         msbuild (doRestore << addTarget "Build") Projects.winFormsLib
         msbuild (doRestore << addTarget "Build") Projects.wpfLib
     else if Environment.isMacOS then
-        msbuild (doRestore << addTarget "Build") Projects.macosWkLib    
+        msbuild (doRestore << addTarget "Build") Projects.macosWkLib
 )
 
 Target.create "Test" (fun _ ->
@@ -148,15 +155,20 @@ Target.create "Test" (fun _ ->
 
 Target.create "BuildDocs" (fun _ ->
     Trace.log " --- Building documentation --- "
-    try Directory.Delete (".fsdocs", true) with _ -> ()
-    try Directory.Delete ("output/", true) with _ -> ()
     let result = DotNet.exec id "fsdocs" ("build --projects=" + Projects.coreLib)
     Trace.logfn "%s" (result.ToString())
 )
 
 Target.create "ReleaseDocs" (fun _ ->
     Trace.log "--- Releasing documentation --- "
-    
+    Git.CommandHelper.runSimpleGitCommand "." (sprintf "clone %s temp/gh-pages --depth 1 -b gh-pages" projectRepo) |> ignore
+    Shell.copyRecursive "output" "temp/gh-pages" true |> printfn "%A"
+    Git.CommandHelper.runSimpleGitCommand "temp/gh-pages" "add ." |> printfn "%s"
+    let commit = Git.Information.getCurrentHash
+    Git.CommandHelper.runSimpleGitCommand "temp/gh-pages"
+        (sprintf """commit -a -m "Update generated docs for version %s from %s" """ currentVersionInfo.versionName commit)
+    |> printfn "%s"
+    Git.Branches.push "temp/gh-pages"
 )
 
 Target.create "Pack" (fun _ ->

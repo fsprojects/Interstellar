@@ -4,6 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <TargetProfile>netcore</TargetProfile>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <None Include="Script1.fsx" />
