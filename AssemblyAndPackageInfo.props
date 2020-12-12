@@ -7,6 +7,7 @@
     <PackageProjectUrl>https://github.com/jwosty/Interstellar</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/jwosty/Interstellar</RepositoryUrl>
+    <PackageProjectUrl>https://jwosty.github.io/Interstellar</PackageProjectUrl>
     <PackageTags>fsharp;interstellar</PackageTags>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>

@@ -412,3 +412,4 @@ ASALocalRun/
 # fsdocs
 .fsdocs/
 output/
+temp/
