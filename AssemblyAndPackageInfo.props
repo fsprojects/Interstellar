@@ -10,6 +10,7 @@
     <PackageProjectUrl>https://jwosty.github.io/Interstellar</PackageProjectUrl>
     <PackageTags>fsharp;interstellar</PackageTags>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <None Include="$(SolutionDir)\LICENSE" Pack="true" PackagePath=""/>

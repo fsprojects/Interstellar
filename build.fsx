@@ -155,7 +155,7 @@ Target.create "Test" (fun _ ->
 
 Target.create "BuildDocs" (fun _ ->
     Trace.log " --- Building documentation --- "
-    let result = DotNet.exec id "fsdocs" ("build --projects=" + Projects.coreLib + " --property Configuration=Release")
+    let result = DotNet.exec id "fsdocs" ("build --clean --projects=" + Projects.coreLib + " --property Configuration=Release")
     Trace.logfn "%s" (result.ToString())
 )
 

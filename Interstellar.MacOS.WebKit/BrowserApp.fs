@@ -7,6 +7,9 @@ open Interstellar.MacOS.WebKit.Internal
 open Foundation
 
 module BrowserApp =
+    /// <summary>Starts and runs a BrowserApp's lifecycle in a Cocoa + WebKit host, asychronously</summary>
+    /// <param name="mainCtx">indicates the thread that is to be used as the UI thread</param>
+    /// <param name="app">Describes the application lifecycle</param>
     let runAsync mainCtx (app: BrowserApp<NSWindow>) = async {
         do! Async.SwitchToContext mainCtx
         let windowCreator : BrowserWindowCreator<NSWindow> = fun config ->
