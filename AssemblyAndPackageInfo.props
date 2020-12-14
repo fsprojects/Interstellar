@@ -4,7 +4,6 @@
     <Company>Interstellar Contributors</Company>
     <Description>Cross-platform F# browser library</Description>
     <Authors>John Wostenberg</Authors>
-    <PackageProjectUrl>https://github.com/jwosty/Interstellar</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/jwosty/Interstellar</RepositoryUrl>
     <PackageProjectUrl>https://jwosty.github.io/Interstellar</PackageProjectUrl>
