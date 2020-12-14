@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.3.1-alpha
+## 0.3.0
 
 * Add IBrowser.CanShowDevTools
 * Interstellar.MacOS.WebKit
