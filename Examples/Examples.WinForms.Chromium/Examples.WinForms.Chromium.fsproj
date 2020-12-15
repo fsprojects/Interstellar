@@ -8,11 +8,12 @@
     <ApplicationIcon />
   </PropertyGroup>
   <ItemGroup>
+    <None Include="paket.references" />
     <Compile Include="App.fs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Interstellar.WinForms.Chromium\Interstellar.WinForms.Chromium.fsproj" />
-    <ProjectReference Include="..\..\Interstellar.Core\Interstellar.Core.fsproj" />
+    <ProjectReference Include="..\..\src\Interstellar.WinForms.Chromium\Interstellar.WinForms.Chromium.fsproj" />
+    <ProjectReference Include="..\..\src\Interstellar.Core\Interstellar.Core.fsproj" />
     <ProjectReference Include="..\Examples.SharedCode\Examples.SharedCode.fsproj" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />

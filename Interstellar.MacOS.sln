@@ -1,9 +1,9 @@
 
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Interstellar.macOS.WebKit", "Interstellar.macOS.WebKit\Interstellar.macOS.WebKit.fsproj", "{728F9219-A62A-481F-92E6-716E09E0C5A9}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Interstellar.macOS.WebKit", "src\Interstellar.macOS.WebKit\Interstellar.macOS.WebKit.fsproj", "{728F9219-A62A-481F-92E6-716E09E0C5A9}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Interstellar.Core", "Interstellar.Core\Interstellar.Core.fsproj", "{7D096C2C-0960-4754-9954-421832426807}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Interstellar.Core", "src\Interstellar.Core\Interstellar.Core.fsproj", "{7D096C2C-0960-4754-9954-421832426807}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Examples.macOS.WebKit", "Examples\Examples.macOS.WebKit\Examples.macOS.WebKit.fsproj", "{95B733CD-8092-4267-80E6-963B65DC71C5}"
 EndProject

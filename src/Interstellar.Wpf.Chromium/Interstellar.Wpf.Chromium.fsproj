@@ -17,6 +17,6 @@
     <ProjectReference Include="..\Interstellar.Chromium\Interstellar.Chromium.fsproj" />
     <ProjectReference Include="..\Interstellar.Core\Interstellar.Core.fsproj" />
   </ItemGroup>
-  <Import Project="..\AssemblyAndPackageInfo.props" />
-  <Import Project="..\.paket\Paket.Restore.targets" />
+  <Import Project="..\..\AssemblyAndPackageInfo.props" />
+  <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

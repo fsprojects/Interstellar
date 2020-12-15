@@ -40,8 +40,8 @@
     <Compile Include="Main.fs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Interstellar.Core\Interstellar.Core.fsproj" />
-    <ProjectReference Include="..\..\Interstellar.macOS.WebKit\Interstellar.macOS.WebKit.fsproj" />
+    <ProjectReference Include="..\..\src\Interstellar.Core\Interstellar.Core.fsproj" />
+    <ProjectReference Include="..\..\src\Interstellar.macOS.WebKit\Interstellar.macOS.WebKit.fsproj" />
     <ProjectReference Include="..\Examples.SharedCode\Examples.SharedCode.fsproj" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />

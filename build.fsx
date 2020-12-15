@@ -25,11 +25,11 @@ open Fake.IO.FileSystemOperators
 open Fake.Tools
 
 module Projects =
-    let coreLib = Path.Combine ("Interstellar.Core", "Interstellar.Core.fsproj")
-    let chromiumLib = Path.Combine ("Interstellar.Chromium", "Interstellar.Chromium.fsproj")
-    let winFormsLib = Path.Combine ("Interstellar.WinForms.Chromium", "Interstellar.WinForms.Chromium.fsproj")
-    let wpfLib = Path.Combine ("Interstellar.Wpf.Chromium", "Interstellar.Wpf.Chromium.fsproj")
-    let macosWkLib = Path.Combine ("Interstellar.macOS.WebKit", "Interstellar.macOS.WebKit.fsproj")
+    let coreLib = Path.Combine ("src", "Interstellar.Core", "Interstellar.Core.fsproj")
+    let chromiumLib = Path.Combine ("src", "Interstellar.Chromium", "Interstellar.Chromium.fsproj")
+    let winFormsLib = Path.Combine ("src", "Interstellar.WinForms.Chromium", "Interstellar.WinForms.Chromium.fsproj")
+    let wpfLib = Path.Combine ("src", "Interstellar.Wpf.Chromium", "Interstellar.Wpf.Chromium.fsproj")
+    let macosWkLib = Path.Combine ("src", "Interstellar.macOS.WebKit", "Interstellar.macOS.WebKit.fsproj")
 
 module Solutions =
     let windows = "Interstellar.Windows.sln"
