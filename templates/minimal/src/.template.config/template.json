@@ -1,7 +1,8 @@
 {
     "author": "John Wostenberg",
     "classifications": [
-        "Interstellar"
+        "Interstellar",
+        "Cross-platform"
     ],
     "name": "Simple Interstellar App",
     "tags": {
@@ -12,5 +13,23 @@
     "groupIdentity": "Interstellar",
     "shortName": "interstellar",
     "sourceName": "InterstellarApp",
-    "preferNameDirectory": true
+    "preferNameDirectory": true,
+    "symbols": {
+        "Windows": {
+            "type": "parameter",
+            "dataType": "bool",
+            "defaultValue": "true",
+            "description": "Generates a Windows host project"
+        }
+    },
+    "sources": [
+        {
+            "modifiers": [
+                {
+                    "condition": "(!Windows)",
+                    "exclude": ["InterstellarApp.Windows/**/*"]
+                }
+            ]
+        }
+    ]
 }
