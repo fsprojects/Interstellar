@@ -212,14 +212,18 @@ Target.create "Pack" (fun _ ->
 
 Target.create "BuildTemplateProjects" (fun _ ->
     Trace.log " --- Building template projects --- "
-    let projects =
-        if Environment.isWindows then [ yield! Templates.winProjects  ]
-        else if Environment.isMacOS then [ yield! Templates.macosProjects ]
-        else []
-    for proj in projects do
-        DotNet.restore id proj
-    for proj in projects do
-        DotNet.build id proj
+    if Environment.isWindows then
+        let p = [ yield! Templates.winProjects ]
+        for proj in p do
+            DotNet.restore id proj
+        for proj in p do
+            DotNet.build id proj
+    else if Environment.isMacOS then
+        let p = [ yield! Templates.macosProjects ]
+        for proj in p do
+            msbuild (addTarget "Restore") proj
+        for proj in p do
+            msbuild (addTarget "Build") proj
 )
 
 Target.create "PackTemplates" (fun _ ->
