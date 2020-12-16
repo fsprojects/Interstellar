@@ -1,27 +1,32 @@
-// F# 4.7 due to: https://github.com/fsharp/FAKE/issues/2001
+#if FAKE
+#load ".fake/build.fsx/intellisense.fsx"
+#endif
+
+// F# 4.7 due to https://github.com/fsharp/FAKE/issues/2001
 #r "paket:
-nuget FSharp.Core 4.7
+nuget FSharp.Core 4.7.0
 nuget Fake.Core.Target
 nuget Fake.DotNet.Cli
 nuget Fake.DotNet.MSBuild
 nuget Fake.DotNet.Paket
 nuget Fake.Tools.Git //"
-#load "./.fake/build.fsx/intellisense.fsx"
-#load "nupkg-hack.fsx"
-// include Fake modules, see Fake modules section
 
 #if !FAKE
-    #r "netstandard"
-    #r "Facades/netstandard" // https://github.com/ionide/ionide-vscode-fsharp/issues/839#issuecomment-396296095
+#r "netstandard"
+// #r "Facades/netstandard" // https://github.com/ionide/ionide-vscode-fsharp/issues/839#issuecomment-396296095
 #endif
+
+#load "nupkg-hack.fsx"
 
 open System
 open System.Text.RegularExpressions
 open System.IO
 open Fake.Core
 open Fake.DotNet
+open Fake.DotNet.NuGet
 open Fake.IO
 open Fake.IO.FileSystemOperators
+open Fake.IO.Globbing.Operators
 open Fake.Tools
 
 module Projects =
@@ -34,6 +39,18 @@ module Projects =
 module Solutions =
     let windows = "Interstellar.Windows.sln"
     let macos = "Interstellar.MacOS.sln"
+
+module Templates =
+    let path = "templates"
+
+    let nuspecPaths = !! (Path.Combine (path, "*.nuspec"))
+    let outputPath = Path.Combine (path, "bin")
+    let allProjects =
+        !! (Path.Combine (path, "**/*.fsproj"))
+    let winProjects =
+        !! (Path.Combine (path, "**/*windows*.fsproj"))
+    let macosProjects =
+        !! (Path.Combine (path, "**/*macos*.fsproj"))
 
 let projectRepo = "https://github.com/jwosty/Interstellar"
 
@@ -67,6 +84,9 @@ let scrapeChangelog () =
 
 let changelog = scrapeChangelog () |> Seq.toList
 let currentVersionInfo = changelog.[0]
+/// Indicates the extra version number that's added to the template package. When releasing a new version of Interstellar, reset this to 0. Whenever making a
+/// change to just the template, increment this.
+let currentTemplateMinorVersion = 1
 
 let addProperties props defaults = { defaults with Properties = [yield! defaults.Properties; yield! props]}
 
@@ -120,14 +140,16 @@ Target.create "Clean" (fun _ ->
     for proj in projects do
         try File.Delete (getNupkgPath (Some currentVersionInfo.versionName) proj) with _ -> ()
         try File.Delete (getNupkgArtifactPath proj) with _ -> ()
-    if Environment.isWindows then
-        msbuild (addTarget "Clean") Projects.winFormsLib
-        msbuild (addTarget "Clean") Projects.wpfLib
-    else
-        msbuild (addTarget "Clean") Solutions.macos
+    let projects =
+        if Environment.isWindows then [ Projects.winFormsLib; Projects.wpfLib; yield! Templates.winProjects ]
+        else if Environment.isMacOS then [ Solutions.macos; yield! Templates.macosProjects ]
+        else []
+    for proj in projects do
+        msbuild (addTarget "Clean") proj
     Shell.deleteDir ".fsdocs"
     Shell.deleteDir "output"
     Shell.deleteDir "temp"
+    Shell.deleteDir Templates.outputPath
 )
 
 Target.create "Restore" (fun _ ->
@@ -188,6 +210,40 @@ Target.create "Pack" (fun _ ->
         ``Nupkg-hack``.hackNupkgAtPath nupkgArtifact // see #3
 )
 
+Target.create "BuildTemplateProjects" (fun _ ->
+    Trace.log " --- Building template projects --- "
+    if Environment.isWindows then
+        let p = [ yield! Templates.winProjects ]
+        for proj in p do
+            DotNet.restore id proj
+        for proj in p do
+            DotNet.build id proj
+    else if Environment.isMacOS then
+        let p = [ yield! Templates.macosProjects ]
+        for proj in p do
+            msbuild (addTarget "Restore") proj
+        for proj in p do
+            msbuild (addTarget "Build") proj
+)
+
+Target.create "PackTemplates" (fun _ ->
+    Trace.log " --- Packing template packages --- "
+    Shell.mkdir Templates.outputPath
+    for nuspecPath in Templates.nuspecPaths do
+        NuGet.NuGetPack
+            (fun opt -> {
+                opt with
+                    WorkingDir = Path.GetDirectoryName nuspecPath
+                    OutputPath = Templates.outputPath
+                    Version = sprintf "%s.%d" currentVersionInfo.versionName currentTemplateMinorVersion
+            })
+            nuspecPath
+)
+
+Target.create "PackAll" ignore
+
+Target.create "All" ignore
+
 open Fake.Core.TargetOperators
 
 // *** Define Dependencies ***
@@ -195,10 +251,21 @@ open Fake.Core.TargetOperators
     ==> "Restore"
     ==> "Build"
     ==> "Pack"
+    ==> "PackAll"
+    ==> "All"
+
+"Clean"
+    ==> "PackTemplates"
+    ==> "PackAll"
+    ==> "All"
 
 "Build"
     ==> "BuildDocs"
     ==> "ReleaseDocs"
+    ==> "All"
+
+"Build"
+    ==> "BuildTemplateProjects"
 
 // *** Start Build ***
 Target.runOrDefault "Build"

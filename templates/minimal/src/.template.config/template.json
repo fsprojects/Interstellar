@@ -1,0 +1,52 @@
+{
+    "author": "John Wostenberg",
+    "classifications": [
+        "Interstellar",
+        "Cross-platform"
+    ],
+    "name": "Simple Interstellar App",
+    "tags": {
+        "language": "F#",
+        "type": "project"
+    },
+    "identity": "Interstellar.Template",
+    "groupIdentity": "Interstellar",
+    "shortName": "interstellar",
+    "sourceName": "InterstellarApp",
+    "preferNameDirectory": true,
+    "exclude": [
+        "**/[Bb]in/**", "**/[Oo]bj/**",
+        ".template.config/**/*", "**/*.filelist",
+        "**/*.user", "**/*.lock.json",
+        "**/.vs/**", "**/.ionide/**",
+        "**/GPUCache/**"
+    ],
+    "symbols": {
+        "Windows": {
+            "type": "parameter",
+            "dataType": "bool",
+            "defaultValue": "true",
+            "description": "Generates a Windows host project"
+        },
+        "macOS": {
+            "type": "parameter",
+            "dataType": "bool",
+            "defaultValue": "true",
+            "description": "Generates a macOS host project"
+        }
+    },
+    "sources": [
+        {
+            "modifiers": [
+                {
+                    "condition": "(!Windows)",
+                    "exclude": ["InterstellarApp.Windows/**/*"]
+                },
+                {
+                    "condition": "(!macOS)",
+                    "exclude": ["InterstellarApp.macOS/**/*"]
+                }
+            ]
+        }
+    ]
+}

@@ -25,7 +25,7 @@ let changeVersionConstraints text =
 // </group>"""
 // |> changeVersionConstraints |> printfn "%s"
 
-let hackNupkgFromStream path (stream: Stream) =
+let hackNupkgFromStream (path: string) (stream: Stream) =
     use archive = new ZipArchive(stream, ZipArchiveMode.Update)
     let nuspecName = sprintf "%s.nuspec" (Path.GetFileNameWithoutExtension path)
     let oldEntry = archive.GetEntry nuspecName
@@ -36,7 +36,7 @@ let hackNupkgFromStream path (stream: Stream) =
     nuspecWriter.Write output
 
 /// Cracks open a nupkg and changes all Interstellar package reference constraints from >= to =
-let hackNupkgAtPath path =
+let hackNupkgAtPath (path: string) =
     use file = File.Open (path, FileMode.Open, FileAccess.ReadWrite, FileShare.None)
     hackNupkgFromStream path file
 

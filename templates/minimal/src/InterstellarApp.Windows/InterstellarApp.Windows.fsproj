@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net5.0-Windows</TargetFramework>
+    <OutputType>WinExe</OutputType>
+    <UseWPF>true</UseWPF>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ApplicationIcon />
+    <CefSharpAnyCpuSupport>true</CefSharpAnyCpuSupport>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Interstellar.Wpf.Chromium" Version="0.3.0" />
+    <PackageReference Include="CefSharp.Wpf" Version="86.0.241" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\InterstellarApp.Core\InterstellarApp.Core.fsproj" />
+  </ItemGroup>
+</Project>
