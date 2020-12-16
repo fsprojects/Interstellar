@@ -20,6 +20,7 @@ open System.Text.RegularExpressions
 open System.IO
 open Fake.Core
 open Fake.DotNet
+open Fake.DotNet.NuGet
 open Fake.IO
 open Fake.IO.FileSystemOperators
 open Fake.Tools
@@ -34,6 +35,8 @@ module Projects =
 module Solutions =
     let windows = "Interstellar.Windows.sln"
     let macos = "Interstellar.MacOS.sln"
+
+let templatesNuspec = "templates/Interstellar.Templates.nuspec"
 
 let projectRepo = "https://github.com/jwosty/Interstellar"
 
@@ -188,6 +191,17 @@ Target.create "Pack" (fun _ ->
         ``Nupkg-hack``.hackNupkgAtPath nupkgArtifact // see #3
 )
 
+Target.create "PackTemplates" (fun _ ->
+    Trace.log " --- Packing template packages --- "
+    NuGet.NuGetPack
+        (fun opt -> {
+            opt with
+                WorkingDir = Path.GetDirectoryName templatesNuspec
+                Version = currentVersionInfo.versionName
+        })
+        templatesNuspec
+)
+
 open Fake.Core.TargetOperators
 
 // *** Define Dependencies ***
@@ -195,6 +209,9 @@ open Fake.Core.TargetOperators
     ==> "Restore"
     ==> "Build"
     ==> "Pack"
+
+"Clean"
+    ==> "PackTemplates"
 
 "Build"
     ==> "BuildDocs"
