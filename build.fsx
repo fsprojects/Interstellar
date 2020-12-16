@@ -2,7 +2,9 @@
 #load ".fake/build.fsx/intellisense.fsx"
 #endif
 
+// F# 4.7 due to https://github.com/fsharp/FAKE/issues/2001
 #r "paket:
+nuget FSharp 4.7
 nuget Fake.Core.Target
 nuget Fake.DotNet.Cli
 nuget Fake.DotNet.MSBuild
@@ -24,6 +26,7 @@ open Fake.DotNet
 open Fake.DotNet.NuGet
 open Fake.IO
 open Fake.IO.FileSystemOperators
+open Fake.IO.Globbing.Operators
 open Fake.Tools
 
 module Projects =
@@ -37,9 +40,17 @@ module Solutions =
     let windows = "Interstellar.Windows.sln"
     let macos = "Interstellar.MacOS.sln"
 
-let templatesNuspec = "templates/Interstellar.Templates.nuspec"
+module Templates =
+    let path = "templates"
 
-let templateOutputPath = "templates/bin"
+    let nuspecPath = Path.Combine (path, "Interstellar.Templates.nuspec")
+    let outputPath = Path.Combine (path, "bin")
+    let allProjects =
+        !! (Path.Combine (path, "**/*.fsproj"))
+    let winProjects =
+        !! (Path.Combine (path, "**/*windows*.fsproj"))
+    let macosProjects =
+        !! (Path.Combine (path, "**/*macos*.fsproj"))
 
 let projectRepo = "https://github.com/jwosty/Interstellar"
 
@@ -126,15 +137,16 @@ Target.create "Clean" (fun _ ->
     for proj in projects do
         try File.Delete (getNupkgPath (Some currentVersionInfo.versionName) proj) with _ -> ()
         try File.Delete (getNupkgArtifactPath proj) with _ -> ()
-    if Environment.isWindows then
-        msbuild (addTarget "Clean") Projects.winFormsLib
-        msbuild (addTarget "Clean") Projects.wpfLib
-    else
-        msbuild (addTarget "Clean") Solutions.macos
+    let projects =
+        if Environment.isWindows then [ Projects.winFormsLib; Projects.wpfLib; yield! Templates.winProjects ]
+        else if Environment.isMacOS then [ Solutions.macos; yield! Templates.macosProjects ]
+        else []
+    for proj in projects do
+        msbuild (addTarget "Clean") proj
     Shell.deleteDir ".fsdocs"
     Shell.deleteDir "output"
     Shell.deleteDir "temp"
-    Shell.deleteDir templateOutputPath
+    Shell.deleteDir Templates.outputPath
 )
 
 Target.create "Restore" (fun _ ->
@@ -195,18 +207,34 @@ Target.create "Pack" (fun _ ->
         ``Nupkg-hack``.hackNupkgAtPath nupkgArtifact // see #3
 )
 
+Target.create "BuildTemplateProjects" (fun _ ->
+    Trace.log " --- Building template projects --- "
+    let projects =
+        if Environment.isWindows then [ yield! Templates.winProjects  ]
+        else if Environment.isMacOS then [ yield! Templates.macosProjects ]
+        else []
+    for proj in projects do
+        DotNet.restore id proj
+    for proj in projects do
+        DotNet.build id proj
+)
+
 Target.create "PackTemplates" (fun _ ->
     Trace.log " --- Packing template packages --- "
-    Shell.mkdir templateOutputPath
+    Shell.mkdir Templates.outputPath
     NuGet.NuGetPack
         (fun opt -> {
             opt with
-                WorkingDir = Path.GetDirectoryName templatesNuspec
-                OutputPath = templateOutputPath
+                WorkingDir = Path.GetDirectoryName Templates.nuspecPath
+                OutputPath = Templates.outputPath
                 Version = currentVersionInfo.versionName
         })
-        templatesNuspec
+        Templates.nuspecPath
 )
+
+Target.create "PackAll" ignore
+
+Target.create "All" ignore
 
 open Fake.Core.TargetOperators
 
@@ -215,13 +243,21 @@ open Fake.Core.TargetOperators
     ==> "Restore"
     ==> "Build"
     ==> "Pack"
+    ==> "PackAll"
+    ==> "All"
 
 "Clean"
     ==> "PackTemplates"
+    ==> "PackAll"
+    ==> "All"
 
 "Build"
     ==> "BuildDocs"
     ==> "ReleaseDocs"
+    ==> "All"
+
+"Build"
+    ==> "BuildTemplateProjects"
 
 // *** Start Build ***
 Target.runOrDefault "Build"
