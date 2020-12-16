@@ -14,6 +14,13 @@
     "shortName": "interstellar",
     "sourceName": "InterstellarApp",
     "preferNameDirectory": true,
+    "exclude": [
+        "**/[Bb]in/**", "**/[Oo]bj/**",
+        ".template.config/**/*", "**/*.filelist",
+        "**/*.user", "**/*.lock.json",
+        "**/.vs/**", "**/.ionide/**",
+        "**/GPUCache/**"
+    ],
     "symbols": {
         "Windows": {
             "type": "parameter",
