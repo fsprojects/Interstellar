@@ -11,12 +11,14 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <CodeSigningKey>Mac Developer</CodeSigningKey>
     <UseSGen>false</UseSGen>
+    <EnableCodeSigning>false</EnableCodeSigning>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <CreatePackage>true</CreatePackage>
     <IncludeMonoRuntime>true</IncludeMonoRuntime>
     <LinkMode>SdkOnly</LinkMode>
     <UseSGen>false</UseSGen>
+    <EnableCodeSigning>false</EnableCodeSigning>
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
@@ -41,5 +43,13 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\InterstellarApp.Core\InterstellarApp.Core.fsproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Interstellar.Core" Version="0.3.0">
+      <GeneratePathProperty></GeneratePathProperty>
+    </PackageReference>
+    <PackageReference Include="Interstellar.macOS.WebKit" Version="0.3.0">
+      <GeneratePathProperty></GeneratePathProperty>
+    </PackageReference>
   </ItemGroup>
 </Project>

@@ -5,7 +5,7 @@ open AppKit
 open Foundation
 open Interstellar
 open Interstellar.MacOS.WebKit
-open Examples.SharedCode
+open InterstellarApp
 
 [<Register("AppDelegate")>]
 type AppDelegate() =
@@ -23,7 +23,7 @@ type AppDelegate() =
                 let nsWindow = w.NativeWindow
                 // This is where you could call some Cocoa-specific APIs on this window
                 ()
-            do! BrowserApp.runAsync mainCtx (SimpleBrowserApp.app ignore)
+            do! BrowserApp.runAsync mainCtx (InterstellarApp.BrowserApp.app ignore)
             NSApplication.SharedApplication.Terminate null
         }
 
