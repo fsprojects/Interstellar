@@ -9,12 +9,13 @@
     <CefSharpAnyCpuSupport>true</CefSharpAnyCpuSupport>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\App.Core\App.Core.fsproj">
-      <Name>App.Core.fsproj</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Program.fs" />
   </ItemGroup>
-  <Import Project="..\..\.paket\Paket.Restore.targets" />
+  <ItemGroup>
+    <PackageReference Include="Interstellar.Wpf.Chromium" Version="0.3.0" />
+    <PackageReference Include="CefSharp.Wpf" Version="86.0.241" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\App.Core\App.Core.fsproj" />
+  </ItemGroup>
 </Project>
