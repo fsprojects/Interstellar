@@ -43,7 +43,7 @@ module Solutions =
 module Templates =
     let path = "templates"
 
-    let nuspecPath = Path.Combine (path, "Interstellar.Templates.nuspec")
+    let nuspecPaths = !! (Path.Combine (path, "*.nuspec"))
     let outputPath = Path.Combine (path, "bin")
     let allProjects =
         !! (Path.Combine (path, "**/*.fsproj"))
@@ -229,14 +229,15 @@ Target.create "BuildTemplateProjects" (fun _ ->
 Target.create "PackTemplates" (fun _ ->
     Trace.log " --- Packing template packages --- "
     Shell.mkdir Templates.outputPath
-    NuGet.NuGetPack
-        (fun opt -> {
-            opt with
-                WorkingDir = Path.GetDirectoryName Templates.nuspecPath
-                OutputPath = Templates.outputPath
-                Version = sprintf "%s.%d" currentVersionInfo.versionName currentTemplateMinorVersion
-        })
-        Templates.nuspecPath
+    for nuspecPath in Templates.nuspecPaths do
+        NuGet.NuGetPack
+            (fun opt -> {
+                opt with
+                    WorkingDir = Path.GetDirectoryName nuspecPath
+                    OutputPath = Templates.outputPath
+                    Version = sprintf "%s.%d" currentVersionInfo.versionName currentTemplateMinorVersion
+            })
+            nuspecPath
 )
 
 Target.create "PackAll" ignore
