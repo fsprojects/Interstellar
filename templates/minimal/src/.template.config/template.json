@@ -20,6 +20,12 @@
             "dataType": "bool",
             "defaultValue": "true",
             "description": "Generates a Windows host project"
+        },
+        "macOS": {
+            "type": "parameter",
+            "dataType": "bool",
+            "defaultValue": "true",
+            "description": "Generates a macOS host project"
         }
     },
     "sources": [
@@ -28,6 +34,10 @@
                 {
                     "condition": "(!Windows)",
                     "exclude": ["InterstellarApp.Windows/**/*"]
+                },
+                {
+                    "condition": "(!macOS)",
+                    "exclude": ["InterstellarApp.macOS/**/*"]
                 }
             ]
         }
