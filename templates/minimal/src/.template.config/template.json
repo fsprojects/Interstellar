@@ -1,0 +1,16 @@
+{
+    "author": "John Wostenberg",
+    "classifications": [
+        "Interstellar"
+    ],
+    "name": "Simple Interstellar App",
+    "tags": {
+        "language": "F#",
+        "type": "project"
+    },
+    "identity": "Interstellar.Template",
+    "groupIdentity": "Interstellar",
+    "shortName": "interstellar",
+    "sourceName": "InterstellarTemplate",
+    "preferNameDirectory": true
+}

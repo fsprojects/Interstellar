@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+      <Description>Simple Interstellar App</Description>
+      <Authors>John Wostenberg</Authors>
+      <PackageProjectUrl>https://github.com/jwosty/Interstellar</PackageProjectUrl>
+      <PackageLicense>https://github.com/jwosty/Interstellar/blob/master/LICENSE</PackageLicense>
+      <RepositoryUrl>https://github.com/jwosty/Interstellar.git</RepositoryUrl>
+      <PackageTags>fsharp;interstellar;template</PackageTags>
+      <NeutralLanguage>en-US</NeutralLanguage>
+      <PackageType>Template</PackageType>
+      <Version>3.0.0</Version>
+      <PackProjectInputFile>$(MSBuildProjectFullPath)</PackProjectInputFile>
+      <NoBuild>true</NoBuild>
+      <IncludeBuildOutput>false</IncludeBuildOutput>
+      <TargetFramework>netstandard2.0</TargetFramework>
+      <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+    </PropertyGroup>
+    <PropertyGroup>
+      <ExcludeFromPackage>
+          Content/node_modules/**/*;
+          Content/.fable/**/*;
+          Content/packages/**/*;
+          Content/paket-files/**/*;
+          Content/public/bundle.js*;
+          Content/src/bin/**/*;
+          Content/src/obj/**/*;
+      </ExcludeFromPackage>
+  </PropertyGroup>
+    <ItemGroup>
+      <Content Include="Content/**/*" Exclude="$(ExcludeFromPackage)" >
+          <PackagePath>Content\</PackagePath>
+      </Content>
+    </ItemGroup>
+  </Project>
