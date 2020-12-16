@@ -4,7 +4,7 @@
 
 // F# 4.7 due to https://github.com/fsharp/FAKE/issues/2001
 #r "paket:
-nuget FSharp 4.7
+nuget FSharp.Core 4.7.0
 nuget Fake.Core.Target
 nuget Fake.DotNet.Cli
 nuget Fake.DotNet.MSBuild
@@ -84,6 +84,9 @@ let scrapeChangelog () =
 
 let changelog = scrapeChangelog () |> Seq.toList
 let currentVersionInfo = changelog.[0]
+/// Indicates the extra version number that's added to the template package. When releasing a new version of Interstellar, reset this to 0. Whenever making a
+/// change to just the template, increment this.
+let currentTemplateMinorVersion = 1
 
 let addProperties props defaults = { defaults with Properties = [yield! defaults.Properties; yield! props]}
 
@@ -227,7 +230,7 @@ Target.create "PackTemplates" (fun _ ->
             opt with
                 WorkingDir = Path.GetDirectoryName Templates.nuspecPath
                 OutputPath = Templates.outputPath
-                Version = currentVersionInfo.versionName
+                Version = sprintf "%s.%d" currentVersionInfo.versionName currentTemplateMinorVersion
         })
         Templates.nuspecPath
 )
