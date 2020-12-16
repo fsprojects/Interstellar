@@ -1,0 +1,5 @@
+{
+    "FSharp.fsiExtraParameters": [
+        "--compilertool:${workspaceFolder}/packages/build/FSharp.DependencyManager.Paket/lib/netstandard2.0/"
+    ]
+}

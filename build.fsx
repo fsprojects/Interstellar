@@ -1,19 +1,20 @@
-// F# 4.7 due to: https://github.com/fsharp/FAKE/issues/2001
+#if FAKE
+#load ".fake/build.fsx/intellisense.fsx"
+#endif
+
 #r "paket:
-nuget FSharp.Core 4.7
 nuget Fake.Core.Target
 nuget Fake.DotNet.Cli
 nuget Fake.DotNet.MSBuild
 nuget Fake.DotNet.Paket
 nuget Fake.Tools.Git //"
-#load "./.fake/build.fsx/intellisense.fsx"
-#load "nupkg-hack.fsx"
-// include Fake modules, see Fake modules section
 
 #if !FAKE
-    #r "netstandard"
-    #r "Facades/netstandard" // https://github.com/ionide/ionide-vscode-fsharp/issues/839#issuecomment-396296095
+#r "netstandard"
+// #r "Facades/netstandard" // https://github.com/ionide/ionide-vscode-fsharp/issues/839#issuecomment-396296095
 #endif
+
+#load "nupkg-hack.fsx"
 
 open System
 open System.Text.RegularExpressions
