@@ -29,12 +29,9 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: artifacts-windows
-        path: artifacts/
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: templates
-        path: templates/bin
+        path: |
+          artifacts/
+          templates/bin
 
   build-macos:
     runs-on: macos-latest
