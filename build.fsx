@@ -38,6 +38,8 @@ module Solutions =
 
 let templatesNuspec = "templates/Interstellar.Templates.nuspec"
 
+let templateOutputPath = "templates/bin"
+
 let projectRepo = "https://github.com/jwosty/Interstellar"
 
 let projAsTarget (projFileName: string) = projFileName.Split('/').[0].Replace(".", "_")
@@ -131,6 +133,7 @@ Target.create "Clean" (fun _ ->
     Shell.deleteDir ".fsdocs"
     Shell.deleteDir "output"
     Shell.deleteDir "temp"
+    Shell.deleteDir templateOutputPath
 )
 
 Target.create "Restore" (fun _ ->
@@ -193,10 +196,12 @@ Target.create "Pack" (fun _ ->
 
 Target.create "PackTemplates" (fun _ ->
     Trace.log " --- Packing template packages --- "
+    Shell.mkdir templateOutputPath
     NuGet.NuGetPack
         (fun opt -> {
             opt with
                 WorkingDir = Path.GetDirectoryName templatesNuspec
+                OutputPath = templateOutputPath
                 Version = currentVersionInfo.versionName
         })
         templatesNuspec
