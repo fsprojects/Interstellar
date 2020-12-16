@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
     <metadata>
-        <id>Interstellar.Templates</id>
+        <id>Interstellar.Template</id>
         <title>Interstellar Template Pack</title>
         <version>0.0.1</version>
         <authors>John Wostenberg</authors>
