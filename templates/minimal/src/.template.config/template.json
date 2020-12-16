@@ -11,6 +11,6 @@
     "identity": "Interstellar.Template",
     "groupIdentity": "Interstellar",
     "shortName": "interstellar",
-    "sourceName": "InterstellarTemplate",
+    "sourceName": "InterstellarApp",
     "preferNameDirectory": true
 }

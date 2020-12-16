@@ -413,3 +413,6 @@ ASALocalRun/
 .fsdocs/
 output/
 temp/
+
+# CEF
+GPUCache/

@@ -16,6 +16,6 @@
     <PackageReference Include="CefSharp.Wpf" Version="86.0.241" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\App.Core\App.Core.fsproj" />
+    <ProjectReference Include="..\InterstellarApp.Core\InterstellarApp.Core.fsproj" />
   </ItemGroup>
 </Project>

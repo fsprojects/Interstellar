@@ -1,4 +1,4 @@
-namespace App.Windows
+namespace InterstellarApp.Windows
 open System
 open System.Diagnostics
 open System.Threading
@@ -16,7 +16,7 @@ type App() =
             let nativeWindow = w.NativeWindow
             // This is where you could call some WPF-specific APIs on this window
             ()
-        BrowserApp.run (App.MyBrowserApp.app onMainWindowCreated)
+        BrowserApp.run (InterstellarApp.BrowserApp.app onMainWindowCreated)
 
 module Main =
     [<EntryPoint; STAThread>]
