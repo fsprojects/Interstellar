@@ -10,6 +10,8 @@
     <PackageTags>fsharp;interstellar</PackageTags>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <FsDocsReleaseNotesLink>$(RepositoryUrl)/blob/master/CHANGELOG.md</FsDocsReleaseNotesLink>
+    <FsDocsLicenseLink>$(RepositoryUrl)/blob/master/LICENSE</FsDocsLicenseLink>
   </PropertyGroup>
   <ItemGroup>
     <None Include="$(SolutionDir)\LICENSE" Pack="true" PackagePath=""/>
