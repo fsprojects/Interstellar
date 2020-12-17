@@ -27,7 +27,7 @@ I intend to create a Windows package that uses the built-in Windows browser cont
 ```bash
 dotnet tool restore
 dotnet paket restore
-dotnet fake run
+dotnet fake build
 ```
 
 ## Creating the NuGet package
@@ -35,7 +35,15 @@ dotnet fake run
 After building, run:
 
 ```bash
-dotnet fake run build.fsx -t pack
+dotnet fake build -t Pack
 ```
 
 The resuling *.nupkg files will end up in ``./artifacts/``
+
+## Building docs
+
+```bash
+dotnet fake build -t BuildDocs
+// to actually release docs, assuming you have push priveleges to the repo:
+dotnet fake biuld -t ReleaseDocs
+```
