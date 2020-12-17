@@ -3,6 +3,8 @@
     <metadata>
         <id>Interstellar.Template</id>
         <title>Interstellar Template Pack</title>
+        <!-- Placeholder version 0.0.0 - FAKE script injects the proper version -->
+        <version>0.0.0</version>
         <authors>John Wostenberg</authors>
         <description>Templates for building cross-platform browser-based applications using Interstellar.</description>
         <projectUrl>https://jwosty.github.io/Interstellar/</projectUrl>
