@@ -79,11 +79,19 @@
 </blockquote>
 <p>Interstellar is an F# library providing a standard, mixed-paradigm API for accessing browser controls on various platforms. Currently, there are 3 combinations platform and browser hosts available. See <a href="https://github.com/jwosty/Interstellar/Examples">Examples</a> for a simple sample application. See <a href="https://github.com/jwosty/InterstellarFableHelloWorld">https://github.com/jwosty/InterstellarFableHelloWorld</a> for an example of combining Interstellar with <a href="https://fable.io/">Fable</a>, achieving a cross-platform desktop app built completely in F#.</p>
 <h2><a name="Quick-Start" class="anchor" href="#Quick-Start">Quick Start</a></h2>
-<p>You will need the .Net 5 SDK. For the Windows projects, you should be able to use any of the standard IDEs (Visual Studio, Visual Studio Code, Rider [untested but should work]). For the macOS projects, you need to use Visual Studio for Mac.</p>
+<p>You will need the .Net 5 SDK (and the mono SDK on macOS). For the Windows projects, you should be able to use any of the standard IDEs (Visual Studio, Visual Studio Code, Rider [untested but should work]). For the macOS projects, you need to use Visual Studio for Mac.</p>
 <p>Create a project from the template:</p>
 <table class="pre"><tr><td class="snippet"><pre class="fssnip"><code lang="bash">dotnet new -i Interstellar.Template
 dotnet new interstellar -n &lt;project-name&gt;
 </code></pre></td></tr></table>
+<p>On Windows, you can run it like so:</p>
+<table class="pre"><tr><td class="snippet"><pre class="fssnip"><code lang="bash">dotnet restore &lt;project-name&gt;.Windows.sln
+dotnet run -p &lt;project-name&gt;.Windows\&lt;project-name&gt;.Windows.fsproj
+</code></pre></td></tr></table>
+<p>On macOS, I recommend opening <code>&lt;project-name&gt;.macOS.sln</code> in Visual Studio for Mac and running it that way. It runs using the mono-based Xamarin.macOS runtime, and as a result you currently can't run it with <code>dotnet run</code> (see <a href="https://github.com/xamarin/xamarin-macios/issues/8955">xamarin/xamarin-macios#3955</a>). This is on the roadmap for .NET 6. You'll have to use Mono's <code>msbuild</code> instead, if you want to use the CLI.</p>
+<p>You should end up with a simple, cross-platform sample app that opens a window built using embeded HTML, CSS, and Javascript.</p>
+<p><img src="https://jwosty.github.io/Interstellar/Interstellar%20sample%20app.gif" alt="Sample Interstellar app" /></p>
+<h3><a name="Customizing-the-template" class="anchor" href="#Customizing-the-template">Customizing the template</a></h3>
 <p>By default, this will create a core sample project, and a host project for each platform (Windows and macOS). To generate a project without a macOS host, use the following:</p>
 <table class="pre"><tr><td class="snippet"><pre class="fssnip"><code lang="bash">dotnet new interstellar --macOS false
 </code></pre></td></tr></table>
