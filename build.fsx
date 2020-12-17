@@ -86,7 +86,7 @@ let changelog = scrapeChangelog () |> Seq.toList
 let currentVersionInfo = changelog.[0]
 /// Indicates the extra version number that's added to the template package. When releasing a new version of Interstellar, reset this to 0. Whenever making a
 /// change to just the template, increment this.
-let currentTemplateMinorVersion = 1
+let currentTemplateMinorVersion = 2
 
 let addProperties props defaults = { defaults with Properties = [yield! defaults.Properties; yield! props]}
 
