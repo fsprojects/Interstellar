@@ -78,6 +78,21 @@
 <p>NOTE: This API is not yet guarenteed to be stable or backward-compatible until v1.0, so breaking changes may occur at any time.</p>
 </blockquote>
 <p>Interstellar is an F# library providing a standard, mixed-paradigm API for accessing browser controls on various platforms. Currently, there are 3 combinations platform and browser hosts available. See <a href="https://github.com/jwosty/Interstellar/Examples">Examples</a> for a simple sample application. See <a href="https://github.com/jwosty/InterstellarFableHelloWorld">https://github.com/jwosty/InterstellarFableHelloWorld</a> for an example of combining Interstellar with <a href="https://fable.io/">Fable</a>, achieving a cross-platform desktop app built completely in F#.</p>
+<h2><a name="Quick-Start" class="anchor" href="#Quick-Start">Quick Start</a></h2>
+<p>You will need the .Net 5 SDK. For the Windows projects, you should be able to use any of the standard IDEs (Visual Studio, Visual Studio Code, Rider [untested but should work]). For the macOS projects, you need to use Visual Studio for Mac.</p>
+<p>Create a project from the template:</p>
+<table class="pre"><tr><td class="snippet"><pre class="fssnip"><code lang="bash">dotnet new -i Interstellar.Template
+dotnet new interstellar -n &lt;project-name&gt;
+</code></pre></td></tr></table>
+<p>By default, this will create a core sample project, and a host project for each platform (Windows and macOS). To generate a project without a macOS host, use the following:</p>
+<table class="pre"><tr><td class="snippet"><pre class="fssnip"><code lang="bash">dotnet new interstellar --macOS false
+</code></pre></td></tr></table>
+<p>And to disable Windows:</p>
+<table class="pre"><tr><td class="snippet"><pre class="fssnip"><code lang="bash">dotnet new interstellar --Windows false
+</code></pre></td></tr></table>
+<p>To see more info about these options:</p>
+<table class="pre"><tr><td class="snippet"><pre class="fssnip"><code lang="bash">dotnet new interstellar --help
+</code></pre></td></tr></table>
 
             
         </div>
