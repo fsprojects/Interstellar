@@ -40,11 +40,11 @@
             "modifiers": [
                 {
                     "condition": "(!Windows)",
-                    "exclude": ["InterstellarApp.Windows/**/*"]
+                    "exclude": ["InterstellarApp.Windows/**/*", "InterstellarApp.Windows.*"]
                 },
                 {
                     "condition": "(!macOS)",
-                    "exclude": ["InterstellarApp.macOS/**/*"]
+                    "exclude": ["InterstellarApp.macOS/**/*", "InterstellarApp.macOS.*"]
                 }
             ]
         }
