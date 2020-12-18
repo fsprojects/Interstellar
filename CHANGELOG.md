@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.1
+
+* WinForms - Fixed an issue that could cause apps to crash at startup in release mode (https://github.com/jwosty/Interstellar/issues/10 ; thanks to @amaitland for the fix)
+
 ## 0.3.0
 
 * Add IBrowser.CanShowDevTools
