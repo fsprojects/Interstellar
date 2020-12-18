@@ -13,7 +13,7 @@ open CefSharp.WinForms
 type Platform private() =
     static let mutable isInitialized = false
     static let initLock = new Object()
-
+    
     static member Initialize () =
         lock initLock (fun () ->
             if not isInitialized then
@@ -21,6 +21,8 @@ type Platform private() =
                 Platform.InitAnyCpuCefSharp () |> ignore
         )
 
+    // Without this inlining, WinForms builds crash in Release mode: https://github.com/jwosty/Interstellar/issues/10
+    [<System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)>]
     static member Shutdown () =
         Cef.Shutdown ()
 
