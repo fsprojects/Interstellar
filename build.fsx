@@ -87,7 +87,7 @@ let changelog = scrapeChangelog () |> Seq.toList
 let currentVersionInfo = changelog.[0]
 /// Indicates the extra version number that's added to the template package. When releasing a new version of Interstellar, reset this to 0. Whenever making a
 /// change to just the template, increment this.
-let currentTemplateMinorVersion = 2
+let currentTemplateMinorVersion = 1
 
 let addProperties props defaults = { defaults with Properties = [yield! defaults.Properties; yield! props]}
 
@@ -134,13 +134,12 @@ let getNupkgPath version projPath =
     Path.Combine ([|projDir; "bin"; "Release";
                     sprintf "%s%s.nupkg" (Path.GetFileNameWithoutExtension projPath) vstr|])
 
-let getNupkgArtifactPath proj = Path.Combine (artifactsPath, sprintf "%s.nupkg" (Path.GetFileNameWithoutExtension proj))
-
 Target.create "Clean" (fun _ ->
     Trace.log " --- Cleaning --- "
     for proj in projects do
-        try File.Delete (getNupkgPath (Some currentVersionInfo.versionName) proj) with _ -> ()
-        try File.Delete (getNupkgArtifactPath proj) with _ -> ()
+        let vstr = currentVersionInfo.versionName
+        File.delete (getNupkgPath (Some vstr) proj)
+    !! (Path.Combine (artifactsPath, "**/*.nupkg")) |> File.deleteAll
     let projects =
         if Environment.isWindows then [ Projects.winFormsLib; Projects.wpfLib; yield! Templates.winProjects ]
         else if Environment.isMacOS then [ Solutions.macos; yield! Templates.macosProjects ]
@@ -150,7 +149,6 @@ Target.create "Clean" (fun _ ->
     Shell.deleteDir ".fsdocs"
     Shell.deleteDir "output"
     Shell.deleteDir "temp"
-    Shell.deleteDir artifactsPath
 )
 
 Target.create "Restore" (fun _ ->
@@ -201,14 +199,14 @@ Target.create "Pack" (fun _ ->
     Trace.log (sprintf "PROJECT LIST: %A" projects)
     for proj in projects do
         msbuild id proj
-        // Strip version stuff from the file name, and collect all generated package archives into a common folder
-        let oldNupkgPath = getNupkgPath (Some currentVersionInfo.versionName) proj
-        Directory.CreateDirectory "artifacts" |> ignore
-        let nupkgArtifact = getNupkgArtifactPath proj
-        Trace.log (sprintf "Moving %s -> %s" oldNupkgPath nupkgArtifact)
-        try File.Delete nupkgArtifact with _ -> ()
-        File.Copy (oldNupkgPath, nupkgArtifact)
-        ``Nupkg-hack``.hackNupkgAtPath nupkgArtifact // see #3
+        // Collect all generated package archives into a common folder
+        let vstr = currentVersionInfo.versionName
+        let oldNupkgPath = getNupkgPath (Some vstr) proj
+        Shell.mkdir artifactsPath
+        Shell.moveFile artifactsPath oldNupkgPath
+    // see https://github.com/jwosty/Interstellar/issues/3
+    !! (Path.Combine (artifactsPath, "**", "*.nupkg"))
+    |> Seq.iter (``Nupkg-hack``.hackNupkgAtPath)
 )
 
 Target.create "BuildTemplateProjects" (fun _ ->
@@ -243,20 +241,20 @@ Target.create "PackTemplates" (fun _ ->
 
 Target.create "PackAll" ignore
 
+Target.create "TestAll" ignore
+
 Target.create "All" ignore
 
 open Fake.Core.TargetOperators
 
 // *** Define Dependencies ***
-"Clean"
-    ==> "Restore"
+"Restore"
     ==> "Build"
     ==> "Pack"
     ==> "PackAll"
     ==> "All"
 
-"Clean"
-    ==> "PackTemplates"
+"PackTemplates"
     ==> "PackAll"
     ==> "All"
 
@@ -264,6 +262,14 @@ open Fake.Core.TargetOperators
     ==> "BuildDocs"
     ==> "ReleaseDocs"
     ==> "All"
+
+"BuildTemplateProjects"
+    ==> "TestAll"
+
+// "Build"
+    // ==> "Test"
+"Test"
+    ==> "TestAll"
 
 "Build"
     ==> "BuildTemplateProjects"

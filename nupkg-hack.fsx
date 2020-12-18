@@ -4,6 +4,8 @@ open System.IO
 open System.IO.Compression
 open System.Text
 open System.Text.RegularExpressions
+open Fake.Core
+open Fake.IO
 
 Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
 
@@ -27,8 +29,7 @@ let changeVersionConstraints text =
 
 let hackNupkgFromStream (path: string) (stream: Stream) =
     use archive = new ZipArchive(stream, ZipArchiveMode.Update)
-    let nuspecName = sprintf "%s.nuspec" (Path.GetFileNameWithoutExtension path)
-    let oldEntry = archive.GetEntry nuspecName
+    let oldEntry = archive.Entries |> Seq.find (fun e -> e.Name.EndsWith ".nuspec")
     let input =
         (use nuspecReader = new StreamReader(oldEntry.Open(), Encoding.UTF8) in nuspecReader.ReadToEnd())
     let output = changeVersionConstraints input
@@ -37,6 +38,7 @@ let hackNupkgFromStream (path: string) (stream: Stream) =
 
 /// Cracks open a nupkg and changes all Interstellar package reference constraints from >= to =
 let hackNupkgAtPath (path: string) =
+    Trace.log ("Hacking nupkg: " + path)
     use file = File.Open (path, FileMode.Open, FileAccess.ReadWrite, FileShare.None)
     hackNupkgFromStream path file
 
