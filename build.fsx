@@ -87,7 +87,7 @@ let changelog = scrapeChangelog () |> Seq.toList
 let currentVersionInfo = changelog.[0]
 /// Indicates the extra version number that's added to the template package. When releasing a new version of Interstellar, reset this to 0. Whenever making a
 /// change to just the template, increment this.
-let currentTemplateMinorVersion = 2
+let currentTemplateMinorVersion = 1
 
 let addProperties props defaults = { defaults with Properties = [yield! defaults.Properties; yield! props]}
 
@@ -243,20 +243,20 @@ Target.create "PackTemplates" (fun _ ->
 
 Target.create "PackAll" ignore
 
+Target.create "TestAll" ignore
+
 Target.create "All" ignore
 
 open Fake.Core.TargetOperators
 
 // *** Define Dependencies ***
-"Clean"
-    ==> "Restore"
+"Restore"
     ==> "Build"
     ==> "Pack"
     ==> "PackAll"
     ==> "All"
 
-"Clean"
-    ==> "PackTemplates"
+"PackTemplates"
     ==> "PackAll"
     ==> "All"
 
@@ -264,6 +264,14 @@ open Fake.Core.TargetOperators
     ==> "BuildDocs"
     ==> "ReleaseDocs"
     ==> "All"
+
+"BuildTemplateProjects"
+    ==> "TestAll"
+
+// "Build"
+    // ==> "Test"
+"Test"
+    ==> "TestAll"
 
 "Build"
     ==> "BuildTemplateProjects"
