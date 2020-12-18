@@ -1,9 +1,10 @@
-name: CI (Windows)
+name: CI
 
 on: [push]
 
 jobs:
   build-windows:
+    name: CI (Windows)
     runs-on: windows-latest
 
     steps:
@@ -34,6 +35,7 @@ jobs:
           templates/bin
 
   build-macos:
+    name: (macOS)
     runs-on: macos-latest
 
     steps:
