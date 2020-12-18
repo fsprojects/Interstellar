@@ -40,11 +40,12 @@ module Solutions =
     let windows = "Interstellar.Windows.sln"
     let macos = "Interstellar.MacOS.sln"
 
+let artifactsPath = "artifacts"
+
 module Templates =
     let path = "templates"
 
     let nuspecPaths = !! (Path.Combine (path, "*.nuspec"))
-    let outputPath = Path.Combine (path, "bin")
     let allProjects =
         !! (Path.Combine (path, "**/*.fsproj"))
     let winProjects =
@@ -133,7 +134,7 @@ let getNupkgPath version projPath =
     Path.Combine ([|projDir; "bin"; "Release";
                     sprintf "%s%s.nupkg" (Path.GetFileNameWithoutExtension projPath) vstr|])
 
-let getNupkgArtifactPath proj = Path.Combine ("artifacts", sprintf "%s.nupkg" (Path.GetFileNameWithoutExtension proj))
+let getNupkgArtifactPath proj = Path.Combine (artifactsPath, sprintf "%s.nupkg" (Path.GetFileNameWithoutExtension proj))
 
 Target.create "Clean" (fun _ ->
     Trace.log " --- Cleaning --- "
@@ -149,7 +150,7 @@ Target.create "Clean" (fun _ ->
     Shell.deleteDir ".fsdocs"
     Shell.deleteDir "output"
     Shell.deleteDir "temp"
-    Shell.deleteDir Templates.outputPath
+    Shell.deleteDir artifactsPath
 )
 
 Target.create "Restore" (fun _ ->
@@ -228,13 +229,13 @@ Target.create "BuildTemplateProjects" (fun _ ->
 
 Target.create "PackTemplates" (fun _ ->
     Trace.log " --- Packing template packages --- "
-    Shell.mkdir Templates.outputPath
+    Shell.mkdir artifactsPath
     for nuspecPath in Templates.nuspecPaths do
         NuGet.NuGetPack
             (fun opt -> {
                 opt with
                     WorkingDir = Path.GetDirectoryName nuspecPath
-                    OutputPath = Templates.outputPath
+                    OutputPath = artifactsPath
                     Version = sprintf "%s.%d" currentVersionInfo.versionName currentTemplateMinorVersion
             })
             nuspecPath

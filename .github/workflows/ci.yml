@@ -26,9 +26,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: artifacts-windows
-        path: |
-          artifacts/
-          templates/bin
+        path: artifacts
     - name: Test
       run: |
         dotnet fake build -t Test
