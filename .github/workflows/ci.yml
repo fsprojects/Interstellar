@@ -18,10 +18,6 @@ jobs:
         dotnet paket restore
     - name: Build
       run: dotnet fake build
-    - name: Test
-      run: |
-        dotnet fake build -t Test
-        dotnet fake build -t BuildTemplateProjects
     - name: Pack
       run: |
         dotnet fake build -t Pack
@@ -33,9 +29,13 @@ jobs:
         path: |
           artifacts/
           templates/bin
+    - name: Test
+      run: |
+        dotnet fake build -t Test
+        dotnet fake build -t BuildTemplateProjects
 
   build-macos:
-    name: (macOS)
+    name: CI (macOS)
     runs-on: macos-latest
 
     steps:
@@ -49,10 +49,6 @@ jobs:
         dotnet paket restore
     - name: Build
       run: dotnet fake build
-    - name: Test
-      run: |
-        dotnet fake build -t Test
-        dotnet fake build -t BuildTemplateProjects
     - name: Pack
       run: dotnet fake build -t pack
     - name: Upload artifacts
@@ -60,3 +56,7 @@ jobs:
       with:
         name: artifacts-macos
         path: artifacts/
+    - name: Test
+      run: |
+        dotnet fake build -t Test
+        dotnet fake build -t BuildTemplateProjects
