@@ -1,6 +1,6 @@
 # Interstellar
 
-![CI (macOS)](https://github.com/jwosty/Interstellar/workflows/CI%20(macOS)/badge.svg) ![CI (Windows)](https://github.com/jwosty/Interstellar/workflows/CI%20(Windows)/badge.svg)
+![CI (macOS)](https://github.com/fsprojects/Interstellar/workflows/CI%20(macOS)/badge.svg) ![CI (Windows)](https://github.com/fsprojects/Interstellar/workflows/CI%20(Windows)/badge.svg)
 
 > NOTE: This API is not yet guarenteed to be stable or backward-compatible until v1.0, so breaking changes may occur at any time.
 

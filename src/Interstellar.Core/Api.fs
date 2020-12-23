@@ -158,7 +158,7 @@ module BrowserWindowConfig =
         disposed.Add (fun _ ->
             try pageTitleChanged.RemoveHandler titleMappingHandler
             // if this log line ever shows up, I'm betting that we've gotten some threading wrong or something
-            with e -> eprintfn "Exception while removing titleMappingHandler. This is likely indicates a bug in the library and may cause other issues; please contact the Interstellar maintainer(s) or add an issue on GitHub to fix the problem: https://github.com/jwosty/Interstellar\nFull exception: %A" e
+            with e -> eprintfn "Exception while removing titleMappingHandler. This is likely indicates a bug in the library and may cause other issues; please contact the Interstellar maintainer(s) or add an issue on GitHub to fix the problem: https://github.com/fsprojects/Interstellar\nFull exception: %A" e
         )
     /// <summary>
     ///     Intended for use by platform implementations; applications generally shouldn't need this function. Applies

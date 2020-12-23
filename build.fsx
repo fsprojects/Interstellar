@@ -53,7 +53,7 @@ module Templates =
     let macosProjects =
         !! (Path.Combine (path, "**/*macos*.fsproj"))
 
-let projectRepo = "https://github.com/jwosty/Interstellar"
+let projectRepo = "https://github.com/fsprojects/Interstellar"
 
 let projAsTarget (projFileName: string) = projFileName.Split('/').[0].Replace(".", "_")
 
@@ -204,7 +204,7 @@ Target.create "Pack" (fun _ ->
         let oldNupkgPath = getNupkgPath (Some vstr) proj
         Shell.mkdir artifactsPath
         Shell.moveFile artifactsPath oldNupkgPath
-    // see https://github.com/jwosty/Interstellar/issues/3
+    // see https://github.com/fsprojects/Interstellar/issues/3
     !! (Path.Combine (artifactsPath, "**", "*.nupkg"))
     |> Seq.iter (``Nupkg-hack``.hackNupkgAtPath)
 )

@@ -21,7 +21,7 @@ type Platform private() =
                 Platform.InitAnyCpuCefSharp () |> ignore
         )
 
-    // Without this inlining, WinForms builds crash in Release mode: https://github.com/jwosty/Interstellar/issues/10
+    // Without this inlining, WinForms builds crash in Release mode: https://github.com/fsprojects/Interstellar/issues/10
     [<System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)>]
     static member Shutdown () =
         Cef.Shutdown ()
