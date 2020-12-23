@@ -5,8 +5,8 @@
     <Description>Cross-platform F# browser library</Description>
     <Authors>John Wostenberg</Authors>
     <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/jwosty/Interstellar</RepositoryUrl>
-    <PackageProjectUrl>https://jwosty.github.io/Interstellar</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/fsprojects/Interstellar</RepositoryUrl>
+    <PackageProjectUrl>https://fsprojects.github.io/Interstellar/</PackageProjectUrl>
     <PackageTags>fsharp;interstellar</PackageTags>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
