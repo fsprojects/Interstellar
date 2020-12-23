@@ -47,3 +47,9 @@ dotnet fake build -t BuildDocs
 // to actually release docs, assuming you have push priveleges to the repo:
 dotnet fake biuld -t ReleaseDocs
 ```
+
+## Maintainer(s)
+
+* [@jwosty](https://github.com/jwosty)
+
+The default maintainer account for projects under "fsprojects" is [@fsprojectsgit](https://github.com/fsprojectsgit) - F# Community Project Incubation Space (repo management)
