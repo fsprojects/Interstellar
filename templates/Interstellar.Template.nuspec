@@ -7,7 +7,7 @@
         <version>0.0.0</version>
         <authors>John Wostenberg</authors>
         <description>Templates for building cross-platform browser-based applications using Interstellar.</description>
-        <projectUrl>https://jwosty.github.io/Interstellar/</projectUrl>
+        <projectUrl>https://fsprojects.github.io/Interstellar/</projectUrl>
         <license type="expression">MIT</license>
         <copyright>Copyright 2020</copyright>
         <packageTypes>

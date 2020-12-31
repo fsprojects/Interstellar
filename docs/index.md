@@ -27,7 +27,7 @@ On macOS, I recommend opening ``<project-name>.macOS.sln`` in Visual Studio for 
 
 You should end up with a simple, cross-platform sample app that opens a window built using embeded HTML, CSS, and Javascript.
 
-![Sample Interstellar app](https://jwosty.github.io/Interstellar/Interstellar%20sample%20app.gif)
+![Sample Interstellar app](https://fsprojects.github.io/Interstellar/Interstellar%20sample%20app.gif)
 
 ### Customizing the template
 
