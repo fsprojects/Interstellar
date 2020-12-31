@@ -90,7 +90,7 @@ dotnet run -p &lt;project-name&gt;.Windows\&lt;project-name&gt;.Windows.fsproj
 </code></pre></td></tr></table>
 <p>On macOS, I recommend opening <code>&lt;project-name&gt;.macOS.sln</code> in Visual Studio for Mac and running it that way. It runs using the mono-based Xamarin.macOS runtime, and as a result you currently can't run it with <code>dotnet run</code> (see <a href="https://github.com/xamarin/xamarin-macios/issues/8955">xamarin/xamarin-macios#3955</a>). This is on the roadmap for .NET 6. You'll have to use Mono's <code>msbuild</code> instead, if you want to use the CLI.</p>
 <p>You should end up with a simple, cross-platform sample app that opens a window built using embeded HTML, CSS, and Javascript.</p>
-<p><img src="https://jwosty.github.io/Interstellar/Interstellar%20sample%20app.gif" alt="Sample Interstellar app" /></p>
+<p><img src="https://fsprojects.github.io/Interstellar/Interstellar%20sample%20app.gif" alt="Sample Interstellar app" /></p>
 <h3><a name="Customizing-the-template" class="anchor" href="#Customizing-the-template">Customizing the template</a></h3>
 <p>By default, this will create a core sample project, and a host project for each platform (Windows and macOS). To generate a project without a macOS host, use the following:</p>
 <table class="pre"><tr><td class="snippet"><pre class="fssnip"><code lang="bash">dotnet new interstellar --macOS false
