@@ -111,10 +111,11 @@ let projects = [
 
 let msbuild setParams project =
     let buildMode = Environment.environVarOrDefault "buildMode" "Release"
+    let commit = Git.Information.getCurrentSHA1 "."
     project |> MSBuild.build (
         quiet <<
         setParams <<
-        addProperties ["Configuration", buildMode] <<
+        addProperties ["Configuration", buildMode; "RepositoryCommit", commit] <<
         addVersionInfo currentVersionInfo << setParams
     )
 
