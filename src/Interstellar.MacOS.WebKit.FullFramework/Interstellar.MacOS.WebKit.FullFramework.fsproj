@@ -6,10 +6,9 @@
     <RootNamespace>Interstellar.macOS.WebKit</RootNamespace>
     <ProjectTypeGuids>{A3F8F2AB-B479-4A4A-A458-A89E7DC349F1};{F2A71F9B-5D33-465A-A702-920D77279786}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
-    <TargetFramework>xamarin.mac20</TargetFramework>
+    <ProjectGuid>{DA9591A8-4189-4171-AF3F-85F1F3EA22A2}</ProjectGuid>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <UseXamMacFullFramework>true</UseXamMacFullFramework>
-    <ProjectGuid>{DA9591A8-4189-4171-AF3F-85F1F3EA22A2}</ProjectGuid>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

@@ -9,7 +9,6 @@
     <AssemblyName>InterstellarExample</AssemblyName>
     <ErrorReport>prompt</ErrorReport>
     <ProjectGuid>{98BEAAC4-9ADD-4D08-B3A7-06BD5934A721}</ProjectGuid>
-    <TargetFramework>xamarin.mac20</TargetFramework>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <UseXamMacFullFramework>true</UseXamMacFullFramework>
   </PropertyGroup>

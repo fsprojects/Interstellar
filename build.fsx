@@ -35,6 +35,7 @@ module Projects =
     let winFormsLib = Path.Combine ("src", "Interstellar.WinForms.Chromium", "Interstellar.WinForms.Chromium.fsproj")
     let wpfLib = Path.Combine ("src", "Interstellar.Wpf.Chromium", "Interstellar.Wpf.Chromium.fsproj")
     let macosWkLib = Path.Combine ("src", "Interstellar.macOS.WebKit", "Interstellar.macOS.WebKit.fsproj")
+    let macosWkFFLib = Path.Combine ("src", "Interstellar.macOS.WebKit.FullFramework", "Interstellar.macOS.WebKit.FullFramework.fsproj")
 
 module Solutions =
     let windows = "Interstellar.Windows.sln"
@@ -106,7 +107,7 @@ let addVersionInfo (versionInfo: PackageVersionInfo) =
 let projects = [
     yield Projects.coreLib
     if Environment.isWindows then yield! [Projects.chromiumLib; Projects.winFormsLib; Projects.wpfLib]
-    if Environment.isMacOS then yield! [Projects.macosWkLib ]
+    if Environment.isMacOS then yield! [Projects.macosWkLib; Projects.macosWkFFLib]
 ]
 
 let msbuild setParams project =
@@ -154,20 +155,25 @@ Target.create "Clean" (fun _ ->
 
 Target.create "Restore" (fun _ ->
     DotNet.exec id "tool" "restore" |> ignore
-    DotNet.restore id |> ignore
+    // DotNet.restore id |> ignore
+    if Environment.isWindows then
+        DotNet.restore id Solutions.windows
+    else if Environment.isMacOS then
+        DotNet.restore id Solutions.macos
 )
 
 Target.create "Build" (fun _ ->
     Trace.log " --- Building --- "
+    // if Environment.isWindows then
+    //     msbuild (addTarget "Restore") Solutions.windows
+    // else
+    //     msbuild (addTarget "Restore") Solutions.macos
     if Environment.isWindows then
-        msbuild (addTarget "Restore") Solutions.windows
-    else
-        msbuild (addTarget "Restore") Solutions.macos
-    if Environment.isWindows then
-        msbuild (doRestore << addTarget "Build") Projects.winFormsLib
-        msbuild (doRestore << addTarget "Build") Projects.wpfLib
+        msbuild (addTarget "Build") Projects.winFormsLib
+        msbuild (addTarget "Build") Projects.wpfLib
     else if Environment.isMacOS then
-        msbuild (doRestore << addTarget "Build") Projects.macosWkLib
+        msbuild (addTarget "Build") Projects.macosWkLib
+        msbuild (addTarget "Build") Projects.macosWkFFLib
 )
 
 Target.create "Test" (fun _ ->
@@ -221,7 +227,8 @@ Target.create "BuildTemplateProjects" (fun _ ->
     else if Environment.isMacOS then
         let p = [ yield! Templates.macosProjects ]
         for proj in p do
-            msbuild (addTarget "Restore") proj
+            // msbuild (addTarget "Restore") proj
+            DotNet.restore id proj
         for proj in p do
             msbuild (addTarget "Build") proj
 )
