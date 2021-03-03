@@ -11,12 +11,14 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <CodeSigningKey>Mac Developer</CodeSigningKey>
     <UseSGen>false</UseSGen>
+    <EnableCodeSigning>false</EnableCodeSigning>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <CreatePackage>true</CreatePackage>
     <IncludeMonoRuntime>true</IncludeMonoRuntime>
     <LinkMode>SdkOnly</LinkMode>
     <UseSGen>false</UseSGen>
+    <EnableCodeSigning>false</EnableCodeSigning>
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Resources\" />

@@ -8,9 +8,11 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <UseSGen>false</UseSGen>
+    <EnableCodeSigning>false</EnableCodeSigning>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <UseSGen>false</UseSGen>
+    <EnableCodeSigning>false</EnableCodeSigning>
   </PropertyGroup>
   <Target Name="BeforeBuild">
     <ItemGroup>
