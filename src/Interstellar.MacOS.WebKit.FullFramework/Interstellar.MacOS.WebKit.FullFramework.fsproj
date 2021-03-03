@@ -9,11 +9,14 @@
     <ProjectGuid>{DA9591A8-4189-4171-AF3F-85F1F3EA22A2}</ProjectGuid>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <UseXamMacFullFramework>true</UseXamMacFullFramework>
+    <Version>$(VersionPrefix)</Version>
+    <PackageVersion>$(Version)</PackageVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
+    <PackageOutputPath>$(OutputPath)</PackageOutputPath>
     <DefineConstants>DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <EnableCodeSigning>false</EnableCodeSigning>
@@ -34,6 +37,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
+    <PackageOutputPath>$(OutputPath)</PackageOutputPath>
     <DefineConstants>
     </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -101,4 +105,5 @@
       </ItemGroup>
     </When>
   </Choose>
+  <Import Project="..\..\packages\NuGet.Build.Tasks.Pack\build\NuGet.Build.Tasks.Pack.targets" Condition="Exists('..\..\packages\NuGet.Build.Tasks.Pack\build\NuGet.Build.Tasks.Pack.targets')" Label="Paket" />
 </Project>

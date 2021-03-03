@@ -34,8 +34,8 @@ module Projects =
     let chromiumLib = Path.Combine ("src", "Interstellar.Chromium", "Interstellar.Chromium.fsproj")
     let winFormsLib = Path.Combine ("src", "Interstellar.WinForms.Chromium", "Interstellar.WinForms.Chromium.fsproj")
     let wpfLib = Path.Combine ("src", "Interstellar.Wpf.Chromium", "Interstellar.Wpf.Chromium.fsproj")
-    let macosWkLib = Path.Combine ("src", "Interstellar.macOS.WebKit", "Interstellar.macOS.WebKit.fsproj")
-    let macosWkFFLib = Path.Combine ("src", "Interstellar.macOS.WebKit.FullFramework", "Interstellar.macOS.WebKit.FullFramework.fsproj")
+    let macosWkLib = Path.Combine ("src", "Interstellar.MacOS.WebKit", "Interstellar.MacOS.WebKit.fsproj")
+    let macosWkFFLib = Path.Combine ("src", "Interstellar.MacOS.WebKit.FullFramework", "Interstellar.MacOS.WebKit.FullFramework.fsproj")
 
 module Solutions =
     let windows = "Interstellar.Windows.sln"
@@ -112,7 +112,7 @@ let projects = [
 
 let msbuild setParams project =
     let buildMode = Environment.environVarOrDefault "buildMode" "Release"
-    let commit = Git.Information.getCurrentSHA1 "."
+    let commit = Git.Information.getCurrentSHA1 __SOURCE_DIRECTORY__
     project |> MSBuild.build (
         quiet <<
         setParams <<
@@ -206,8 +206,8 @@ Target.create "ReleaseDocs" (fun _ ->
 
 Target.create "Pack" (fun _ ->
     Trace.log " --- Packing NuGet packages --- "
-    let props = ["SolutionDir", __SOURCE_DIRECTORY__; "RepositoryCommit", Git.Information.getCurrentSHA1 __SOURCE_DIRECTORY__]
-    let msbuild f = msbuild (doRestore << addTargets ["Pack"] << addProperties props << f)
+    let props = ["SolutionDir", __SOURCE_DIRECTORY__]
+    let msbuild f = msbuild (addTargets ["Pack"] << addProperties props << f)
     Trace.log (sprintf "PROJECT LIST: %A" projects)
     for proj in projects do
         msbuild id proj
@@ -231,9 +231,9 @@ Target.create "BuildTemplateProjects" (fun _ ->
             DotNet.build id proj
     else if Environment.isMacOS then
         let p = [ yield! Templates.macosProjects ]
-        for proj in p do
-            // msbuild (addTarget "Restore") proj
-            DotNet.restore id proj
+        // for proj in p do
+        //     msbuild (addTarget "Restore") proj
+            // DotNet.restore id proj
         for proj in p do
             msbuild (addTarget "Build") proj
 )
