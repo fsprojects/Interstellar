@@ -172,8 +172,13 @@ Target.create "Build" (fun _ ->
         msbuild (addTarget "Build") Projects.winFormsLib
         msbuild (addTarget "Build") Projects.wpfLib
     else if Environment.isMacOS then
-        msbuild (addTarget "Build") Projects.macosWkLib
-        msbuild (addTarget "Build") Projects.macosWkFFLib
+        // this is so very strange that we have to treat them differently like so...
+        // macosWkLib needs the `msbuild /restore` for whatever reason because it's an SDK-style project...
+        msbuild (doRestore) Projects.macosWkLib
+        // but this one needs the `dotnet restore *.sln` somehow because it's not an SDK-style project!
+        msbuild id Projects.macosWkFFLib
+        // this makes zero sense, but alright... seriously, what the heck? You try changing those around and see msbuild/dotnet scream
+        // at you
 )
 
 Target.create "Test" (fun _ ->
