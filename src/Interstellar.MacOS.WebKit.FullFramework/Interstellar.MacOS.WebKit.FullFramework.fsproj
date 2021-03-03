@@ -25,7 +25,8 @@
     <UseRefCounting>true</UseRefCounting>
     <HttpClientHandler>
     </HttpClientHandler>
-    <LinkMode>None</LinkMode>
+    <LinkMode>
+    </LinkMode>
     <XamMacArch>
     </XamMacArch>
     <AOTMode>None</AOTMode>
@@ -37,7 +38,7 @@
     </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <EnableCodeSigning>false</EnableCodeSigning>
-    <CreatePackage>true</CreatePackage>
+    <CreatePackage>false</CreatePackage>
     <EnablePackageSigning>false</EnablePackageSigning>
     <IncludeMonoRuntime>true</IncludeMonoRuntime>
     <UseSGen>true</UseSGen>
