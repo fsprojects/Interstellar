@@ -7,11 +7,18 @@
     <AssemblyName>InterstellarExample</AssemblyName>
     <TargetFramework>xamarin.mac20</TargetFramework>
     <ErrorReport>prompt</ErrorReport>
+    <ProjectGuid>{C91E86B6-72B1-4367-9CD4-A1116FECD752}</ProjectGuid>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <CodeSigningKey>Mac Developer</CodeSigningKey>
     <UseSGen>false</UseSGen>
     <EnableCodeSigning>false</EnableCodeSigning>
+    <Optimize>false</Optimize>
+    <CreatePackage>false</CreatePackage>
+    <EnablePackageSigning>false</EnablePackageSigning>
+    <IncludeMonoRuntime>false</IncludeMonoRuntime>
+    <LinkMode>None</LinkMode>
+    <AOTMode>None</AOTMode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <CreatePackage>true</CreatePackage>
@@ -19,6 +26,9 @@
     <LinkMode>SdkOnly</LinkMode>
     <UseSGen>false</UseSGen>
     <EnableCodeSigning>false</EnableCodeSigning>
+    <Optimize>false</Optimize>
+    <EnablePackageSigning>false</EnablePackageSigning>
+    <AOTMode>None</AOTMode>
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
@@ -42,9 +52,12 @@
     <Compile Include="Main.fs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Interstellar.Core\Interstellar.Core.fsproj" />
-    <ProjectReference Include="..\..\src\Interstellar.macOS.WebKit\Interstellar.macOS.WebKit.fsproj" />
-    <ProjectReference Include="..\Examples.SharedCode\Examples.SharedCode.fsproj" />
+    <ProjectReference Include="..\..\src\Interstellar.Core\Interstellar.Core.fsproj">
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Interstellar.macOS.WebKit\Interstellar.macOS.WebKit.fsproj">
+    </ProjectReference>
+    <ProjectReference Include="..\Examples.SharedCode\Examples.SharedCode.fsproj">
+    </ProjectReference>
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

@@ -9,10 +9,14 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <UseSGen>false</UseSGen>
     <EnableCodeSigning>false</EnableCodeSigning>
+    <LinkMode>None</LinkMode>
+    <AOTMode>None</AOTMode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <UseSGen>false</UseSGen>
     <EnableCodeSigning>false</EnableCodeSigning>
+    <LinkMode>None</LinkMode>
+    <AOTMode>None</AOTMode>
   </PropertyGroup>
   <Target Name="BeforeBuild">
     <ItemGroup>

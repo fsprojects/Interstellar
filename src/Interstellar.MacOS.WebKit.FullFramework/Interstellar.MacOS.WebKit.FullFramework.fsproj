@@ -1,17 +1,15 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <RootNamespace>Interstellar.macOS.WebKit</RootNamespace>
     <ProjectTypeGuids>{A3F8F2AB-B479-4A4A-A458-A89E7DC349F1};{F2A71F9B-5D33-465A-A702-920D77279786}</ProjectTypeGuids>
-    <OutputType>Exe</OutputType>
-    <RootNamespace>Example.macOS.WebKit</RootNamespace>
-    <AssemblyName>InterstellarExample</AssemblyName>
-    <ErrorReport>prompt</ErrorReport>
-    <ProjectGuid>{98BEAAC4-9ADD-4D08-B3A7-06BD5934A721}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <TargetFramework>xamarin.mac20</TargetFramework>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <UseXamMacFullFramework>true</UseXamMacFullFramework>
+    <ProjectGuid>{DA9591A8-4189-4171-AF3F-85F1F3EA22A2}</ProjectGuid>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -28,10 +26,10 @@
     <UseRefCounting>true</UseRefCounting>
     <HttpClientHandler>
     </HttpClientHandler>
-    <LinkMode>
-    </LinkMode>
+    <LinkMode>None</LinkMode>
     <XamMacArch>
     </XamMacArch>
+    <AOTMode>None</AOTMode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
@@ -62,41 +60,34 @@
     <Reference Include="mscorlib" />
     <Reference Include="System.Numerics" />
   </ItemGroup>
+  <Target Name="BeforeBuild">
+    <ItemGroup>
+      <AssemblyAttributes Include="AssemblyVersion">
+        <_Parameter1>$(Version)</_Parameter1>
+      </AssemblyAttributes>
+    </ItemGroup>
+    <MakeDir Directories="$(IntermediateOutputPath)" />
+    <WriteCodeFragment Language="F#" OutputFile="$(IntermediateOutputPath)Version.fs" AssemblyAttributes="@(AssemblyAttributes)" />
+    <ItemGroup>
+      <Compile Include="$(IntermediateOutputPath)Version.fs" />
+    </ItemGroup>
+  </Target>
   <ItemGroup>
-    <Folder Include="Resources\" />
-  </ItemGroup>
-  <ItemGroup>
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\AppIcon-128.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\AppIcon-128%402x.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\AppIcon-16.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\AppIcon-16%402x.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\AppIcon-256.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\AppIcon-256%402x.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\AppIcon-32.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\AppIcon-32%402x.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\AppIcon-512.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\AppIcon-512%402x.png" />
-    <ImageAsset Include="Assets.xcassets\Contents.json" />
-    <None Include="Info.plist" />
-    <None Include="Entitlements.plist" />
-    <Compile Include="AppDelegate.fs" />
-    <Compile Include="Main.fs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\Interstellar.Core\Interstellar.Core.fsproj">
+    <ProjectReference Include="..\Interstellar.Core\Interstellar.Core.fsproj">
       <Project>{7D096C2C-0960-4754-9954-421832426807}</Project>
       <Name>Interstellar.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Examples.SharedCode\Examples.SharedCode.fsproj">
-      <Project>{0332BEB2-0915-47CC-A709-49FC4C2B3DB5}</Project>
-      <Name>Examples.SharedCode</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\src\Interstellar.MacOS.WebKit.FullFramework\Interstellar.MacOS.WebKit.FullFramework.fsproj">
-      <Project>{DA9591A8-4189-4171-AF3F-85F1F3EA22A2}</Project>
-      <Name>Interstellar.MacOS.WebKit.FullFramework</Name>
-    </ProjectReference>
+    <Compile Include="..\Interstellar.MacOS.WebKit\Browser.fs">
+      <Link>Browser.fs</Link>
+    </Compile>
+    <Compile Include="..\Interstellar.MacOS.WebKit\BrowserWindow.fs">
+      <Link>BrowserWindow.fs</Link>
+    </Compile>
+    <Compile Include="..\Interstellar.MacOS.WebKit\BrowserApp.fs">
+      <Link>BrowserApp.fs</Link>
+    </Compile>
   </ItemGroup>
+  <Import Project="..\..\AssemblyAndPackageInfo.props" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.FSharp.targets" />
   <Import Project="..\..\.paket\Paket.Restore.targets" />
   <Choose>
