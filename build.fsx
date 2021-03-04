@@ -35,7 +35,7 @@ module Projects =
     let coreLib = Path.Combine ("src", "Interstellar.Core", "Interstellar.Core.fsproj"), ProjectStyle.Sdk
     let chromiumLib = Path.Combine ("src", "Interstellar.Chromium", "Interstellar.Chromium.fsproj"), ProjectStyle.Sdk
     let winFormsLib = Path.Combine ("src", "Interstellar.WinForms.Chromium", "Interstellar.WinForms.Chromium.fsproj"), ProjectStyle.Sdk
-    let wpfLib = Path.Combine ("src", "Interstellar.Wpf.Chromium", "Interstellar.Wpf.Chromium.fsproj"), ProjectStyle.Traditional
+    let wpfLib = Path.Combine ("src", "Interstellar.Wpf.Chromium", "Interstellar.Wpf.Chromium.fsproj"), ProjectStyle.Sdk
     let macosWkLib = Path.Combine ("src", "Interstellar.MacOS.WebKit", "Interstellar.MacOS.WebKit.fsproj"), ProjectStyle.Sdk
     let macosWkFFLib = Path.Combine ("src", "Interstellar.MacOS.WebKit.FullFramework", "Interstellar.MacOS.WebKit.FullFramework.fsproj"), ProjectStyle.Traditional
 
