@@ -27,7 +27,7 @@ let changeVersionConstraints text =
 // </group>"""
 // |> changeVersionConstraints |> printfn "%s"
 
-let hackNupkgFromStream (path: string) (stream: Stream) =
+let hackNupkgFromStream (_: string) (stream: Stream) =
     use archive = new ZipArchive(stream, ZipArchiveMode.Update)
     let oldEntry = archive.Entries |> Seq.find (fun e -> e.Name.EndsWith ".nuspec")
     let input =

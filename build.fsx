@@ -29,13 +29,15 @@ open Fake.IO.FileSystemOperators
 open Fake.IO.Globbing.Operators
 open Fake.Tools
 
+type ProjectStyle = Sdk | Traditional
+
 module Projects =
-    let coreLib = Path.Combine ("src", "Interstellar.Core", "Interstellar.Core.fsproj")
-    let chromiumLib = Path.Combine ("src", "Interstellar.Chromium", "Interstellar.Chromium.fsproj")
-    let winFormsLib = Path.Combine ("src", "Interstellar.WinForms.Chromium", "Interstellar.WinForms.Chromium.fsproj")
-    let wpfLib = Path.Combine ("src", "Interstellar.Wpf.Chromium", "Interstellar.Wpf.Chromium.fsproj")
-    let macosWkLib = Path.Combine ("src", "Interstellar.MacOS.WebKit", "Interstellar.MacOS.WebKit.fsproj")
-    let macosWkFFLib = Path.Combine ("src", "Interstellar.MacOS.WebKit.FullFramework", "Interstellar.MacOS.WebKit.FullFramework.fsproj")
+    let coreLib = Path.Combine ("src", "Interstellar.Core", "Interstellar.Core.fsproj"), ProjectStyle.Sdk
+    let chromiumLib = Path.Combine ("src", "Interstellar.Chromium", "Interstellar.Chromium.fsproj"), ProjectStyle.Sdk
+    let winFormsLib = Path.Combine ("src", "Interstellar.WinForms.Chromium", "Interstellar.WinForms.Chromium.fsproj"), ProjectStyle.Sdk
+    let wpfLib = Path.Combine ("src", "Interstellar.Wpf.Chromium", "Interstellar.Wpf.Chromium.fsproj"), ProjectStyle.Traditional
+    let macosWkLib = Path.Combine ("src", "Interstellar.MacOS.WebKit", "Interstellar.MacOS.WebKit.fsproj"), ProjectStyle.Sdk
+    let macosWkFFLib = Path.Combine ("src", "Interstellar.MacOS.WebKit.FullFramework", "Interstellar.MacOS.WebKit.FullFramework.fsproj"), ProjectStyle.Traditional
 
 module Solutions =
     let windows = "Interstellar.Windows.sln"
@@ -49,10 +51,13 @@ module Templates =
     let nuspecPaths = !! (Path.Combine (path, "*.nuspec"))
     let allProjects =
         !! (Path.Combine (path, "**/*.fsproj"))
+        |> Seq.map (fun p -> p, ProjectStyle.Sdk)
     let winProjects =
         !! (Path.Combine (path, "**/*windows*.fsproj"))
+        |> Seq.map (fun p -> p, ProjectStyle.Sdk)
     let macosProjects =
         !! (Path.Combine (path, "**/*macos*.fsproj"))
+        |> Seq.map (fun p -> p, ProjectStyle.Sdk)
 
 let projectRepo = "https://github.com/fsprojects/Interstellar"
 
@@ -138,13 +143,13 @@ let getNupkgPath version projPath =
 
 Target.create "Clean" (fun _ ->
     Trace.log " --- Cleaning --- "
-    for proj in projects do
+    for (proj, projStyle) in projects do
         let vstr = currentVersionInfo.versionName
         File.delete (getNupkgPath (Some vstr) proj)
     !! (Path.Combine (artifactsPath, "**/*.nupkg")) |> File.deleteAll
     let projects =
-        if Environment.isWindows then [ Projects.winFormsLib; Projects.wpfLib; yield! Templates.winProjects ]
-        else if Environment.isMacOS then [ Solutions.macos; yield! Templates.macosProjects ]
+        if Environment.isWindows then [for (p,_) in [ Projects.winFormsLib; Projects.wpfLib; yield! Templates.winProjects ] -> p]
+        else if Environment.isMacOS then [ yield Solutions.macos; for (p,_) in Templates.macosProjects -> p ]
         else []
     for proj in projects do
         msbuild (addTarget "Clean") proj
@@ -169,14 +174,14 @@ Target.create "Build" (fun _ ->
     // else
     //     msbuild (addTarget "Restore") Solutions.macos
     if Environment.isWindows then
-        msbuild (addTarget "Build") Projects.winFormsLib
-        msbuild (addTarget "Build") Projects.wpfLib
+        msbuild (addTarget "Build") (fst Projects.winFormsLib)
+        msbuild (addTarget "Build") (fst Projects.wpfLib)
     else if Environment.isMacOS then
         // this is so very strange that we have to treat them differently like so...
         // macosWkLib needs the `msbuild /restore` for whatever reason because it's an SDK-style project...
-        msbuild (doRestore) Projects.macosWkLib
+        msbuild (doRestore) (fst Projects.macosWkLib)
         // but this one needs the `dotnet restore *.sln` somehow because it's not an SDK-style project!
-        msbuild id Projects.macosWkFFLib
+        msbuild id (fst Projects.macosWkFFLib)
         // this makes zero sense, but alright... seriously, what the heck? You try changing those around and see msbuild/dotnet scream
         // at you
 )
@@ -188,7 +193,7 @@ Target.create "Test" (fun _ ->
 
 Target.create "BuildDocs" (fun _ ->
     Trace.log " --- Building documentation --- "
-    let result = DotNet.exec id "fsdocs" ("build --clean --projects=" + Projects.coreLib + " --property Configuration=Release")
+    let result = DotNet.exec id "fsdocs" ("build --clean --projects=" + (fst Projects.coreLib) + " --property Configuration=Release")
     Trace.logfn "%s" (result.ToString())
 )
 
@@ -209,7 +214,7 @@ Target.create "Pack" (fun _ ->
     let props = ["SolutionDir", __SOURCE_DIRECTORY__]
     let msbuild f = msbuild (addTargets ["Pack"] << addProperties props << f)
     Trace.log (sprintf "PROJECT LIST: %A" projects)
-    for proj in projects do
+    for (proj, projStyle) in projects do
         msbuild id proj
         // Collect all generated package archives into a common folder
         let vstr = currentVersionInfo.versionName
@@ -225,16 +230,16 @@ Target.create "BuildTemplateProjects" (fun _ ->
     Trace.log " --- Building template projects --- "
     if Environment.isWindows then
         let p = [ yield! Templates.winProjects ]
-        for proj in p do
+        for (proj, projStyle) in p do
             DotNet.restore id proj
-        for proj in p do
+        for (proj, projStyle) in p do
             DotNet.build id proj
     else if Environment.isMacOS then
         let p = [ yield! Templates.macosProjects ]
-        // for proj in p do
-        //     msbuild (addTarget "Restore") proj
+        for (proj, projStyle) in p do
+            msbuild (addTarget "Restore") proj
             // DotNet.restore id proj
-        for proj in p do
+        for (proj, projStyle) in p do
             msbuild (addTarget "Build") proj
 )
 
