@@ -44,7 +44,7 @@ jobs:
       uses: maxim-lobanov/setup-xamarin@v1
       with:
         mono-version: 6
-        xamarin-mac-version: 6
+        xamarin-mac-version: 7
         xcode-version: 12.x
     - name: Restore
       run: |
