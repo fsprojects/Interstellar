@@ -95,6 +95,13 @@ let currentVersionInfo = changelog.[0]
 /// change to just the template, increment this.
 let currentTemplateMinorVersion = 1
 
+let asmPkgInfo = System.IO.File.ReadAllText "AssemblyAndPackageInfo.props"
+
+// Extract assembly info property value
+let extractAsmPkgInfoProp propName =
+    let r = new System.Text.RegularExpressions.Regex(sprintf "(<%s>)(?'value'.*)(</%s>)" propName propName)
+    r.Match("asmPkgInfo").Groups.["value"].Value
+
 let addProperties props defaults = { defaults with Properties = [yield! defaults.Properties; yield! props]}
 
 let addVersionInfo (versionInfo: PackageVersionInfo) =
@@ -231,7 +238,11 @@ Target.create "Pack" (fun _ ->
                     opt with
                         WorkingDir = Path.GetDirectoryName proj
                         OutputPath = artifactsPath
+                        Properties = ["Configuration", "Release"]
                         Version = sprintf "%s.%d" currentVersionInfo.versionName currentTemplateMinorVersion
+                        Authors = [extractAsmPkgInfoProp "Authors"]
+                        Copyright = extractAsmPkgInfoProp "Copyright"
+                        ReleaseNotes = currentVersionInfo.versionChanges
                 })
                 proj
     // see https://github.com/fsprojects/Interstellar/issues/3
