@@ -212,15 +212,28 @@ Target.create "ReleaseDocs" (fun _ ->
 Target.create "Pack" (fun _ ->
     Trace.log " --- Packing NuGet packages --- "
     let props = ["SolutionDir", __SOURCE_DIRECTORY__]
-    let msbuild f = msbuild (addTargets ["Pack"] << addProperties props << f)
     Trace.log (sprintf "PROJECT LIST: %A" projects)
     for (proj, projStyle) in projects do
-        msbuild id proj
-        // Collect all generated package archives into a common folder
-        let vstr = currentVersionInfo.versionName
-        let oldNupkgPath = getNupkgPath (Some vstr) proj
-        Shell.mkdir artifactsPath
-        Shell.moveFile artifactsPath oldNupkgPath
+        match projStyle with
+        | ProjectStyle.Sdk ->
+            Trace.log (sprintf "Packing %s (sdk-style project)" proj)
+            msbuild (addTargets ["Pack"] << addProperties props) proj
+            // Collect all generated package archives into a common folder
+            let vstr = currentVersionInfo.versionName
+            let oldNupkgPath = getNupkgPath (Some vstr) proj
+            Shell.mkdir artifactsPath
+            Shell.moveFile artifactsPath oldNupkgPath
+        | ProjectStyle.Traditional ->
+            // `dotnet pack` and `msbuild pack` only work with sdk-style projects
+            Trace.log (sprintf "Packing %s (traditional-style project)" proj)
+            NuGet.NuGetPack
+                (fun opt -> {
+                    opt with
+                        WorkingDir = Path.GetDirectoryName proj
+                        OutputPath = artifactsPath
+                        Version = sprintf "%s.%d" currentVersionInfo.versionName currentTemplateMinorVersion
+                })
+                proj
     // see https://github.com/fsprojects/Interstellar/issues/3
     !! (Path.Combine (artifactsPath, "**", "*.nupkg"))
     |> Seq.iter (``Nupkg-hack``.hackNupkgAtPath)
