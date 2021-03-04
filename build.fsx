@@ -239,7 +239,7 @@ Target.create "Pack" (fun _ ->
                         WorkingDir = Path.GetDirectoryName proj
                         OutputPath = artifactsPath
                         Properties = ["Configuration", "Release"]
-                        Version = sprintf "%s.%d" currentVersionInfo.versionName currentTemplateMinorVersion
+                        Version = currentVersionInfo.versionName
                         Authors = [extractAsmPkgInfoProp "Authors"]
                         Copyright = extractAsmPkgInfoProp "Copyright"
                         ReleaseNotes = currentVersionInfo.versionChanges
