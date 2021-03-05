@@ -99,8 +99,8 @@ let asmPkgInfo = System.IO.File.ReadAllText "AssemblyAndPackageInfo.props"
 
 // Extract assembly info property value
 let extractAsmPkgInfoProp propName =
-    let r = new System.Text.RegularExpressions.Regex(sprintf "(<%s>)(?'value'.*)(</%s>)" propName propName)
-    r.Match("asmPkgInfo").Groups.["value"].Value
+    let r = new Regex(sprintf "(<%s>)(?'value'.*)(</%s>)" propName propName)
+    r.Match(asmPkgInfo).Groups.["value"].Value
 
 let addProperties props defaults = { defaults with Properties = [yield! defaults.Properties; yield! props]}
 
@@ -232,7 +232,8 @@ Target.create "Pack" (fun _ ->
             Shell.moveFile artifactsPath oldNupkgPath
         | ProjectStyle.Traditional ->
             // `dotnet pack` and `msbuild pack` only work with sdk-style projects
-            Trace.log (sprintf "Packing %s (traditional-style project)" proj)
+            Trace.logf "Packing %s (traditional-style project)" proj
+            Trace.logf "Authors = %A" ([for a in (extractAsmPkgInfoProp "Authors").Split(';') -> a.Trim()])
             NuGet.NuGetPack
                 (fun opt -> {
                     opt with
@@ -240,9 +241,10 @@ Target.create "Pack" (fun _ ->
                         OutputPath = artifactsPath
                         Properties = ["Configuration", "Release"]
                         Version = currentVersionInfo.versionName
-                        Authors = [extractAsmPkgInfoProp "Authors"]
+                        Authors = [for a in (extractAsmPkgInfoProp "Authors").Split(';') -> a.Trim()]
                         Copyright = extractAsmPkgInfoProp "Copyright"
                         ReleaseNotes = currentVersionInfo.versionChanges
+                        Tags = String.Join (" ", (extractAsmPkgInfoProp "Tags").Split(';') |> Seq.map (fun a -> a.Trim()))
                 })
                 proj
     // see https://github.com/fsprojects/Interstellar/issues/3

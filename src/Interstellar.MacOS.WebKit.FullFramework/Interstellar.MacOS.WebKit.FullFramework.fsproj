@@ -90,6 +90,7 @@
     <Compile Include="..\Interstellar.MacOS.WebKit\BrowserApp.fs">
       <Link>BrowserApp.fs</Link>
     </Compile>
+    <None Include="..\..\LICENSE" Pack="true" PackagePath="LICENSE.txt" />
   </ItemGroup>
   <Import Project="..\..\AssemblyAndPackageInfo.props" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.FSharp.targets" />
