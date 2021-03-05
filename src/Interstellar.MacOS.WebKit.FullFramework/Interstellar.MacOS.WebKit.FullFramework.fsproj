@@ -91,6 +91,7 @@
       <Link>BrowserApp.fs</Link>
     </Compile>
     <None Include="..\..\LICENSE" Pack="true" PackagePath="LICENSE.txt" />
+    <Compile Include="AssemblyInfo.fs" />
   </ItemGroup>
   <Import Project="..\..\AssemblyAndPackageInfo.props" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.FSharp.targets" />

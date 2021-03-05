@@ -174,6 +174,53 @@ Target.create "Restore" (fun _ ->
         DotNet.restore id Solutions.macos
 )
 
+// Syncs AssemblyInfo.fs with AssemblyAndPackageInfo.props
+Target.create "UpdateAssemblyInfo" (fun _ ->
+    Trace.log " --- Updating AssemblyInfo.fs in Interstellar.MacOS.WebKit.FullFramework --- "
+
+    let asmInfoPath = Path.Combine (Path.GetDirectoryName (fst Projects.macosWkFFLib), "AssemblyInfo.fs")
+    let projNameWithoutExt = Path.GetFileNameWithoutExtension (fst Projects.macosWkFFLib)
+    let asmInfo = File.ReadAllText asmInfoPath
+
+    let replacements =
+        Map.ofList [
+            "AssemblyDescription", extractAsmPkgInfoProp "Description"
+            "AssemblyCopyright", extractAsmPkgInfoProp "Copyright"
+            "AssemblyCompany", extractAsmPkgInfoProp "Company"
+            "AssemblyTitle", projNameWithoutExt
+            "AssemblyProduct", projNameWithoutExt
+            // Since the fsproj imports AssemblyAndPackageInfo.props and properly ingests this property, we do not need to include it here
+            //"AssemblyVersion", currentVersionInfo.versionName + ".0
+            "AssemblyInformationalVersion", currentVersionInfo.versionName
+            "AssemblyFileVersion", currentVersionInfo.versionName + ".0"
+        ]
+
+    let result =
+        Regex.Replace (
+            asmInfo,
+            // matches the following:
+            // [<assembly: ${AttributeName}("${AttributeValue}")>]
+            // where ${AttributeName} and ${AttributeValue} are named match groups that could be anything
+            """(\[<assembly: )(?<AttributeName>.*)(\(")(?<OldValue>.*)("\)>\])""",
+            MatchEvaluator(fun m ->
+                match Map.tryFind (m.Groups.["AttributeName"].Value) replacements with
+                | Some newValue ->
+                    //printfn "VALUES"
+                    //for x in m.Groups do printfn "%s -> %s" x.Name x.Value
+                    m.Groups.[1].Value                    // [<assembly: 
+                    + m.Groups.["AttributeName"].Value    // ${AttributeName}
+                    + m.Groups.[2].Value                  // "
+                    + newValue // the actual replacement
+                    + m.Groups.[3].Value                  // ")
+                | None -> m.ToString()
+            )
+        )
+
+    //Trace.log result
+
+    File.WriteAllText (asmInfoPath, result)
+)
+
 Target.create "Build" (fun _ ->
     Trace.log " --- Building --- "
     // if Environment.isWindows then
@@ -232,8 +279,8 @@ Target.create "Pack" (fun _ ->
             Shell.moveFile artifactsPath oldNupkgPath
         | ProjectStyle.Traditional ->
             // `dotnet pack` and `msbuild pack` only work with sdk-style projects
-            Trace.logf "Packing %s (traditional-style project)" proj
-            Trace.logf "Authors = %A" ([for a in (extractAsmPkgInfoProp "Authors").Split(';') -> a.Trim()])
+            Trace.logfn "Packing %s (traditional-style project)" proj
+            Trace.logfn "Authors = %A" ([for a in (extractAsmPkgInfoProp "Authors").Split(';') -> a.Trim()])
             NuGet.NuGetPack
                 (fun opt -> {
                     opt with
@@ -293,6 +340,7 @@ open Fake.Core.TargetOperators
 
 // *** Define Dependencies ***
 "Restore"
+    ==> "UpdateAssemblyInfo"
     ==> "Build"
     ==> "Pack"
     ==> "PackAll"
