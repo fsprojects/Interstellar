@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.2
+
+* macOS - Explicity throw exceptions when accessing browser operations from non-UI threads, instead of silently crashing
+
 ## 0.3.1
 
 * WinForms - Fixed an issue that could cause apps to crash at startup in release mode (https://github.com/jwosty/Interstellar/issues/10 ; thanks to @amaitland for the fix)

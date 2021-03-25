@@ -1,10 +1,12 @@
 ﻿namespace Interstellar.MacOS.Internal
 open System
+open System.Threading
 open AppKit
 open CoreGraphics
 open Foundation
 open Interstellar
 open WebKit
+
 type WebKitViewDialogueHandler() =
     inherit WKUIDelegate()
 
@@ -15,6 +17,7 @@ type WebKitViewDialogueHandler() =
 
 namespace Interstellar.MacOS.WebKit
 open System
+open System.Threading
 open AppKit
 open CoreGraphics
 open Foundation
@@ -42,8 +45,10 @@ type Browser(config: BrowserWindowConfig<NSWindow>) =
     let jsMsgRecieved = new Event<string>()
     let mutable pageTitleObserverHandle = null
 
+    let owningThreadId = Thread.CurrentThread.ManagedThreadId
+
     static let wkBridgeName = "interstellarWkBridge"
-    
+
     do
         wkBrowser.NavigationDelegate <- {
             new WKNavigationDelegate() with
@@ -76,6 +81,12 @@ type Browser(config: BrowserWindowConfig<NSWindow>) =
         | Some address, None -> BrowserHelpers.load (wkBrowser, address)
         | None, None -> ()
 
+    member private this.CheckThread() =
+        // check manually because some doing this for some operations will otherwise give nasty undebuggable crashes with no information
+        // (for example ExecuteJavascript)
+        if Thread.CurrentThread.ManagedThreadId <> owningThreadId then
+            invalidOp "Browser methods may only be invoked from the thread it was created on" // TODO: nameof
+
     member this.WebKitBrowser = wkBrowser
 
     member this.AwaitLoadedThenJSReady () = async {
@@ -93,29 +104,51 @@ type Browser(config: BrowserWindowConfig<NSWindow>) =
             | url -> Some (new Uri(url.AbsoluteString))
         member this.AreDevToolsShowing = false
         member this.CloseDevTools () = ()
-        member this.CanGoBack = wkBrowser.CanGoBack
-        member this.CanGoForward = wkBrowser.CanGoForward
+        member this.CanGoBack =
+            this.CheckThread ()
+            wkBrowser.CanGoBack
+        member this.CanGoForward =
+            this.CheckThread ()
+            wkBrowser.CanGoForward
         member this.CanShowDevTools = false
-        member this.Engine = BrowserEngine.AppleWebKit
-        member this.ExecuteJavascript code = wkBrowser.EvaluateJavaScript (code, null)
-        member this.Load address = BrowserHelpers.load (wkBrowser, address)
+        member this.Engine =
+            this.CheckThread ()
+            BrowserEngine.AppleWebKit
+        member this.ExecuteJavascript code =
+            this.CheckThread ()
+            wkBrowser.EvaluateJavaScript (code, null)
+        member this.Load address =
+            this.CheckThread ()
+            BrowserHelpers.load (wkBrowser, address)
         member this.LoadAsync address = async {
+            this.CheckThread ()
             (this :> IBrowser).Load address
             return! this.AwaitLoadedThenJSReady ()
         }
-        member this.LoadString (html, ?uri) = BrowserHelpers.loadString (wkBrowser, html, uri)
+        member this.LoadString (html, ?uri) =
+            this.CheckThread ()
+            BrowserHelpers.loadString (wkBrowser, html, uri)
         member this.LoadStringAsync (html, ?uri) = async {
+            this.CheckThread ()
             (this :> IBrowser).LoadString (html, ?uri = uri)
             return! this.AwaitLoadedThenJSReady ()
         }
-        member this.GoBack () = wkBrowser.GoBack () |> ignore
-        member this.GoForward () = wkBrowser.GoForward () |> ignore
+        member this.GoBack () =
+            this.CheckThread ()
+            wkBrowser.GoBack () |> ignore
+        member this.GoForward () =
+            this.CheckThread ()
+            wkBrowser.GoForward () |> ignore
         [<CLIEvent>]
         member val JavascriptMessageRecieved = jsMsgRecieved.Publish
-        member this.PageTitle = wkBrowser.Title
+        member this.PageTitle =
+            this.CheckThread ()
+            wkBrowser.Title
         [<CLIEvent>]
         member val PageLoaded : IEvent<_> = pageLoaded.Publish
-        member this.Reload () = wkBrowser.Reload () |> ignore
+        member this.Reload () =
+            this.CheckThread ()
+            wkBrowser.Reload () |> ignore
         [<CLIEvent>]
         member val PageTitleChanged : IEvent<_> = pageTitleChanged.Publish
         // there's no way that I know of to programmatically open the WKWebView inspector: https://stackoverflow.com/questions/25200116/how-to-show-the-inspector-within-your-wkwebview-based-desktop-app

@@ -1,5 +1,6 @@
 ﻿namespace Interstellar.MacOS.WebKit.Internal
 open System
+open System.Threading
 open AppKit
 open CoreGraphics
 open Foundation
@@ -22,6 +23,8 @@ type BrowserWindow(config: BrowserWindowConfig<NSWindow>) as this =
     let shownEvt = new Event<_>()
     let disposedEvt = new Event<_>()
 
+    let owningThreadId = Thread.CurrentThread.ManagedThreadId
+
     do
         let wkBrowserController = {
             new NiblessViewController(browser.WebKitBrowser) with
@@ -38,7 +41,11 @@ type BrowserWindow(config: BrowserWindowConfig<NSWindow>) as this =
         this.Window.ContentViewController <- wkBrowserController
         this.Window.Center ()
         this.Window.AwakeFromNib ()
-    
+
+    member private this.CheckThread() =
+        if Thread.CurrentThread.ManagedThreadId <> owningThreadId then
+            invalidOp "BrowserWindow methods may only be invoked from the thread it was created on" // TODO: nameof
+
     member this.WKBrowserView = browser.WebKitBrowser
     member this.WKBrowser = browser
 
@@ -47,29 +54,41 @@ type BrowserWindow(config: BrowserWindowConfig<NSWindow>) as this =
 
     interface IBrowserWindow<NSWindow> with
         member this.Browser = upcast browser
-        member this.Close () = (this :> NSWindowController).Close ()
+        member this.Close () =
+            this.CheckThread()
+            (this :> NSWindowController).Close ()
         [<CLIEvent>]
         member val Closed = closedEvt.Publish
         member this.IsShowing =
+            this.CheckThread()
             let w = (this :> NSWindowController).Window
             w.IsVisible || w.IsMiniaturized
         member this.Show () = async {
+            this.CheckThread()
             (this :> NSWindowController).ShowWindow this
         }
-        member this.NativeWindow = this.Window
+        member this.NativeWindow =
+            this.CheckThread()
+            this.Window
         member this.Platform = BrowserWindowPlatform.MacOS
         [<CLIEvent>]
         member val Shown = shownEvt.Publish
         member this.Size
             with get () =
+                this.CheckThread()
                 let size = this.Window.Frame.Size
                 float size.Width, float size.Height
             and set (width, height) =
+                this.CheckThread()
                 let oldFrame = this.Window.Frame
                 // Cocoa uses a bottom-left origin, so we have to move the bottom-left corner in order to keep the top-right
                 // corner in place
                 let rect = new CGRect(float oldFrame.X, float oldFrame.Y - (height - float oldFrame.Height), width, height)
                 this.Window.SetFrame (rect, true, true)
         member this.Title
-            with get () = base.Window.Title
-            and set x = base.Window.Title <- x
+            with get () =
+                this.CheckThread()
+                base.Window.Title
+            and set x =
+                this.CheckThread()
+                base.Window.Title <- x
