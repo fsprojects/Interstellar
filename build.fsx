@@ -5,11 +5,14 @@
 // F# 4.7 due to https://github.com/fsharp/FAKE/issues/2001
 #r "paket:
 nuget FSharp.Core 4.7.0
+nuget FSharp.Data
 nuget Fake.Core.Target
 nuget Fake.DotNet.Cli
 nuget Fake.DotNet.MSBuild
 nuget Fake.DotNet.Paket
 nuget Fake.Tools.Git //"
+
+//#r "nuget: FSharp.Data"
 
 #if !FAKE
 #r "netstandard"
@@ -21,6 +24,7 @@ nuget Fake.Tools.Git //"
 open System
 open System.Text.RegularExpressions
 open System.IO
+open FSharp.Data
 open Fake.Core
 open Fake.DotNet
 open Fake.DotNet.NuGet
@@ -56,7 +60,10 @@ module Templates =
     let macosProjects =
         !! (Path.Combine (path, "**/*macos*.fsproj"))
 
-let projectRepo = "https://github.com/fsprojects/Interstellar"
+let [<Literal>] _srcDir =  __SOURCE_DIRECTORY__
+type PackageInfo = XmlProvider<"AssemblyAndPackageInfo.props", ResolutionFolder=_srcDir>
+let packageInfo = PackageInfo.Load(Path.Combine(__SOURCE_DIRECTORY__, "AssemblyAndPackageInfo.props"))
+let packageProps = packageInfo.PropertyGroup
 
 let projAsTarget (projFileName: string) = projFileName.Split('/').[0].Replace(".", "_")
 
@@ -198,7 +205,7 @@ Target.create "BuildDocs" (fun _ ->
 
 Target.create "ReleaseDocs" (fun _ ->
     Trace.log "--- Releasing documentation --- "
-    Git.CommandHelper.runSimpleGitCommand "." (sprintf "clone %s temp/gh-pages --depth 1 -b gh-pages" projectRepo) |> ignore
+    Git.CommandHelper.runSimpleGitCommand "." (sprintf "clone %s temp/gh-pages --depth 1 -b gh-pages" packageProps.RepositoryUrl) |> ignore
     Shell.copyRecursive "output" "temp/gh-pages" true |> printfn "%A"
     Git.CommandHelper.runSimpleGitCommand "temp/gh-pages" "add ." |> printfn "%s"
     let commit = Git.Information.getCurrentHash ()
