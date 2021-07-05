@@ -34,6 +34,7 @@ open Fake.IO.Globbing.Operators
 open Fake.Tools
 
 let srcDir = Path.Combine (__SOURCE_DIRECTORY__, "src")
+let examplesDir = Path.Combine (__SOURCE_DIRECTORY__, "Examples")
 
 module Projects =
     let coreLib = Path.Combine (srcDir, "Interstellar.Core", "Interstellar.Core.fsproj")
@@ -41,7 +42,8 @@ module Projects =
     let winFormsLib = Path.Combine (srcDir, "Interstellar.WinForms.Chromium", "Interstellar.WinForms.Chromium.fsproj")
     let wpfLib = Path.Combine (srcDir, "Interstellar.Wpf.Chromium", "Interstellar.Wpf.Chromium.fsproj")
     let macosWkLib = Path.Combine (srcDir, "Interstellar.macOS.WebKit", "Interstellar.macOS.WebKit.fsproj")
-    let macosExampleApp = Path.Combine (__SOURCE_DIRECTORY__, "Examples", "Examples.macOS.WebKit", "Examples.macOS.WebKit.fsproj")
+    let wpfExampleApp = Path.Combine (examplesDir, "Examples.wpf.Chromium", "Examples.wpf.Chromium.fsproj")
+    let macosExampleApp = Path.Combine (examplesDir, "Examples.macOS.WebKit", "Examples.macOS.WebKit.fsproj")
 
 module Solutions =
     let windows = "Interstellar.Windows.sln"
@@ -119,15 +121,16 @@ let projects = [
     if Environment.isMacOS then yield! [Projects.macosWkLib ]
 ]
 
-let dotnetBuild (setParams: DotNet.BuildOptions -> DotNet.BuildOptions) project =
+let buildOptions setParams =
     let buildMode = Environment.environVarOrDefault "buildMode" "Release"
     let commit = Git.Information.getCurrentSHA1 __SOURCE_DIRECTORY__
-    project |> DotNet.build (
-        quiet <<
-        setParams <<
-        addProperties ["Configuration", buildMode; "RepositoryCommit", commit] <<
-        addVersionInfo currentVersionInfo << setParams
-    )
+
+    quiet <<
+    setParams <<
+    addProperties ["Configuration", buildMode; "RepositoryCommit", commit] <<
+    addVersionInfo currentVersionInfo << setParams
+
+let dotnetBuild (setParams: DotNet.BuildOptions -> DotNet.BuildOptions) project = project |> DotNet.build (buildOptions setParams)
 
 // *** Define Targets ***
 Target.create "PackageDescription" (fun _ ->
@@ -182,14 +185,12 @@ Target.create "Build" (fun _ ->
 )
 
 Target.create "Run" (fun _ ->
-    Trace.log " --- Running example app --0 "
-    let proj =
-        if Environment.isWindows then
-            raise (new NotImplementedException())
-        else
-            Projects.macosExampleApp
-    Shell.cd (Path.GetDirectoryName Projects.macosExampleApp)
-    dotnetBuild (addTarget "Run") proj
+    Trace.log " --- Running example app --- "
+    if Environment.isWindows then
+        DotNet.exec id "run" ("-p " + Projects.wpfExampleApp) |> ignore
+    else
+        Shell.cd (Path.GetDirectoryName Projects.macosExampleApp)
+        dotnetBuild (addTarget "Run") Projects.macosExampleApp
 )
 
 Target.create "Test" (fun _ ->
