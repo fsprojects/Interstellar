@@ -62,10 +62,10 @@ let runDotNet cmd workingDir =
         DotNet.exec (DotNet.Options.withWorkingDirectory workingDir) cmd ""
     if result.ExitCode <> 0 then failwithf "'dotnet %s' failed in %s" cmd workingDir
 
-let addTargets targets (defaults: MSBuildParams) = { defaults with Targets = targets @ defaults.Targets }
-let addTarget target (defaults: MSBuildParams) = { defaults with Targets = target :: defaults.Targets }
+let addTargets targets (defaults: DotNet.BuildOptions) = { defaults with MSBuildParams = { defaults.MSBuildParams with Targets = targets @ defaults.MSBuildParams.Targets } }
+let addTarget target (defaults: DotNet.BuildOptions) = { defaults with MSBuildParams = { defaults.MSBuildParams with Targets = target :: defaults.MSBuildParams.Targets } }
 
-let quiet (defaults: MSBuildParams) = { defaults with Verbosity = Some MSBuildVerbosity.Quiet }
+let quiet (defaults: DotNet.BuildOptions) = { defaults with MSBuildParams = { defaults.MSBuildParams with Verbosity = Some MSBuildVerbosity.Quiet } }
 
 type PackageVersionInfo = { versionName: string; versionChanges: string }
 
@@ -89,7 +89,7 @@ let currentVersionInfo = changelog.[0]
 /// change to just the template, increment this.
 let currentTemplateMinorVersion = 1
 
-let addProperties props defaults = { defaults with Properties = [yield! defaults.Properties; yield! props]}
+let addProperties props (defaults: DotNet.BuildOptions) = { defaults with MSBuildParams = { defaults.MSBuildParams with Properties = [yield! defaults.MSBuildParams.Properties; yield! props]} }
 
 let addVersionInfo (versionInfo: PackageVersionInfo) =
     let versionPrefix, versionSuffix =
@@ -109,10 +109,10 @@ let projects = [
     if Environment.isMacOS then yield! [Projects.macosWkLib ]
 ]
 
-let msbuild setParams project =
+let dotnetBuild (setParams: DotNet.BuildOptions -> DotNet.BuildOptions) project =
     let buildMode = Environment.environVarOrDefault "buildMode" "Release"
-    let commit = Git.Information.getCurrentSHA1 "."
-    project |> MSBuild.build (
+    let commit = Git.Information.getCurrentSHA1 __SOURCE_DIRECTORY__
+    project |> DotNet.build (
         quiet <<
         setParams <<
         addProperties ["Configuration", buildMode; "RepositoryCommit", commit] <<
@@ -127,7 +127,7 @@ Target.create "PackageDescription" (fun _ ->
     Trace.log str
 )
 
-let doRestore msbParams = { msbParams with DoRestore = true }
+let doRestore (dotnetBuildOptions: DotNet.BuildOptions) = { dotnetBuildOptions with MSBuildParams = { dotnetBuildOptions.MSBuildParams with DoRestore = true } }
 
 let getNupkgPath version projPath =
     let vstr = match version with Some v -> sprintf ".%s" v | None -> ""
@@ -146,7 +146,7 @@ Target.create "Clean" (fun _ ->
         else if Environment.isMacOS then [ Solutions.macos; yield! Templates.macosProjects ]
         else []
     for proj in projects do
-        msbuild (addTarget "Clean") proj
+        dotnetBuild (addTarget "Clean") proj
     Shell.deleteDir ".fsdocs"
     Shell.deleteDir "output"
     Shell.deleteDir "temp"
@@ -154,20 +154,21 @@ Target.create "Clean" (fun _ ->
 
 Target.create "Restore" (fun _ ->
     DotNet.exec id "tool" "restore" |> ignore
-    DotNet.restore id |> ignore
+    let proj = if Environment.isWindows then Solutions.windows else if Environment.isMacOS then Solutions.macos else failwithf "Platform not supported"
+    DotNet.restore id proj |> ignore
 )
 
 Target.create "Build" (fun _ ->
     Trace.log " --- Building --- "
     if Environment.isWindows then
-        msbuild (addTarget "Restore") Solutions.windows
+        dotnetBuild (addTarget "Restore") Solutions.windows
     else
-        msbuild (addTarget "Restore") Solutions.macos
+        dotnetBuild (addTarget "Restore") Solutions.macos
     if Environment.isWindows then
-        msbuild (doRestore << addTarget "Build") Projects.winFormsLib
-        msbuild (doRestore << addTarget "Build") Projects.wpfLib
+        dotnetBuild (doRestore << addTarget "Build") Projects.winFormsLib
+        dotnetBuild (doRestore << addTarget "Build") Projects.wpfLib
     else if Environment.isMacOS then
-        msbuild (doRestore << addTarget "Build") Projects.macosWkLib
+        dotnetBuild (doRestore << addTarget "Build") Projects.macosWkLib
 )
 
 Target.create "Test" (fun _ ->
@@ -196,10 +197,10 @@ Target.create "ReleaseDocs" (fun _ ->
 Target.create "Pack" (fun _ ->
     Trace.log " --- Packing NuGet packages --- "
     let props = ["SolutionDir", __SOURCE_DIRECTORY__; "RepositoryCommit", Git.Information.getCurrentSHA1 __SOURCE_DIRECTORY__]
-    let msbuild f = msbuild (doRestore << addTargets ["Pack"] << addProperties props << f)
+    let dotnetBuild f = dotnetBuild (doRestore << addTargets ["Pack"] << addProperties props << f)
     Trace.log (sprintf "PROJECT LIST: %A" projects)
     for proj in projects do
-        msbuild id proj
+        dotnetBuild id proj
         // Collect all generated package archives into a common folder
         let vstr = currentVersionInfo.versionName
         let oldNupkgPath = getNupkgPath (Some vstr) proj
@@ -221,9 +222,9 @@ Target.create "BuildTemplateProjects" (fun _ ->
     else if Environment.isMacOS then
         let p = [ yield! Templates.macosProjects ]
         for proj in p do
-            msbuild (addTarget "Restore") proj
+            dotnetBuild (addTarget "Restore") proj
         for proj in p do
-            msbuild (addTarget "Build") proj
+            dotnetBuild (addTarget "Build") proj
 )
 
 Target.create "PackTemplates" (fun _ ->
