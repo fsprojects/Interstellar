@@ -11,7 +11,7 @@ jobs:
     - uses: actions/checkout@v2
     - uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: '5.0.101'
+        dotnet-version: '6.0.100-preview.5.21302.13'
     - name: Restore
       run: |
         dotnet tool restore
@@ -40,6 +40,9 @@ jobs:
     - uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '6.0.100-preview.5.21302.13'
+    - name: Install workloads
+      run: |
+        sudo dotnet install workload microsoft-macos-sdk-full
     - name: Restore
       run: |
         dotnet tool restore
