@@ -29,21 +29,24 @@ open Fake.IO.FileSystemOperators
 open Fake.IO.Globbing.Operators
 open Fake.Tools
 
+let srcDir = Path.Combine (__SOURCE_DIRECTORY__, "src")
+
 module Projects =
-    let coreLib = Path.Combine ("src", "Interstellar.Core", "Interstellar.Core.fsproj")
-    let chromiumLib = Path.Combine ("src", "Interstellar.Chromium", "Interstellar.Chromium.fsproj")
-    let winFormsLib = Path.Combine ("src", "Interstellar.WinForms.Chromium", "Interstellar.WinForms.Chromium.fsproj")
-    let wpfLib = Path.Combine ("src", "Interstellar.Wpf.Chromium", "Interstellar.Wpf.Chromium.fsproj")
-    let macosWkLib = Path.Combine ("src", "Interstellar.macOS.WebKit", "Interstellar.macOS.WebKit.fsproj")
+    let coreLib = Path.Combine (srcDir, "Interstellar.Core", "Interstellar.Core.fsproj")
+    let chromiumLib = Path.Combine (srcDir, "Interstellar.Chromium", "Interstellar.Chromium.fsproj")
+    let winFormsLib = Path.Combine (srcDir, "Interstellar.WinForms.Chromium", "Interstellar.WinForms.Chromium.fsproj")
+    let wpfLib = Path.Combine (srcDir, "Interstellar.Wpf.Chromium", "Interstellar.Wpf.Chromium.fsproj")
+    let macosWkLib = Path.Combine (srcDir, "Interstellar.macOS.WebKit", "Interstellar.macOS.WebKit.fsproj")
+    let macosExampleApp = Path.Combine (__SOURCE_DIRECTORY__, "Examples", "Examples.macOS.WebKit", "Examples.macOS.WebKit.fsproj")
 
 module Solutions =
     let windows = "Interstellar.Windows.sln"
     let macos = "Interstellar.MacOS.sln"
 
-let artifactsPath = "artifacts"
+let artifactsPath = Path.Combine (__SOURCE_DIRECTORY__, "artifacts")
 
 module Templates =
-    let path = "templates"
+    let path = Path.Combine (__SOURCE_DIRECTORY__, "templates")
 
     let nuspecPaths = !! (Path.Combine (path, "*.nuspec"))
     let allProjects =
@@ -171,6 +174,17 @@ Target.create "Build" (fun _ ->
         dotnetBuild (doRestore << addTarget "Build") Projects.macosWkLib
 )
 
+Target.create "Run" (fun _ ->
+    Trace.log " --- Running example app --0 "
+    let proj =
+        if Environment.isWindows then
+            raise (new NotImplementedException())
+        else
+            Projects.macosExampleApp
+    Shell.cd (Path.GetDirectoryName Projects.macosExampleApp)
+    dotnetBuild (addTarget "Run") proj
+)
+
 Target.create "Test" (fun _ ->
     Trace.log " --- Running tests --- "
     // TODO: add some tests!
@@ -255,6 +269,9 @@ open Fake.Core.TargetOperators
     ==> "Pack"
     ==> "PackAll"
     ==> "All"
+
+"Restore"
+    ==> "Run"
 
 "PackTemplates"
     ==> "PackAll"
