@@ -42,7 +42,7 @@ jobs:
         dotnet-version: '6.0.100-preview.5.21302.13'
     - name: Install workloads
       run: |
-        sudo dotnet install workload microsoft-macos-sdk-full
+        sudo dotnet workload install microsoft-macos-sdk-full
     - name: Restore
       run: |
         dotnet tool restore
