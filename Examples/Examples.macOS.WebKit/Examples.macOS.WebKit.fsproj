@@ -2,7 +2,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net6.0-macos</TargetFramework>
-    <RuntimeIdentifier>osx-x64</RuntimeIdentifier>
     <OutputType>Exe</OutputType>
     <RootNamespace>Example.macOS.WebKit</RootNamespace>
     <AssemblyName>InterstellarExample</AssemblyName>
@@ -15,8 +14,8 @@
     <Compile Include="Main.fs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Interstellar.macOS.WebKit\Interstellar.macOS.WebKit.fsproj" />
     <ProjectReference Include="..\Examples.SharedCode\Examples.SharedCode.fsproj" />
+    <ProjectReference Include="..\..\src\Interstellar.MacOS.WebKit\Interstellar.MacOS.WebKit.fsproj" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

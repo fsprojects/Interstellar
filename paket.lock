@@ -30,5 +30,5 @@ GROUP Build
 NUGET
   remote: https://api.nuget.org/v3/index.json
     FSharp.Core (5.0) - restriction: >= netstandard2.0
-    FSharp.DependencyManager.Paket (6.0.0-rc006)
+    FSharp.DependencyManager.Paket (6.0.13)
       FSharp.Core (>= 5.0) - restriction: >= netstandard2.0
