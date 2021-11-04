@@ -25,6 +25,8 @@ type BrowserWindow(config: BrowserWindowConfig<NSWindow>) as this =
     do
         let wkBrowserController = {
             new NiblessViewController(browser.WebKitBrowser) with
+                // This KeyDown override prevents the macOS beep (error) sound on key presses
+                override this.KeyDown (event: NSEvent) = ()
                 override this.ViewDidAppear () =
                     base.ViewDidAppear ()
                     shownEvt.Trigger ()
