@@ -5,6 +5,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Example.macOS.WebKit</RootNamespace>
     <AssemblyName>InterstellarExample</AssemblyName>
+    <SupportedOSPlatformVersion>10.14</SupportedOSPlatformVersion>
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
