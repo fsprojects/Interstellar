@@ -1,11 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;net472</TargetFrameworks>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <CefSharpAnyCpuSupport>true</CefSharpAnyCpuSupport>
     <UseWPF>true</UseWPF>
     <DefineConstants>WPF</DefineConstants>
-    <TargetProfile>netcore</TargetProfile>
   </PropertyGroup>
   <ItemGroup>
     <None Include="paket.references" />

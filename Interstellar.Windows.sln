@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29503.13
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{2173101E-392D-4167-8928-A66A3D777746}"
 	ProjectSection(SolutionItems) = preProject
@@ -32,6 +32,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		paket.dependencies = paket.dependencies
 		README.md = README.md
 	EndProjectSection
+EndProject
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Interstellar.Webview", "src\Interstellar.Webview\Interstellar.Webview.fsproj", "{03DFDA8F-4123-41DE-BE09-AC3E1E1B13D6}"
+EndProject
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Examples.Webview", "Examples\Examples.Webview\Examples.Webview.fsproj", "{DBC55BE9-9E5B-4DE3-BDD6-02E2FD75A28C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -67,6 +71,14 @@ Global
 		{58387294-2BDC-4799-919E-9F71883DA9B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58387294-2BDC-4799-919E-9F71883DA9B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58387294-2BDC-4799-919E-9F71883DA9B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03DFDA8F-4123-41DE-BE09-AC3E1E1B13D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03DFDA8F-4123-41DE-BE09-AC3E1E1B13D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03DFDA8F-4123-41DE-BE09-AC3E1E1B13D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03DFDA8F-4123-41DE-BE09-AC3E1E1B13D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBC55BE9-9E5B-4DE3-BDD6-02E2FD75A28C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBC55BE9-9E5B-4DE3-BDD6-02E2FD75A28C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBC55BE9-9E5B-4DE3-BDD6-02E2FD75A28C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBC55BE9-9E5B-4DE3-BDD6-02E2FD75A28C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -75,6 +87,7 @@ Global
 		{F8F250AA-A4E3-4DC2-863E-1348C98862D9} = {96BB8378-7D63-49AF-BEF5-6016E234653D}
 		{8FD85916-B47D-4055-8661-718B9ABEFF6B} = {96BB8378-7D63-49AF-BEF5-6016E234653D}
 		{7DC66E91-1D5D-4775-BE40-378AA2E432F8} = {96BB8378-7D63-49AF-BEF5-6016E234653D}
+		{DBC55BE9-9E5B-4DE3-BDD6-02E2FD75A28C} = {96BB8378-7D63-49AF-BEF5-6016E234653D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A67740F5-352E-46BF-A4E3-B7D199B90811}

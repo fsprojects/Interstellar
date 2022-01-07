@@ -1,18 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFrameworks>netcoreapp3.1;net48</TargetFrameworks>
-    <UseWPF>true</UseWPF>
+    <TargetFramework>net6.0</TargetFramework>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <ApplicationIcon />
   </PropertyGroup>
   <ItemGroup>
     <None Include="paket.references" />
     <Compile Include="App.fs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Interstellar.Wpf.Chromium\Interstellar.Wpf.Chromium.fsproj" />
     <ProjectReference Include="..\..\src\Interstellar.Core\Interstellar.Core.fsproj" />
     <ProjectReference Include="..\Examples.SharedCode\Examples.SharedCode.fsproj" />
   </ItemGroup>
