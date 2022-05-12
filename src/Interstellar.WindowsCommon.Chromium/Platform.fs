@@ -30,6 +30,9 @@ type Platform private() =
         Path.Combine(AppDomain.CurrentDomain.SetupInformation.ApplicationBase, (if Environment.Is64BitProcess then "x64" else "x86"), assemblyName)
 
     static member private InitAnyCpuCefSharp () =
+        // Required to fix high DPI issue: https://github.com/fsprojects/Interstellar/issues/25
+        Cef.EnableHighDPISupport()
+        
         let browserSubpath = Platform.GetPlatformAssemblyPath("CefSharp.BrowserSubprocess.exe")
         let settings = new CefSettings(BrowserSubprocessPath = browserSubpath)
         //settings.RegisterExtension Browser.bridgeExtension
