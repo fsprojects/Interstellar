@@ -46,10 +46,10 @@
     <ProjectReference Include="..\InterstellarApp.Core\InterstellarApp.Core.fsproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Interstellar.Core" Version="0.3.1">
+    <PackageReference Include="Interstellar.Core" Version="0.3.2">
       <GeneratePathProperty></GeneratePathProperty>
     </PackageReference>
-    <PackageReference Include="Interstellar.macOS.WebKit" Version="0.3.1">
+    <PackageReference Include="Interstellar.macOS.WebKit" Version="0.3.2">
       <GeneratePathProperty></GeneratePathProperty>
     </PackageReference>
   </ItemGroup>

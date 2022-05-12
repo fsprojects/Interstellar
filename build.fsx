@@ -2,7 +2,6 @@
 #load ".fake/build.fsx/intellisense.fsx"
 #endif
 
-// F# 4.7 due to https://github.com/fsharp/FAKE/issues/2001
 #r "paket:
 nuget FSharp.Core 6.0.4
 nuget Fake.Core.Target
@@ -122,13 +121,18 @@ let projects = [
     if Environment.isMacOS then yield! [Projects.macosWkLib; Projects.macosWkFFLib]
 ]
 
-let msbuild setParams project =
-    let buildMode = Environment.environVarOrDefault "buildMode" "Release"
+let buildMode (args: TargetParameter) =
+    args.Context.Arguments
+    |> List.tryPick (fun x -> if x.ToLower() = "debug" then Some x else None)
+    |> Option.defaultValue "Release"
+
+let msbuild args setParams project =
+    // let buildMode = Environment.environVarOrDefault "buildMode" "Release"
     let commit = Git.Information.getCurrentSHA1 __SOURCE_DIRECTORY__
     project |> MSBuild.build (
         quiet <<
         setParams <<
-        addProperties ["Configuration", buildMode; "RepositoryCommit", commit] <<
+        addProperties ["Configuration", buildMode args; "RepositoryCommit", commit] <<
         addVersionInfo currentVersionInfo << setParams
     )
 
@@ -148,7 +152,7 @@ let getNupkgPath version (projPath: string) =
     Path.Combine ([|projDir; "bin"; "Release";
                     sprintf "%s%s.nupkg" (Path.GetFileNameWithoutExtension projPath) vstr|])
 
-Target.create "Clean" (fun _ ->
+Target.create "Clean" (fun args ->
     Trace.log " --- Cleaning --- "
     for (proj, projStyle) in projects do
         let vstr = currentVersionInfo.versionName
@@ -159,7 +163,7 @@ Target.create "Clean" (fun _ ->
         else if Environment.isMacOS then [ yield Solutions.macos; for (p,_) in Templates.macosProjects -> p ]
         else []
     for proj in projects do
-        msbuild (addTarget "Clean") proj
+        msbuild args (addTarget "Clean") proj
     Shell.deleteDir ".fsdocs"
     Shell.deleteDir "output"
     Shell.deleteDir "temp"
@@ -221,21 +225,21 @@ Target.create "UpdateAssemblyInfo" (fun _ ->
     File.WriteAllText (asmInfoPath, result)
 )
 
-Target.create "Build" (fun _ ->
+Target.create "Build" (fun args ->
     Trace.log " --- Building --- "
     // if Environment.isWindows then
     //     msbuild (addTarget "Restore") Solutions.windows
     // else
     //     msbuild (addTarget "Restore") Solutions.macos
     if Environment.isWindows then
-        msbuild (addTarget "Build") (fst Projects.winFormsLib)
-        msbuild (addTarget "Build") (fst Projects.wpfLib)
+        msbuild args (addTarget "Build") (fst Projects.winFormsLib)
+        msbuild args (addTarget "Build") (fst Projects.wpfLib)
     else if Environment.isMacOS then
         // this is so very strange that we have to treat them differently like so...
         // macosWkLib needs the `msbuild /restore` for whatever reason because it's an SDK-style project...
-        msbuild (doRestore) (fst Projects.macosWkLib)
+        msbuild args (doRestore) (fst Projects.macosWkLib)
         // but this one needs the `dotnet restore *.sln` somehow because it's not an SDK-style project!
-        msbuild id (fst Projects.macosWkFFLib)
+        msbuild args id (fst Projects.macosWkFFLib)
         // this makes zero sense, but alright... seriously, what the heck? You try changing those around and see msbuild/dotnet scream
         // at you
 )
@@ -263,7 +267,7 @@ Target.create "ReleaseDocs" (fun _ ->
     Git.Branches.pushBranch "temp/gh-pages" "origin" "gh-pages"
 )
 
-Target.create "Pack" (fun _ ->
+Target.create "Pack" (fun args ->
     Trace.log " --- Packing NuGet packages --- "
     let props = ["SolutionDir", __SOURCE_DIRECTORY__]
     Trace.log (sprintf "PROJECT LIST: %A" projects)
@@ -271,7 +275,7 @@ Target.create "Pack" (fun _ ->
         match projStyle with
         | ProjectStyle.Sdk ->
             Trace.log (sprintf "Packing %s (sdk-style project)" proj)
-            msbuild (addTargets ["Pack"] << addProperties props) proj
+            msbuild args (addTargets ["Pack"] << addProperties props) proj
             // Collect all generated package archives into a common folder
             let vstr = currentVersionInfo.versionName
             let oldNupkgPath = getNupkgPath (Some vstr) proj
@@ -299,7 +303,7 @@ Target.create "Pack" (fun _ ->
     |> Seq.iter (``Nupkg-hack``.hackNupkgAtPath)
 )
 
-Target.create "BuildTemplateProjects" (fun _ ->
+Target.create "BuildTemplateProjects" (fun args ->
     Trace.log " --- Building template projects --- "
     if Environment.isWindows then
         let p = [ yield! Templates.winProjects ]
@@ -310,10 +314,10 @@ Target.create "BuildTemplateProjects" (fun _ ->
     else if Environment.isMacOS then
         let p = [ yield! Templates.macosProjects ]
         for (proj, projStyle) in p do
-            msbuild (addTarget "Restore") proj
+            msbuild args (addTarget "Restore") proj
             // DotNet.restore id proj
         for (proj, projStyle) in p do
-            msbuild (addTarget "Build") proj
+            msbuild args (addTarget "Build") proj
 )
 
 Target.create "PackTemplates" (fun _ ->
@@ -367,4 +371,4 @@ open Fake.Core.TargetOperators
     ==> "BuildTemplateProjects"
 
 // *** Start Build ***
-Target.runOrDefault "Build"
+Target.runOrDefaultWithArguments "Build"
