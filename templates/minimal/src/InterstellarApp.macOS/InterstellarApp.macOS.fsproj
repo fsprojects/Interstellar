@@ -6,6 +6,7 @@
     <RootNamespace>InterstellarApp.macOS</RootNamespace>
     <AssemblyName>InterstellarApp</AssemblyName>
     <TargetFramework>xamarin.mac20</TargetFramework>
+    <SupportedOSPlatformVersion>10.12</SupportedOSPlatformVersion>
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
