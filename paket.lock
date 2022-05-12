@@ -18,7 +18,7 @@ NUGET
     System.Buffers (4.5.1) - restriction: || (== net472) (== net48) (&& (== netcoreapp3.0) (>= monotouch)) (&& (== netcoreapp3.0) (>= net461)) (&& (== netcoreapp3.0) (< netcoreapp2.0) (< netstandard2.1)) (&& (== netcoreapp3.0) (< netcoreapp2.1) (< netstandard2.1) (>= xamarinios)) (&& (== netcoreapp3.0) (< netcoreapp2.1) (< netstandard2.1) (>= xamarinmac)) (&& (== netcoreapp3.0) (< netcoreapp2.1) (< netstandard2.1) (>= xamarintvos)) (&& (== netcoreapp3.0) (< netcoreapp2.1) (< netstandard2.1) (>= xamarinwatchos)) (&& (== netcoreapp3.0) (< netstandard1.1)) (&& (== netcoreapp3.0) (< netstandard2.0)) (&& (== netcoreapp3.0) (>= uap10.1)) (== netstandard2.0) (== xamarinmac)
     System.Memory (4.5.4) - restriction: || (== net472) (== net48) (&& (== netcoreapp3.0) (>= net461)) (&& (== netcoreapp3.0) (< netcoreapp2.1) (< netstandard2.1)) (&& (== netcoreapp3.0) (>= uap10.1)) (== netstandard2.0) (== xamarinmac)
       System.Buffers (>= 4.5.1) - restriction: || (== net472) (== net48) (&& (== netcoreapp3.0) (>= monotouch)) (&& (== netcoreapp3.0) (>= net461)) (&& (== netcoreapp3.0) (< netcoreapp2.0)) (&& (== netcoreapp3.0) (< netstandard1.1)) (&& (== netcoreapp3.0) (< netstandard2.0)) (&& (== netcoreapp3.0) (>= xamarinios)) (&& (== netcoreapp3.0) (>= xamarinmac)) (&& (== netcoreapp3.0) (>= xamarintvos)) (&& (== netcoreapp3.0) (>= xamarinwatchos)) (== netstandard2.0) (== xamarinmac)
-      System.Numerics.Vectors (>= 4.4) - restriction: || (&& (== net472) (< net45)) (&& (== net48) (< net45)) (&& (== netcoreapp3.0) (< netcoreapp2.0)) (== netstandard2.0)
+      System.Numerics.Vectors (>= 4.4) - restriction: || (&& (== net472) (== netcoreapp3.0)) (&& (== net472) (== xamarinmac)) (&& (== net472) (< net45)) (&& (== net48) (== netcoreapp3.0)) (&& (== net48) (== xamarinmac)) (&& (== net48) (< net45)) (&& (== netcoreapp3.0) (== xamarinmac)) (&& (== netcoreapp3.0) (< netcoreapp2.0)) (== netstandard2.0)
       System.Numerics.Vectors (>= 4.5) - restriction: || (== net472) (== net48) (&& (== netcoreapp3.0) (>= net461)) (&& (== netstandard2.0) (>= net461)) (&& (== xamarinmac) (>= net461))
       System.Runtime.CompilerServices.Unsafe (>= 4.5.3) - restriction: || (== net472) (== net48) (&& (== netcoreapp3.0) (>= monotouch)) (&& (== netcoreapp3.0) (>= net461)) (&& (== netcoreapp3.0) (< netcoreapp2.0)) (&& (== netcoreapp3.0) (< netcoreapp2.1)) (&& (== netcoreapp3.0) (< netstandard1.1)) (&& (== netcoreapp3.0) (< netstandard2.0)) (&& (== netcoreapp3.0) (>= uap10.1)) (&& (== netcoreapp3.0) (>= xamarinios)) (&& (== netcoreapp3.0) (>= xamarinmac)) (&& (== netcoreapp3.0) (>= xamarintvos)) (&& (== netcoreapp3.0) (>= xamarinwatchos)) (== netstandard2.0) (== xamarinmac)
     System.Numerics.Vectors (4.5) - restriction: || (== net472) (== net48) (&& (== netcoreapp3.0) (== xamarinmac)) (&& (== netcoreapp3.0) (>= net461)) (&& (== netcoreapp3.0) (< netcoreapp2.0) (< netstandard2.1)) (&& (== netcoreapp3.0) (>= uap10.1)) (== netstandard2.0) (&& (== xamarinmac) (>= net461))
@@ -31,5 +31,5 @@ GROUP Build
 NUGET
   remote: https://api.nuget.org/v3/index.json
     FSharp.Core (5.0) - restriction: >= netstandard2.0
-    FSharp.DependencyManager.Paket (6.0.0-beta8)
-      FSharp.Core (>= 5.0) - restriction: >= netstandard2.0
+    FSharp.DependencyManager.Paket (7.1.5)
+      FSharp.Core (5.0) - restriction: >= netstandard2.0
