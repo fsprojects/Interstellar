@@ -4,7 +4,7 @@
 
 // F# 4.7 due to https://github.com/fsharp/FAKE/issues/2001
 #r "paket:
-nuget FSharp.Core 4.7.0
+nuget FSharp.Core 6.0.4
 nuget Fake.Core.Target
 nuget Fake.DotNet.Cli
 nuget Fake.DotNet.MSBuild
@@ -129,7 +129,7 @@ Target.create "PackageDescription" (fun _ ->
 
 let doRestore msbParams = { msbParams with DoRestore = true }
 
-let getNupkgPath version projPath =
+let getNupkgPath version (projPath: string) =
     let vstr = match version with Some v -> sprintf ".%s" v | None -> ""
     let projDir = Path.GetDirectoryName projPath
     Path.Combine ([|projDir; "bin"; "Release";
