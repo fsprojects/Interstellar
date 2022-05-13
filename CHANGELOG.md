@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.2
+
+* WinForms, WPF - Fix a bug that happens under Windows high-DPI mode
+* Change targets to netcoreapp3.1
+
 ## 0.3.1
 
 * WinForms - Fixed an issue that could cause apps to crash at startup in release mode (https://github.com/jwosty/Interstellar/issues/10 ; thanks to @amaitland for the fix)

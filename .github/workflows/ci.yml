@@ -28,8 +28,8 @@ jobs:
         path: artifacts
     - name: Test
       run: |
-        dotnet fake build -t Test
-        dotnet fake build -t BuildTemplateProjects
+        dotnet fake build -t Test -- Release
+        dotnet fake build -t BuildTemplateProjects -- Release
 
   build-macos:
     name: CI (macOS)
@@ -40,14 +40,25 @@ jobs:
     - uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '6.0.300'
+    - name: setup-xamarin
+      uses: maxim-lobanov/setup-xamarin@v1
+      with:
+        mono-version: 6
+#         xamarin-mac-version: 7
+        xcode-version: 12.x
+    # temporary workaround for https://github.com/xamarin/xamarin-macios/issues/10652 until Xamarin.Mac 7.4.0.10 lands in GitHub Actions
+    - name: setup-xamarin-mac-patched
+      run: |
+        curl -o xamarinmac.pkg 'https://bosstoragemirror.blob.core.windows.net/wrench/xcode12.4/a4c70e7d04e3904d17aa60f6d640eb048081c757/4477741/package/notarized/xamarin.mac-7.4.0.10.pkg'
+        sudo installer -pkg xamarinmac.pkg -target /
     - name: Restore
       run: |
         dotnet tool restore
         dotnet paket restore
     - name: Build
-      run: dotnet fake build
+      run: dotnet fake build -- Release
     - name: Pack
-      run: dotnet fake build -t PackAll
+      run: dotnet fake build -t PackAll -- Release
     - name: Upload artifacts
       uses: actions/upload-artifact@v2
       with:
@@ -55,5 +66,5 @@ jobs:
         path: artifacts/
     - name: Test
       run: |
-        dotnet fake build -t Test
-        dotnet fake build -t BuildTemplateProjects
+        dotnet fake build -t Test -- Release
+        dotnet fake build -t BuildTemplateProjects -- Release
