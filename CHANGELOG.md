@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.3
+
+* Fix FSharp.Core dependency version mistake in last release
+
 ## 0.3.2
 
 * WinForms, WPF - Fix a bug that happens under Windows high-DPI mode
