@@ -16,6 +16,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Examples.SharedCode\Examples.SharedCode.fsproj" />
+    <ProjectReference Include="..\..\src\Interstellar.Core\Interstellar.Core.fsproj" />
     <ProjectReference Include="..\..\src\Interstellar.MacOS.WebKit\Interstellar.MacOS.WebKit.fsproj" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />

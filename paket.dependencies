@@ -5,6 +5,7 @@ nuget BlackFox.MasterOfFoo
 nuget CefSharp.WinForms 86.0.241
 nuget CefSharp.Wpf 86.0.241
 nuget FSharp.Core >= 4.2.3
+nuget NuGet.Build.Tasks.Pack
 nuget System.Text.Encodings.Web
 
 group Build

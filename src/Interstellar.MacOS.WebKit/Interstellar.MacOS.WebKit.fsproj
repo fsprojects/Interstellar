@@ -5,6 +5,18 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Interstellar.macOS.WebKit</RootNamespace>
   </PropertyGroup>
+  <Target Name="BeforeBuild">
+    <ItemGroup>
+      <AssemblyAttributes Include="AssemblyVersion">
+        <_Parameter1>$(Version)</_Parameter1>
+      </AssemblyAttributes>
+    </ItemGroup>
+    <MakeDir Directories="$(IntermediateOutputPath)" />
+    <WriteCodeFragment Language="F#" OutputFile="$(IntermediateOutputPath)Version.fs" AssemblyAttributes="@(AssemblyAttributes)" />
+    <ItemGroup>
+      <Compile Include="$(IntermediateOutputPath)Version.fs" />
+    </ItemGroup>
+  </Target>
   <ItemGroup>
     <Compile Include="Browser.fs" />
     <Compile Include="BrowserWindow.fs" />

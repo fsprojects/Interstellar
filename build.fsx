@@ -1,16 +1,20 @@
-#if FAKE
 #load ".fake/build.fsx/intellisense.fsx"
-#endif
 
-// F# 4.7 due to https://github.com/fsharp/FAKE/issues/2001
+#if FAKE
 #r "paket:
+<<<<<<< HEAD
 nuget FSharp.Core 4.7.0
 nuget FSharp.Data
+=======
+nuget FSharp.Core 6.0.4
+>>>>>>> master
 nuget Fake.Core.Target
 nuget Fake.DotNet.Cli
 nuget Fake.DotNet.MSBuild
 nuget Fake.DotNet.Paket
 nuget Fake.Tools.Git //"
+#endif
+#load ".fake/build.fsx/intellisense.fsx"
 
 //#r "nuget: FSharp.Data"
 
@@ -33,6 +37,7 @@ open Fake.IO.FileSystemOperators
 open Fake.IO.Globbing.Operators
 open Fake.Tools
 
+<<<<<<< HEAD
 let srcDir = Path.Combine (__SOURCE_DIRECTORY__, "src")
 let examplesDir = Path.Combine (__SOURCE_DIRECTORY__, "Examples")
 
@@ -44,6 +49,17 @@ module Projects =
     let macosWkLib = Path.Combine (srcDir, "Interstellar.macOS.WebKit", "Interstellar.macOS.WebKit.fsproj")
     let wpfExampleApp = Path.Combine (examplesDir, "Examples.wpf.Chromium", "Examples.wpf.Chromium.fsproj")
     let macosExampleApp = Path.Combine (examplesDir, "Examples.macOS.WebKit", "Examples.macOS.WebKit.fsproj")
+=======
+type ProjectStyle = Sdk | Traditional
+
+module Projects =
+    let coreLib = Path.Combine ("src", "Interstellar.Core", "Interstellar.Core.fsproj"), ProjectStyle.Sdk
+    let chromiumLib = Path.Combine ("src", "Interstellar.Chromium", "Interstellar.Chromium.fsproj"), ProjectStyle.Sdk
+    let winFormsLib = Path.Combine ("src", "Interstellar.WinForms.Chromium", "Interstellar.WinForms.Chromium.fsproj"), ProjectStyle.Sdk
+    let wpfLib = Path.Combine ("src", "Interstellar.Wpf.Chromium", "Interstellar.Wpf.Chromium.fsproj"), ProjectStyle.Sdk
+    let macosWkLib = Path.Combine ("src", "Interstellar.MacOS.WebKit", "Interstellar.MacOS.WebKit.fsproj"), ProjectStyle.Sdk
+    let macosWkFFLib = Path.Combine ("src", "Interstellar.MacOS.WebKit.FullFramework", "Interstellar.MacOS.WebKit.FullFramework.fsproj"), ProjectStyle.Traditional
+>>>>>>> master
 
 module Solutions =
     let windows = "Interstellar.Windows.sln"
@@ -57,10 +73,13 @@ module Templates =
     let nuspecPaths = !! (Path.Combine (path, "*.nuspec"))
     let allProjects =
         !! (Path.Combine (path, "**/*.fsproj"))
+        |> Seq.map (fun p -> p, ProjectStyle.Sdk)
     let winProjects =
         !! (Path.Combine (path, "**/*windows*.fsproj"))
+        |> Seq.map (fun p -> p, ProjectStyle.Sdk)
     let macosProjects =
         !! (Path.Combine (path, "**/*macos*.fsproj"))
+        |> Seq.map (fun p -> p, ProjectStyle.Sdk)
 
 let [<Literal>] _srcDir =  __SOURCE_DIRECTORY__
 type PackageInfo = XmlProvider<"AssemblyAndPackageInfo.props", ResolutionFolder=_srcDir>
@@ -101,6 +120,13 @@ let currentVersionInfo = changelog.[0]
 /// change to just the template, increment this.
 let currentTemplateMinorVersion = 1
 
+let asmPkgInfo = System.IO.File.ReadAllText "AssemblyAndPackageInfo.props"
+
+// Extract assembly info property value
+let extractAsmPkgInfoProp propName =
+    let r = new Regex(sprintf "(<%s>)(?'value'.*)(</%s>)" propName propName)
+    r.Match(asmPkgInfo).Groups.["value"].Value
+
 let addProperties props (defaults: DotNet.BuildOptions) = { defaults with MSBuildParams = { defaults.MSBuildParams with Properties = [yield! defaults.MSBuildParams.Properties; yield! props]} }
 
 let addVersionInfo (versionInfo: PackageVersionInfo) =
@@ -118,7 +144,7 @@ let addVersionInfo (versionInfo: PackageVersionInfo) =
 let projects = [
     yield Projects.coreLib
     if Environment.isWindows then yield! [Projects.chromiumLib; Projects.winFormsLib; Projects.wpfLib]
-    if Environment.isMacOS then yield! [Projects.macosWkLib ]
+    if Environment.isMacOS then yield! [Projects.macosWkLib; Projects.macosWkFFLib]
 ]
 
 let buildOptions setParams =
@@ -142,21 +168,21 @@ Target.create "PackageDescription" (fun _ ->
 
 let doRestore (dotnetBuildOptions: DotNet.BuildOptions) = { dotnetBuildOptions with MSBuildParams = { dotnetBuildOptions.MSBuildParams with DoRestore = true } }
 
-let getNupkgPath version projPath =
+let getNupkgPath version (projPath: string) =
     let vstr = match version with Some v -> sprintf ".%s" v | None -> ""
     let projDir = Path.GetDirectoryName projPath
     Path.Combine ([|projDir; "bin"; "Release";
                     sprintf "%s%s.nupkg" (Path.GetFileNameWithoutExtension projPath) vstr|])
 
-Target.create "Clean" (fun _ ->
+Target.create "Clean" (fun args ->
     Trace.log " --- Cleaning --- "
-    for proj in projects do
+    for (proj, projStyle) in projects do
         let vstr = currentVersionInfo.versionName
         File.delete (getNupkgPath (Some vstr) proj)
     !! (Path.Combine (artifactsPath, "**/*.nupkg")) |> File.deleteAll
     let projects =
-        if Environment.isWindows then [ Projects.winFormsLib; Projects.wpfLib; yield! Templates.winProjects ]
-        else if Environment.isMacOS then [ Solutions.macos; yield! Templates.macosProjects ]
+        if Environment.isWindows then [for (p,_) in [ Projects.winFormsLib; Projects.wpfLib; yield! Templates.winProjects ] -> p]
+        else if Environment.isMacOS then [ yield Solutions.macos; for (p,_) in Templates.macosProjects -> p ]
         else []
     for proj in projects do
         dotnetBuild (addTarget "Clean") proj
@@ -171,8 +197,59 @@ Target.create "Restore" (fun _ ->
     DotNet.restore id proj |> ignore
 )
 
-Target.create "Build" (fun _ ->
+// Syncs AssemblyInfo.fs with AssemblyAndPackageInfo.props
+Target.create "UpdateAssemblyInfo" (fun _ ->
+    Trace.log " --- Updating AssemblyInfo.fs in Interstellar.MacOS.WebKit.FullFramework --- "
+
+    let asmInfoPath = Path.Combine (Path.GetDirectoryName (fst Projects.macosWkFFLib), "AssemblyInfo.fs")
+    let projNameWithoutExt = Path.GetFileNameWithoutExtension (fst Projects.macosWkFFLib)
+    let asmInfo = File.ReadAllText asmInfoPath
+
+    let replacements =
+        Map.ofList [
+            "AssemblyDescription", extractAsmPkgInfoProp "Description"
+            "AssemblyCopyright", extractAsmPkgInfoProp "Copyright"
+            "AssemblyCompany", extractAsmPkgInfoProp "Company"
+            "AssemblyTitle", projNameWithoutExt
+            "AssemblyProduct", projNameWithoutExt
+            // Since the fsproj imports AssemblyAndPackageInfo.props and properly ingests this property, we do not need to include it here
+            //"AssemblyVersion", currentVersionInfo.versionName + ".0
+            "AssemblyInformationalVersion", currentVersionInfo.versionName
+            "AssemblyFileVersion", currentVersionInfo.versionName + ".0"
+        ]
+
+    let result =
+        Regex.Replace (
+            asmInfo,
+            // matches the following:
+            // [<assembly: ${AttributeName}("${AttributeValue}")>]
+            // where ${AttributeName} and ${AttributeValue} are named match groups that could be anything
+            """(\[<assembly: )(?<AttributeName>.*)(\(")(?<OldValue>.*)("\)>\])""",
+            MatchEvaluator(fun m ->
+                match Map.tryFind (m.Groups.["AttributeName"].Value) replacements with
+                | Some newValue ->
+                    //printfn "VALUES"
+                    //for x in m.Groups do printfn "%s -> %s" x.Name x.Value
+                    m.Groups.[1].Value                    // [<assembly: 
+                    + m.Groups.["AttributeName"].Value    // ${AttributeName}
+                    + m.Groups.[2].Value                  // "
+                    + newValue // the actual replacement
+                    + m.Groups.[3].Value                  // ")
+                | None -> m.ToString()
+            )
+        )
+
+    //Trace.log result
+
+    File.WriteAllText (asmInfoPath, result)
+)
+
+Target.create "Build" (fun args ->
     Trace.log " --- Building --- "
+    // if Environment.isWindows then
+    //     msbuild (addTarget "Restore") Solutions.windows
+    // else
+    //     msbuild (addTarget "Restore") Solutions.macos
     if Environment.isWindows then
         dotnetBuild (addTarget "Restore") Solutions.windows
     else
@@ -200,7 +277,7 @@ Target.create "Test" (fun _ ->
 
 Target.create "BuildDocs" (fun _ ->
     Trace.log " --- Building documentation --- "
-    let result = DotNet.exec id "fsdocs" ("build --clean --projects=" + Projects.coreLib + " --property Configuration=Release")
+    let result = DotNet.exec id "fsdocs" ("build --clean --projects=" + (fst Projects.coreLib) + " --property Configuration=Release")
     Trace.logfn "%s" (result.ToString())
 )
 
@@ -216,7 +293,7 @@ Target.create "ReleaseDocs" (fun _ ->
     Git.Branches.pushBranch "temp/gh-pages" "origin" "gh-pages"
 )
 
-Target.create "Pack" (fun _ ->
+Target.create "Pack" (fun args ->
     Trace.log " --- Packing NuGet packages --- "
     let props = ["SolutionDir", __SOURCE_DIRECTORY__; "RepositoryCommit", Git.Information.getCurrentSHA1 __SOURCE_DIRECTORY__]
     let dotnetBuild f = dotnetBuild (doRestore << addTargets ["Pack"] << addProperties props << f)
@@ -233,13 +310,13 @@ Target.create "Pack" (fun _ ->
     |> Seq.iter (``Nupkg-hack``.hackNupkgAtPath)
 )
 
-Target.create "BuildTemplateProjects" (fun _ ->
+Target.create "BuildTemplateProjects" (fun args ->
     Trace.log " --- Building template projects --- "
     if Environment.isWindows then
         let p = [ yield! Templates.winProjects ]
-        for proj in p do
+        for (proj, projStyle) in p do
             DotNet.restore id proj
-        for proj in p do
+        for (proj, projStyle) in p do
             DotNet.build id proj
     else if Environment.isMacOS then
         let p = [ yield! Templates.macosProjects ]
@@ -273,6 +350,7 @@ open Fake.Core.TargetOperators
 
 // *** Define Dependencies ***
 "Restore"
+    ==> "UpdateAssemblyInfo"
     ==> "Build"
     ==> "Pack"
     ==> "PackAll"
@@ -302,4 +380,4 @@ open Fake.Core.TargetOperators
     ==> "BuildTemplateProjects"
 
 // *** Start Build ***
-Target.runOrDefault "Build"
+Target.runOrDefaultWithArguments "Build"

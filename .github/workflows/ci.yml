@@ -28,8 +28,8 @@ jobs:
         path: artifacts
     - name: Test
       run: |
-        dotnet fake build -t Test
-#        dotnet fake build -t BuildTemplateProjects
+        dotnet fake build -t Test -- Release
+        dotnet fake build -t BuildTemplateProjects -- Release
 
   build-macos:
     name: CI (macOS)
@@ -49,9 +49,9 @@ jobs:
         dotnet tool restore
         dotnet paket restore
     - name: Build
-      run: dotnet fake build
+      run: dotnet fake build -- Release
     - name: Pack
-      run: dotnet fake build -t PackAll
+      run: dotnet fake build -t PackAll -- Release
     - name: Upload artifacts
       uses: actions/upload-artifact@v2
       with:
@@ -59,5 +59,5 @@ jobs:
         path: artifacts/
     - name: Test
       run: |
-        dotnet fake build -t Test
-#        dotnet fake build -t BuildTemplateProjects
+        dotnet fake build -t Test -- Release
+        dotnet fake build -t BuildTemplateProjects -- Release
