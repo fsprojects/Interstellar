@@ -1,7 +1,6 @@
-#if FAKE
 #load ".fake/build.fsx/intellisense.fsx"
-#endif
 
+#if FAKE
 #r "paket:
 nuget FSharp.Core 6.0.4
 nuget Fake.Core.Target
@@ -9,6 +8,8 @@ nuget Fake.DotNet.Cli
 nuget Fake.DotNet.MSBuild
 nuget Fake.DotNet.Paket
 nuget Fake.Tools.Git //"
+#endif
+#load ".fake/build.fsx/intellisense.fsx"
 
 #if !FAKE
 #r "netstandard"
