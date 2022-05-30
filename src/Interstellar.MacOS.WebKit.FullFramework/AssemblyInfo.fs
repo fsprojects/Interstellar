@@ -4,7 +4,7 @@ open System.Reflection
 open System.Runtime.CompilerServices
 
 
-[<assembly: AssemblyTitle("Interstellar.MacOS.WebKit.FullFramework")>]
+[<assembly: AssemblyTitle("Interstellar.macOS.WebKit.FullFramework")>]
 [<assembly: AssemblyDescription("Cross-platform F# browser library")>]
 
 #if DEBUG
@@ -14,7 +14,7 @@ open System.Runtime.CompilerServices
 #endif
 
 [<assembly: AssemblyCompany("Interstellar Contributors")>]
-[<assembly: AssemblyProduct("Interstellar.MacOS.WebKit.FullFramework")>]
+[<assembly: AssemblyProduct("Interstellar.macOS.WebKit.FullFramework")>]
 [<assembly: AssemblyCopyright("© John Wostenberg 2019-2021")>]
 //[<assembly: AssemblyTrademark("")>]
 

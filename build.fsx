@@ -2,12 +2,8 @@
 
 #if FAKE
 #r "paket:
-<<<<<<< HEAD
 nuget FSharp.Core 4.7.0
 nuget FSharp.Data
-=======
-nuget FSharp.Core 6.0.4
->>>>>>> master
 nuget Fake.Core.Target
 nuget Fake.DotNet.Cli
 nuget Fake.DotNet.MSBuild
@@ -37,7 +33,6 @@ open Fake.IO.FileSystemOperators
 open Fake.IO.Globbing.Operators
 open Fake.Tools
 
-<<<<<<< HEAD
 let srcDir = Path.Combine (__SOURCE_DIRECTORY__, "src")
 let examplesDir = Path.Combine (__SOURCE_DIRECTORY__, "Examples")
 
@@ -47,19 +42,9 @@ module Projects =
     let winFormsLib = Path.Combine (srcDir, "Interstellar.WinForms.Chromium", "Interstellar.WinForms.Chromium.fsproj")
     let wpfLib = Path.Combine (srcDir, "Interstellar.Wpf.Chromium", "Interstellar.Wpf.Chromium.fsproj")
     let macosWkLib = Path.Combine (srcDir, "Interstellar.macOS.WebKit", "Interstellar.macOS.WebKit.fsproj")
+    let macosWkFFLib = Path.Combine (srcDir, "Interstellar.macOS.WebKit.FullFramework", "Interstellar.macOS.WebKit.FullFramework.fsproj")
     let wpfExampleApp = Path.Combine (examplesDir, "Examples.wpf.Chromium", "Examples.wpf.Chromium.fsproj")
     let macosExampleApp = Path.Combine (examplesDir, "Examples.macOS.WebKit", "Examples.macOS.WebKit.fsproj")
-=======
-type ProjectStyle = Sdk | Traditional
-
-module Projects =
-    let coreLib = Path.Combine ("src", "Interstellar.Core", "Interstellar.Core.fsproj"), ProjectStyle.Sdk
-    let chromiumLib = Path.Combine ("src", "Interstellar.Chromium", "Interstellar.Chromium.fsproj"), ProjectStyle.Sdk
-    let winFormsLib = Path.Combine ("src", "Interstellar.WinForms.Chromium", "Interstellar.WinForms.Chromium.fsproj"), ProjectStyle.Sdk
-    let wpfLib = Path.Combine ("src", "Interstellar.Wpf.Chromium", "Interstellar.Wpf.Chromium.fsproj"), ProjectStyle.Sdk
-    let macosWkLib = Path.Combine ("src", "Interstellar.MacOS.WebKit", "Interstellar.MacOS.WebKit.fsproj"), ProjectStyle.Sdk
-    let macosWkFFLib = Path.Combine ("src", "Interstellar.MacOS.WebKit.FullFramework", "Interstellar.MacOS.WebKit.FullFramework.fsproj"), ProjectStyle.Traditional
->>>>>>> master
 
 module Solutions =
     let windows = "Interstellar.Windows.sln"
@@ -73,13 +58,13 @@ module Templates =
     let nuspecPaths = !! (Path.Combine (path, "*.nuspec"))
     let allProjects =
         !! (Path.Combine (path, "**/*.fsproj"))
-        |> Seq.map (fun p -> p, ProjectStyle.Sdk)
+        |> Seq.map (fun p -> p)
     let winProjects =
         !! (Path.Combine (path, "**/*windows*.fsproj"))
-        |> Seq.map (fun p -> p, ProjectStyle.Sdk)
+        |> Seq.map (fun p -> p)
     let macosProjects =
         !! (Path.Combine (path, "**/*macos*.fsproj"))
-        |> Seq.map (fun p -> p, ProjectStyle.Sdk)
+        |> Seq.map (fun p -> p)
 
 let [<Literal>] _srcDir =  __SOURCE_DIRECTORY__
 type PackageInfo = XmlProvider<"AssemblyAndPackageInfo.props", ResolutionFolder=_srcDir>
@@ -176,13 +161,13 @@ let getNupkgPath version (projPath: string) =
 
 Target.create "Clean" (fun args ->
     Trace.log " --- Cleaning --- "
-    for (proj, projStyle) in projects do
+    for proj in projects do
         let vstr = currentVersionInfo.versionName
         File.delete (getNupkgPath (Some vstr) proj)
     !! (Path.Combine (artifactsPath, "**/*.nupkg")) |> File.deleteAll
     let projects =
-        if Environment.isWindows then [for (p,_) in [ Projects.winFormsLib; Projects.wpfLib; yield! Templates.winProjects ] -> p]
-        else if Environment.isMacOS then [ yield Solutions.macos; for (p,_) in Templates.macosProjects -> p ]
+        if Environment.isWindows then [for p in [ Projects.winFormsLib; Projects.wpfLib; yield! Templates.winProjects ] -> p]
+        else if Environment.isMacOS then [ yield Solutions.macos; for p in Templates.macosProjects -> p ]
         else []
     for proj in projects do
         dotnetBuild (addTarget "Clean") proj
@@ -201,8 +186,8 @@ Target.create "Restore" (fun _ ->
 Target.create "UpdateAssemblyInfo" (fun _ ->
     Trace.log " --- Updating AssemblyInfo.fs in Interstellar.MacOS.WebKit.FullFramework --- "
 
-    let asmInfoPath = Path.Combine (Path.GetDirectoryName (fst Projects.macosWkFFLib), "AssemblyInfo.fs")
-    let projNameWithoutExt = Path.GetFileNameWithoutExtension (fst Projects.macosWkFFLib)
+    let asmInfoPath = Path.Combine (Path.GetDirectoryName Projects.macosWkFFLib, "AssemblyInfo.fs")
+    let projNameWithoutExt = Path.GetFileNameWithoutExtension Projects.macosWkFFLib
     let asmInfo = File.ReadAllText asmInfoPath
 
     let replacements =
@@ -277,7 +262,7 @@ Target.create "Test" (fun _ ->
 
 Target.create "BuildDocs" (fun _ ->
     Trace.log " --- Building documentation --- "
-    let result = DotNet.exec id "fsdocs" ("build --clean --projects=" + (fst Projects.coreLib) + " --property Configuration=Release")
+    let result = DotNet.exec id "fsdocs" ("build --clean --projects=" + Projects.coreLib + " --property Configuration=Release")
     Trace.logfn "%s" (result.ToString())
 )
 
@@ -314,9 +299,9 @@ Target.create "BuildTemplateProjects" (fun args ->
     Trace.log " --- Building template projects --- "
     if Environment.isWindows then
         let p = [ yield! Templates.winProjects ]
-        for (proj, projStyle) in p do
+        for proj in p do
             DotNet.restore id proj
-        for (proj, projStyle) in p do
+        for proj in p do
             DotNet.build id proj
     else if Environment.isMacOS then
         let p = [ yield! Templates.macosProjects ]

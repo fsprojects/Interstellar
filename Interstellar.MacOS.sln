@@ -16,8 +16,9 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Examples.macOS.WebKit.Moder
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Examples.macOS.WebKit.FullFramework", "Examples\Examples.macOS.WebKit.FullFramework\Examples.macOS.WebKit.FullFramework.fsproj", "{98BEAAC4-9ADD-4D08-B3A7-06BD5934A721}"
 EndProject
-
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Interstellar.MacOS.WebKit.FullFramework", "src\Interstellar.MacOS.WebKit.FullFramework\Interstellar.MacOS.WebKit.FullFramework.fsproj", "{DA9591A8-4189-4171-AF3F-85F1F3EA22A2}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Interstellar.MacOS.WebKit", "src\Interstellar.MacOS.WebKit\Interstellar.MacOS.WebKit.fsproj", "{77FAE56F-23ED-4B30-B961-BBC7B492AAFE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -49,5 +50,9 @@ Global
 		{DA9591A8-4189-4171-AF3F-85F1F3EA22A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DA9591A8-4189-4171-AF3F-85F1F3EA22A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DA9591A8-4189-4171-AF3F-85F1F3EA22A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77FAE56F-23ED-4B30-B961-BBC7B492AAFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77FAE56F-23ED-4B30-B961-BBC7B492AAFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77FAE56F-23ED-4B30-B961-BBC7B492AAFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77FAE56F-23ED-4B30-B961-BBC7B492AAFE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
