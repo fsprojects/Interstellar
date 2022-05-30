@@ -42,7 +42,6 @@ module Projects =
     let winFormsLib = Path.Combine (srcDir, "Interstellar.WinForms.Chromium", "Interstellar.WinForms.Chromium.fsproj")
     let wpfLib = Path.Combine (srcDir, "Interstellar.Wpf.Chromium", "Interstellar.Wpf.Chromium.fsproj")
     let macosWkLib = Path.Combine (srcDir, "Interstellar.macOS.WebKit", "Interstellar.macOS.WebKit.fsproj")
-    let macosWkFFLib = Path.Combine (srcDir, "Interstellar.macOS.WebKit.FullFramework", "Interstellar.macOS.WebKit.FullFramework.fsproj")
     let wpfExampleApp = Path.Combine (examplesDir, "Examples.wpf.Chromium", "Examples.wpf.Chromium.fsproj")
     let macosExampleApp = Path.Combine (examplesDir, "Examples.macOS.WebKit", "Examples.macOS.WebKit.fsproj")
 
@@ -129,7 +128,7 @@ let addVersionInfo (versionInfo: PackageVersionInfo) =
 let projects = [
     yield Projects.coreLib
     if Environment.isWindows then yield! [Projects.chromiumLib; Projects.winFormsLib; Projects.wpfLib]
-    if Environment.isMacOS then yield! [Projects.macosWkLib; Projects.macosWkFFLib]
+    if Environment.isMacOS then yield! [Projects.macosWkLib]
 ]
 
 let buildOptions setParams =
@@ -180,53 +179,6 @@ Target.create "Restore" (fun _ ->
     DotNet.exec id "tool" "restore" |> ignore
     let proj = if Environment.isWindows then Solutions.windows else if Environment.isMacOS then Solutions.macos else failwithf "Platform not supported"
     DotNet.restore id proj |> ignore
-)
-
-// Syncs AssemblyInfo.fs with AssemblyAndPackageInfo.props
-Target.create "UpdateAssemblyInfo" (fun _ ->
-    Trace.log " --- Updating AssemblyInfo.fs in Interstellar.MacOS.WebKit.FullFramework --- "
-
-    let asmInfoPath = Path.Combine (Path.GetDirectoryName Projects.macosWkFFLib, "AssemblyInfo.fs")
-    let projNameWithoutExt = Path.GetFileNameWithoutExtension Projects.macosWkFFLib
-    let asmInfo = File.ReadAllText asmInfoPath
-
-    let replacements =
-        Map.ofList [
-            "AssemblyDescription", extractAsmPkgInfoProp "Description"
-            "AssemblyCopyright", extractAsmPkgInfoProp "Copyright"
-            "AssemblyCompany", extractAsmPkgInfoProp "Company"
-            "AssemblyTitle", projNameWithoutExt
-            "AssemblyProduct", projNameWithoutExt
-            // Since the fsproj imports AssemblyAndPackageInfo.props and properly ingests this property, we do not need to include it here
-            //"AssemblyVersion", currentVersionInfo.versionName + ".0
-            "AssemblyInformationalVersion", currentVersionInfo.versionName
-            "AssemblyFileVersion", currentVersionInfo.versionName + ".0"
-        ]
-
-    let result =
-        Regex.Replace (
-            asmInfo,
-            // matches the following:
-            // [<assembly: ${AttributeName}("${AttributeValue}")>]
-            // where ${AttributeName} and ${AttributeValue} are named match groups that could be anything
-            """(\[<assembly: )(?<AttributeName>.*)(\(")(?<OldValue>.*)("\)>\])""",
-            MatchEvaluator(fun m ->
-                match Map.tryFind (m.Groups.["AttributeName"].Value) replacements with
-                | Some newValue ->
-                    //printfn "VALUES"
-                    //for x in m.Groups do printfn "%s -> %s" x.Name x.Value
-                    m.Groups.[1].Value                    // [<assembly: 
-                    + m.Groups.["AttributeName"].Value    // ${AttributeName}
-                    + m.Groups.[2].Value                  // "
-                    + newValue // the actual replacement
-                    + m.Groups.[3].Value                  // ")
-                | None -> m.ToString()
-            )
-        )
-
-    //Trace.log result
-
-    File.WriteAllText (asmInfoPath, result)
 )
 
 Target.create "Build" (fun args ->
@@ -335,7 +287,6 @@ open Fake.Core.TargetOperators
 
 // *** Define Dependencies ***
 "Restore"
-    ==> "UpdateAssemblyInfo"
     ==> "Build"
     ==> "Pack"
     ==> "PackAll"

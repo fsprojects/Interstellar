@@ -12,11 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		paket.dependencies = paket.dependencies
 	EndProjectSection
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Examples.macOS.WebKit.ModernFramework", "Examples\Examples.macOS.WebKit.ModernFramework\Examples.macOS.WebKit.ModernFramework.fsproj", "{C91E86B6-72B1-4367-9CD4-A1116FECD752}"
-EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Examples.macOS.WebKit.FullFramework", "Examples\Examples.macOS.WebKit.FullFramework\Examples.macOS.WebKit.FullFramework.fsproj", "{98BEAAC4-9ADD-4D08-B3A7-06BD5934A721}"
-EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Interstellar.MacOS.WebKit.FullFramework", "src\Interstellar.MacOS.WebKit.FullFramework\Interstellar.MacOS.WebKit.FullFramework.fsproj", "{DA9591A8-4189-4171-AF3F-85F1F3EA22A2}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Examples.macOS.WebKit", "Examples\Examples.macOS.WebKit\Examples.macOS.WebKit.fsproj", "{C91E86B6-72B1-4367-9CD4-A1116FECD752}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Interstellar.MacOS.WebKit", "src\Interstellar.MacOS.WebKit\Interstellar.MacOS.WebKit.fsproj", "{77FAE56F-23ED-4B30-B961-BBC7B492AAFE}"
 EndProject
@@ -38,18 +34,10 @@ Global
 		{C91E86B6-72B1-4367-9CD4-A1116FECD752}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C91E86B6-72B1-4367-9CD4-A1116FECD752}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C91E86B6-72B1-4367-9CD4-A1116FECD752}.Release|Any CPU.Build.0 = Release|Any CPU
-		{98BEAAC4-9ADD-4D08-B3A7-06BD5934A721}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{98BEAAC4-9ADD-4D08-B3A7-06BD5934A721}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{98BEAAC4-9ADD-4D08-B3A7-06BD5934A721}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{98BEAAC4-9ADD-4D08-B3A7-06BD5934A721}.Release|Any CPU.Build.0 = Release|Any CPU
 		{14C8FADA-AD8F-421E-8FB3-F9EA797E507C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{14C8FADA-AD8F-421E-8FB3-F9EA797E507C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{14C8FADA-AD8F-421E-8FB3-F9EA797E507C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{14C8FADA-AD8F-421E-8FB3-F9EA797E507C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DA9591A8-4189-4171-AF3F-85F1F3EA22A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DA9591A8-4189-4171-AF3F-85F1F3EA22A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DA9591A8-4189-4171-AF3F-85F1F3EA22A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DA9591A8-4189-4171-AF3F-85F1F3EA22A2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{77FAE56F-23ED-4B30-B961-BBC7B492AAFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{77FAE56F-23ED-4B30-B961-BBC7B492AAFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{77FAE56F-23ED-4B30-B961-BBC7B492AAFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
