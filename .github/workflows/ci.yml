@@ -29,7 +29,6 @@ jobs:
     - name: Test
       run: |
         dotnet fake build -t Test -- Release
-        dotnet fake build -t BuildTemplateProjects -- Release
 
   build-macos:
     name: CI (macOS)
@@ -60,4 +59,3 @@ jobs:
     - name: Test
       run: |
         dotnet fake build -t Test -- Release
-        dotnet fake build -t BuildTemplateProjects -- Release

@@ -1,0 +1,42 @@
+name: Test Templates
+
+on: workflow_dispatch
+
+jobs:
+  build-windows:
+    name: Test Templates (Windows)
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '6.0.300'
+    - name: Restore
+      run: |
+        dotnet tool restore
+        dotnet paket restore
+    - name: Test templates
+      run: |
+        dotnet fake build -t BuildTemplateProjects -- Release
+
+  build-macos:
+    name: Test Templates (macOS)
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '6.0.300'
+    - name: Install workloads
+      run: |
+        dotnet tool restore
+        sudo dotnet workload install macos
+    - name: Restore
+      run: |
+        dotnet tool restore
+        dotnet paket restore
+    - name: Test templates
+      run: |
+        dotnet fake build -t BuildTemplateProjects -- Release
