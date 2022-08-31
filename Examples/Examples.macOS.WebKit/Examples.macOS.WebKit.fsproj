@@ -21,6 +21,7 @@
   <ItemGroup>
     <Compile Include="AppDelegate.fs" />
     <Compile Include="Main.fs" />
+    <None Include="Info.plist" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Examples.SharedCode\Examples.SharedCode.fsproj" />
