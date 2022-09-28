@@ -1,13 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="MSBuild.Sdk.Extras" ToolsVersion="4.0">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <ProjectTypeGuids>{A3F8F2AB-B479-4A4A-A458-A89E7DC349F1};{F2A71F9B-5D33-465A-A702-920D77279786}</ProjectTypeGuids>
+    <TargetFramework>net6.0-macos</TargetFramework>
     <OutputType>Exe</OutputType>
     <RootNamespace>InterstellarApp.macOS</RootNamespace>
     <AssemblyName>InterstellarApp</AssemblyName>
-    <TargetFramework>xamarin.mac20</TargetFramework>
-    <SupportedOSPlatformVersion>10.12</SupportedOSPlatformVersion>
-    <ErrorReport>prompt</ErrorReport>
+    <SupportedOSPlatformVersion>10.14</SupportedOSPlatformVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <CodeSigningKey>Mac Developer</CodeSigningKey>

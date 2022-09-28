@@ -11,7 +11,7 @@ jobs:
     - uses: actions/checkout@v2
     - uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: '6.0.300'
+        dotnet-version: '6.0.400'
     - name: Restore
       run: |
         dotnet tool restore
@@ -29,7 +29,6 @@ jobs:
     - name: Test
       run: |
         dotnet fake build -t Test -- Release
-        dotnet fake build -t BuildTemplateProjects -- Release
 
   build-macos:
     name: CI (macOS)
@@ -39,18 +38,11 @@ jobs:
     - uses: actions/checkout@v2
     - uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: '6.0.300'
-    - name: setup-xamarin
-      uses: maxim-lobanov/setup-xamarin@v1
-      with:
-        mono-version: 6
-#         xamarin-mac-version: 7
-        xcode-version: 12.x
-    # temporary workaround for https://github.com/xamarin/xamarin-macios/issues/10652 until Xamarin.Mac 7.4.0.10 lands in GitHub Actions
-    - name: setup-xamarin-mac-patched
+        dotnet-version: '6.0.400'
+    - name: Install workloads
       run: |
-        curl -o xamarinmac.pkg 'https://bosstoragemirror.blob.core.windows.net/wrench/xcode12.4/a4c70e7d04e3904d17aa60f6d640eb048081c757/4477741/package/notarized/xamarin.mac-7.4.0.10.pkg'
-        sudo installer -pkg xamarinmac.pkg -target /
+        dotnet tool restore
+        sudo dotnet workload install macos
     - name: Restore
       run: |
         dotnet tool restore
@@ -67,4 +59,3 @@ jobs:
     - name: Test
       run: |
         dotnet fake build -t Test -- Release
-        dotnet fake build -t BuildTemplateProjects -- Release
