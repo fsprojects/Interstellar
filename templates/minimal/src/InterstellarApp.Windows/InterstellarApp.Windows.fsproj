@@ -13,7 +13,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Interstellar.Wpf.Chromium" Version="0.4.0" />
-    <PackageReference Include="CefSharp.Wpf" Version="86.0.241" />
+    <PackageReference Include="CefSharp.Wpf" Version="98.1.210" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\InterstellarApp.Core\InterstellarApp.Core.fsproj" />
