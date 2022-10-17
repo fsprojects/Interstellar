@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.0
+
+* Fully support .NET 6 on Windows and macOS
+
 ## 0.3.3
 
 * Fix FSharp.Core dependency version mistake in last release
