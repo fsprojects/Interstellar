@@ -48,6 +48,27 @@ dotnet fake build -t BuildDocs
 dotnet fake biuld -t ReleaseDocs
 ```
 
+## FAKE build error: "Unsupported log file format"
+
+Sometimes, `dotnet fake build` will start failing with messages similar to:
+
+`NotSupportedException: Unsupported log file format. Latest supported version is 9, the log file has version 14.`
+
+Fix this by running:
+
+``bash
+git clean -xdf
+rm build.fsx.lock``
+
+You may also have to run:
+
+``bash
+dotnet tool uninstall fake-cli
+dotnet tool install fake-cli
+``
+
+The build should succeed again now. You can commit the changes.
+
 ## Maintainer(s)
 
 * [@jwosty](https://github.com/jwosty)

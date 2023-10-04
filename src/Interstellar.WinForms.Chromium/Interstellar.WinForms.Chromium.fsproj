@@ -1,11 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;net472</TargetFrameworks>
+    <TargetFrameworks>net5.0-windows;net48</TargetFrameworks>
+    <OutputType>Library</OutputType>
     <CefSharpAnyCpuSupport>true</CefSharpAnyCpuSupport>
     <UseWindowsForms>true</UseWindowsForms>
     <DefineConstants>WINFORMS</DefineConstants>
     <TargetProfile>netcore</TargetProfile>
+    <!-- https://github.com/dotnet/sdk/issues/1560#issuecomment-327043099 -->
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <None Include="paket.references" />

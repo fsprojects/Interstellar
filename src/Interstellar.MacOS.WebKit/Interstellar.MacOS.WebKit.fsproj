@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="MSBuild.Sdk.Extras">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>xamarin.mac20</TargetFramework>
-    <RootNamespace>Interstellar.macOS.WebKit</RootNamespace>
-    <ProjectTypeGuids>{A3F8F2AB-B479-4A4A-A458-A89E7DC349F1};{F2A71F9B-5D33-465A-A702-920D77279786}</ProjectTypeGuids>
+    <TargetFramework>net6.0-macos</TargetFramework>
     <OutputType>Library</OutputType>
+    <RootNamespace>Interstellar.macOS.WebKit</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <EnableCodeSigning>false</EnableCodeSigning>
     <UseSGen>false</UseSGen>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <EnableCodeSigning>false</EnableCodeSigning>
     <UseSGen>false</UseSGen>
   </PropertyGroup>
   <Target Name="BeforeBuild">

@@ -1,15 +1,18 @@
-#if FAKE
 #load ".fake/build.fsx/intellisense.fsx"
-#endif
 
-// F# 4.7 due to https://github.com/fsharp/FAKE/issues/2001
+#if FAKE
 #r "paket:
 nuget FSharp.Core 4.7.0
+nuget FSharp.Data
 nuget Fake.Core.Target
 nuget Fake.DotNet.Cli
 nuget Fake.DotNet.MSBuild
 nuget Fake.DotNet.Paket
 nuget Fake.Tools.Git //"
+#endif
+#load ".fake/build.fsx/intellisense.fsx"
+
+//#r "nuget: FSharp.Data"
 
 #if !FAKE
 #r "netstandard"
@@ -21,6 +24,7 @@ nuget Fake.Tools.Git //"
 open System
 open System.Text.RegularExpressions
 open System.IO
+open FSharp.Data
 open Fake.Core
 open Fake.DotNet
 open Fake.DotNet.NuGet
@@ -29,31 +33,42 @@ open Fake.IO.FileSystemOperators
 open Fake.IO.Globbing.Operators
 open Fake.Tools
 
+let srcDir = Path.Combine (__SOURCE_DIRECTORY__, "src")
+let examplesDir = Path.Combine (__SOURCE_DIRECTORY__, "Examples")
+
 module Projects =
-    let coreLib = Path.Combine ("src", "Interstellar.Core", "Interstellar.Core.fsproj")
-    let chromiumLib = Path.Combine ("src", "Interstellar.Chromium", "Interstellar.Chromium.fsproj")
-    let winFormsLib = Path.Combine ("src", "Interstellar.WinForms.Chromium", "Interstellar.WinForms.Chromium.fsproj")
-    let wpfLib = Path.Combine ("src", "Interstellar.Wpf.Chromium", "Interstellar.Wpf.Chromium.fsproj")
-    let macosWkLib = Path.Combine ("src", "Interstellar.macOS.WebKit", "Interstellar.macOS.WebKit.fsproj")
+    let coreLib = Path.Combine (srcDir, "Interstellar.Core", "Interstellar.Core.fsproj")
+    let chromiumLib = Path.Combine (srcDir, "Interstellar.Chromium", "Interstellar.Chromium.fsproj")
+    let winFormsLib = Path.Combine (srcDir, "Interstellar.WinForms.Chromium", "Interstellar.WinForms.Chromium.fsproj")
+    let wpfLib = Path.Combine (srcDir, "Interstellar.Wpf.Chromium", "Interstellar.Wpf.Chromium.fsproj")
+    let macosWkLib = Path.Combine (srcDir, "Interstellar.macOS.WebKit", "Interstellar.macOS.WebKit.fsproj")
+    let wpfExampleApp = Path.Combine (examplesDir, "Examples.wpf.Chromium", "Examples.wpf.Chromium.fsproj")
+    let macosExampleApp = Path.Combine (examplesDir, "Examples.macOS.WebKit", "Examples.macOS.WebKit.fsproj")
 
 module Solutions =
     let windows = "Interstellar.Windows.sln"
     let macos = "Interstellar.MacOS.sln"
 
-let artifactsPath = "artifacts"
+let artifactsPath = Path.Combine (__SOURCE_DIRECTORY__, "artifacts")
 
 module Templates =
-    let path = "templates"
+    let path = Path.Combine (__SOURCE_DIRECTORY__, "templates")
 
     let nuspecPaths = !! (Path.Combine (path, "*.nuspec"))
     let allProjects =
         !! (Path.Combine (path, "**/*.fsproj"))
+        |> Seq.map (fun p -> p)
     let winProjects =
         !! (Path.Combine (path, "**/*windows*.fsproj"))
+        |> Seq.map (fun p -> p)
     let macosProjects =
         !! (Path.Combine (path, "**/*macos*.fsproj"))
+        |> Seq.map (fun p -> p)
 
-let projectRepo = "https://github.com/fsprojects/Interstellar"
+let [<Literal>] _srcDir =  __SOURCE_DIRECTORY__
+type PackageInfo = XmlProvider<"AssemblyAndPackageInfo.props", ResolutionFolder=_srcDir>
+let packageInfo = PackageInfo.Load(Path.Combine(__SOURCE_DIRECTORY__, "AssemblyAndPackageInfo.props"))
+let packageProps = packageInfo.PropertyGroup
 
 let projAsTarget (projFileName: string) = projFileName.Split('/').[0].Replace(".", "_")
 
@@ -62,10 +77,10 @@ let runDotNet cmd workingDir =
         DotNet.exec (DotNet.Options.withWorkingDirectory workingDir) cmd ""
     if result.ExitCode <> 0 then failwithf "'dotnet %s' failed in %s" cmd workingDir
 
-let addTargets targets (defaults: MSBuildParams) = { defaults with Targets = targets @ defaults.Targets }
-let addTarget target (defaults: MSBuildParams) = { defaults with Targets = target :: defaults.Targets }
+let addTargets targets (defaults: DotNet.BuildOptions) = { defaults with MSBuildParams = { defaults.MSBuildParams with Targets = targets @ defaults.MSBuildParams.Targets } }
+let addTarget target (defaults: DotNet.BuildOptions) = { defaults with MSBuildParams = { defaults.MSBuildParams with Targets = target :: defaults.MSBuildParams.Targets } }
 
-let quiet (defaults: MSBuildParams) = { defaults with Verbosity = Some MSBuildVerbosity.Quiet }
+let quiet (defaults: DotNet.BuildOptions) = { defaults with MSBuildParams = { defaults.MSBuildParams with Verbosity = Some MSBuildVerbosity.Quiet } }
 
 type PackageVersionInfo = { versionName: string; versionChanges: string }
 
@@ -89,7 +104,14 @@ let currentVersionInfo = changelog.[0]
 /// change to just the template, increment this.
 let currentTemplateMinorVersion = 1
 
-let addProperties props defaults = { defaults with Properties = [yield! defaults.Properties; yield! props]}
+let asmPkgInfo = System.IO.File.ReadAllText "AssemblyAndPackageInfo.props"
+
+// Extract assembly info property value
+let extractAsmPkgInfoProp propName =
+    let r = new Regex(sprintf "(<%s>)(?'value'.*)(</%s>)" propName propName)
+    r.Match(asmPkgInfo).Groups.["value"].Value
+
+let addProperties props (defaults: DotNet.BuildOptions) = { defaults with MSBuildParams = { defaults.MSBuildParams with Properties = [yield! defaults.MSBuildParams.Properties; yield! props]} }
 
 let addVersionInfo (versionInfo: PackageVersionInfo) =
     let versionPrefix, versionSuffix =
@@ -106,18 +128,19 @@ let addVersionInfo (versionInfo: PackageVersionInfo) =
 let projects = [
     yield Projects.coreLib
     if Environment.isWindows then yield! [Projects.chromiumLib; Projects.winFormsLib; Projects.wpfLib]
-    if Environment.isMacOS then yield! [Projects.macosWkLib ]
+    if Environment.isMacOS then yield! [Projects.macosWkLib]
 ]
 
-let msbuild setParams project =
+let buildOptions setParams =
     let buildMode = Environment.environVarOrDefault "buildMode" "Release"
-    let commit = Git.Information.getCurrentSHA1 "."
-    project |> MSBuild.build (
-        quiet <<
-        setParams <<
-        addProperties ["Configuration", buildMode; "RepositoryCommit", commit] <<
-        addVersionInfo currentVersionInfo << setParams
-    )
+    let commit = Git.Information.getCurrentSHA1 __SOURCE_DIRECTORY__
+
+    quiet <<
+    setParams <<
+    addProperties ["Configuration", buildMode; "RepositoryCommit", commit] <<
+    addVersionInfo currentVersionInfo << setParams
+
+let dotnetBuild (setParams: DotNet.BuildOptions -> DotNet.BuildOptions) project = project |> DotNet.build (buildOptions setParams)
 
 // *** Define Targets ***
 Target.create "PackageDescription" (fun _ ->
@@ -127,26 +150,26 @@ Target.create "PackageDescription" (fun _ ->
     Trace.log str
 )
 
-let doRestore msbParams = { msbParams with DoRestore = true }
+let doRestore (dotnetBuildOptions: DotNet.BuildOptions) = { dotnetBuildOptions with MSBuildParams = { dotnetBuildOptions.MSBuildParams with DoRestore = true } }
 
-let getNupkgPath version projPath =
+let getNupkgPath version (projPath: string) =
     let vstr = match version with Some v -> sprintf ".%s" v | None -> ""
     let projDir = Path.GetDirectoryName projPath
     Path.Combine ([|projDir; "bin"; "Release";
                     sprintf "%s%s.nupkg" (Path.GetFileNameWithoutExtension projPath) vstr|])
 
-Target.create "Clean" (fun _ ->
+Target.create "Clean" (fun args ->
     Trace.log " --- Cleaning --- "
     for proj in projects do
         let vstr = currentVersionInfo.versionName
         File.delete (getNupkgPath (Some vstr) proj)
     !! (Path.Combine (artifactsPath, "**/*.nupkg")) |> File.deleteAll
     let projects =
-        if Environment.isWindows then [ Projects.winFormsLib; Projects.wpfLib; yield! Templates.winProjects ]
-        else if Environment.isMacOS then [ Solutions.macos; yield! Templates.macosProjects ]
+        if Environment.isWindows then [for p in [ Projects.winFormsLib; Projects.wpfLib; yield! Templates.winProjects ] -> p]
+        else if Environment.isMacOS then [ yield Solutions.macos; for p in Templates.macosProjects -> p ]
         else []
     for proj in projects do
-        msbuild (addTarget "Clean") proj
+        dotnetBuild (addTarget "Clean") proj
     Shell.deleteDir ".fsdocs"
     Shell.deleteDir "output"
     Shell.deleteDir "temp"
@@ -154,20 +177,34 @@ Target.create "Clean" (fun _ ->
 
 Target.create "Restore" (fun _ ->
     DotNet.exec id "tool" "restore" |> ignore
-    DotNet.restore id |> ignore
+    let proj = if Environment.isWindows then Solutions.windows else if Environment.isMacOS then Solutions.macos else failwithf "Platform not supported"
+    DotNet.restore id proj |> ignore
 )
 
-Target.create "Build" (fun _ ->
+Target.create "Build" (fun args ->
     Trace.log " --- Building --- "
+    // if Environment.isWindows then
+    //     msbuild (addTarget "Restore") Solutions.windows
+    // else
+    //     msbuild (addTarget "Restore") Solutions.macos
     if Environment.isWindows then
-        msbuild (addTarget "Restore") Solutions.windows
+        dotnetBuild (addTarget "Restore") Solutions.windows
     else
-        msbuild (addTarget "Restore") Solutions.macos
+        dotnetBuild (addTarget "Restore") Solutions.macos
     if Environment.isWindows then
-        msbuild (doRestore << addTarget "Build") Projects.winFormsLib
-        msbuild (doRestore << addTarget "Build") Projects.wpfLib
+        dotnetBuild (doRestore << addTarget "Build") Projects.winFormsLib
+        dotnetBuild (doRestore << addTarget "Build") Projects.wpfLib
     else if Environment.isMacOS then
-        msbuild (doRestore << addTarget "Build") Projects.macosWkLib
+        dotnetBuild (doRestore << addTarget "Build") Projects.macosWkLib
+)
+
+Target.create "Run" (fun _ ->
+    Trace.log " --- Running example app --- "
+    if Environment.isWindows then
+        DotNet.exec id "run" ("-p " + Projects.wpfExampleApp) |> ignore
+    else
+        Shell.cd (Path.GetDirectoryName Projects.macosExampleApp)
+        dotnetBuild (addTarget "Run") Projects.macosExampleApp
 )
 
 Target.create "Test" (fun _ ->
@@ -183,7 +220,7 @@ Target.create "BuildDocs" (fun _ ->
 
 Target.create "ReleaseDocs" (fun _ ->
     Trace.log "--- Releasing documentation --- "
-    Git.CommandHelper.runSimpleGitCommand "." (sprintf "clone %s temp/gh-pages --depth 1 -b gh-pages" projectRepo) |> ignore
+    Git.CommandHelper.runSimpleGitCommand "." (sprintf "clone %s temp/gh-pages --depth 1 -b gh-pages" packageProps.RepositoryUrl) |> ignore
     Shell.copyRecursive "output" "temp/gh-pages" true |> printfn "%A"
     Git.CommandHelper.runSimpleGitCommand "temp/gh-pages" "add ." |> printfn "%s"
     let commit = Git.Information.getCurrentHash ()
@@ -193,13 +230,13 @@ Target.create "ReleaseDocs" (fun _ ->
     Git.Branches.pushBranch "temp/gh-pages" "origin" "gh-pages"
 )
 
-Target.create "Pack" (fun _ ->
+Target.create "Pack" (fun args ->
     Trace.log " --- Packing NuGet packages --- "
     let props = ["SolutionDir", __SOURCE_DIRECTORY__; "RepositoryCommit", Git.Information.getCurrentSHA1 __SOURCE_DIRECTORY__]
-    let msbuild f = msbuild (doRestore << addTargets ["Pack"] << addProperties props << f)
+    let dotnetBuild f = dotnetBuild (doRestore << addTargets ["Pack"] << addProperties props << f)
     Trace.log (sprintf "PROJECT LIST: %A" projects)
     for proj in projects do
-        msbuild id proj
+        dotnetBuild id proj
         // Collect all generated package archives into a common folder
         let vstr = currentVersionInfo.versionName
         let oldNupkgPath = getNupkgPath (Some vstr) proj
@@ -210,7 +247,7 @@ Target.create "Pack" (fun _ ->
     |> Seq.iter (``Nupkg-hack``.hackNupkgAtPath)
 )
 
-Target.create "BuildTemplateProjects" (fun _ ->
+Target.create "BuildTemplateProjects" (fun args ->
     Trace.log " --- Building template projects --- "
     if Environment.isWindows then
         let p = [ yield! Templates.winProjects ]
@@ -221,9 +258,9 @@ Target.create "BuildTemplateProjects" (fun _ ->
     else if Environment.isMacOS then
         let p = [ yield! Templates.macosProjects ]
         for proj in p do
-            msbuild (addTarget "Restore") proj
+            dotnetBuild (addTarget "Restore") proj
         for proj in p do
-            msbuild (addTarget "Build") proj
+            dotnetBuild (addTarget "Build") proj
 )
 
 Target.create "PackTemplates" (fun _ ->
@@ -255,6 +292,9 @@ open Fake.Core.TargetOperators
     ==> "PackAll"
     ==> "All"
 
+"Restore"
+    ==> "Run"
+
 "PackTemplates"
     ==> "PackAll"
     ==> "All"
@@ -276,4 +316,4 @@ open Fake.Core.TargetOperators
     ==> "BuildTemplateProjects"
 
 // *** Start Build ***
-Target.runOrDefault "Build"
+Target.runOrDefaultWithArguments "Build"

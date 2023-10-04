@@ -2,9 +2,10 @@ source https://api.nuget.org/v3/index.json
 framework: auto-detect
 
 nuget BlackFox.MasterOfFoo
-nuget CefSharp.WinForms
-nuget CefSharp.Wpf >= 75.1.143
+nuget CefSharp.WinForms 86.0.241
+nuget CefSharp.Wpf 86.0.241
 nuget FSharp.Core >= 4.2.3
+nuget NuGet.Build.Tasks.Pack
 nuget System.Text.Encodings.Web
 nuget Webview
 
