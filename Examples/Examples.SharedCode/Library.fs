@@ -209,7 +209,8 @@ module SimpleBrowserApp =
                     <meta charset="utf-8"/>
                     <script>
                         function ex(which) {
-                            interstellarBridge.postMessage(which)
+                            window.webkit.messageHandlers.interstellarBridge.postMessage(which)
+                            // interstellarBridge.postMessage(which)
                         }
                     </script>
                 </head>
@@ -221,6 +222,8 @@ module SimpleBrowserApp =
                     <button onclick="ex('%s')">Interstellar detector</button> - %s
                     <br>
                     <button onclick="ex('%s')">Inter window communication</button>
+                    <br>
+                    <button onclick="alert('hello')">Alert</button>
                 </body>
             </html>""" AppletIds.Calculator AppletIds.InjectedContent AppletIds.InterstellarDetector detectorPageUrl.AbsoluteUri AppletIds.InterWindowCommunication
         let selectorWindow = createWindow { defaultBrowserWindowConfig with html = Some page }

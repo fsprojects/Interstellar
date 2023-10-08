@@ -7,7 +7,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="paket.references" />
-    <Compile Include="Library.fs" />
+    <Compile Include="Browser.fs" />
+    <Compile Include="BrowserWindow.fs" />
+    <Compile Include="BrowserApp.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Interstellar.Core\Interstellar.Core.fsproj" />
