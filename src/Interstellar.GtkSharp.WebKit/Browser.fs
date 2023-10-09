@@ -13,15 +13,22 @@ type Browser(config: BrowserWindowConfig<Window>) =
     let pageTitleChanged = new Event<string>()
     let jsMsgReceived = new Event<string>()
     
+    let wkBridgeName = "interstellarWkBridge"
+    
     do
         wkBrowser.Settings.EnableDeveloperExtras <- true
         wkBrowser.Settings.EnableWriteConsoleMessagesToStdout <- true
         wkBrowser.UserContentManager.ScriptMessageReceived.Add (fun e ->
-            printfn "%A" e
+            let msgAsStr = e.JsResult.JsValue |> string
+            jsMsgReceived.Trigger msgAsStr
         )
-        let s = UserScript("", UserContentInjectedFrames.AllFrames, UserScriptInjectionTime.Start, null, null)
-        wkBrowser.UserContentManager.AddScript(s)
-        if not (wkBrowser.UserContentManager.RegisterScriptMessageHandler("interstellarBridge")) then
+        let scriptSrc =
+            sprintf
+                "window.interstellarBridge={'postMessage':function(message){window.webkit.messageHandlers.%s.postMessage(message)}}"
+                wkBridgeName
+        wkBrowser.UserContentManager.AddScript
+            (new UserScript(scriptSrc, UserContentInjectedFrames.AllFrames, UserScriptInjectionTime.Start, null, null))
+        if not (wkBrowser.UserContentManager.RegisterScriptMessageHandler(wkBridgeName)) then
             eprintfn "Failed to register script message handler; JS bridge will not work"
         
         match config.address, config.html with

@@ -209,8 +209,7 @@ module SimpleBrowserApp =
                     <meta charset="utf-8"/>
                     <script>
                         function ex(which) {
-                            window.webkit.messageHandlers.interstellarBridge.postMessage(which)
-                            // interstellarBridge.postMessage(which)
+                            interstellarBridge.postMessage(which)
                         }
                     </script>
                 </head>
