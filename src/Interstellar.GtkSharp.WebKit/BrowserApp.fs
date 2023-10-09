@@ -7,7 +7,7 @@ open Interstellar.Core
 open WebKit
 
 module BrowserApp =
-    /// <summary>Starts and runs a BrowserApp's lifecycle in a Cocoa + WebKit host, asychronously</summary>
+    /// <summary>Starts and runs a BrowserApp's lifecycle in a GtkSharp + WebKit host, asynchronously</summary>
     /// <param name="mainCtx">indicates the thread that is to be used as the UI thread</param>
     /// <param name="app">Describes the application lifecycle</param>
     let runAsync mainCtx (app: BrowserApp<Window>) = async {
