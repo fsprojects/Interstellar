@@ -1,5 +1,5 @@
 source https://api.nuget.org/v3/index.json
-source https://nuget.pkg.github.com/GtkSharp/index.json username: "%GITHUB_NUGET_USERNAME%" password: "%GITHUB_NUGET_PASSWORD%"
+#source https://nuget.pkg.github.com/GtkSharp/index.json username: "%GITHUB_NUGET_USERNAME%" password: "%GITHUB_NUGET_PASSWORD%"
 framework: auto-detect
 
 nuget BlackFox.MasterOfFoo
@@ -8,7 +8,8 @@ nuget CefSharp.Wpf 86.0.241
 nuget FSharp.Core >= 4.2.3
 nuget NuGet.Build.Tasks.Pack
 nuget System.Text.Encodings.Web
-nuget WebkitGtkSharp 3.24.24.114-develop
+nuget GtkSharp 3.24.24.117-develop
+nuget WebkitGtkSharp 3.24.24.117-develop
 
 group Build
     source https://api.nuget.org/v3/index.json
