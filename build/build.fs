@@ -31,13 +31,16 @@ module Projects =
     let winFormsLib = Path.Combine (srcDir, "Interstellar.WinForms.Chromium", "Interstellar.WinForms.Chromium.fsproj")
     let wpfLib = Path.Combine (srcDir, "Interstellar.Wpf.Chromium", "Interstellar.Wpf.Chromium.fsproj")
     let macosWkLib = Path.Combine (srcDir, "Interstellar.macOS.WebKit", "Interstellar.macOS.WebKit.fsproj")
+    let gtkSharpLib = Path.Combine (srcDir, "Interstellar.GtkSharp.WebKit", "Interstellar.GtkSharp.WebKit.fsproj")
     let winFormsExampleApp = Path.Combine (examplesDir, "Examples.winForms.Chromium", "Examples.WinForms.Chromium.fsproj")
     let wpfExampleApp = Path.Combine (examplesDir, "Examples.Wpf.Chromium", "Examples.Wpf.Chromium.fsproj")
     let macosExampleApp = Path.Combine (examplesDir, "Examples.macOS.WebKit", "Examples.macOS.WebKit.fsproj")
+    let gtkSharpExampleApp = Path.Combine (examplesDir, "Examples.GtkSharp.WebKit", "Examples.GtkSharp.WebKit.fsproj")
 
 module Solutions =
     let windows = Path.Combine (repoDir, "Interstellar.Windows.sln")
     let macos = Path.Combine (repoDir, "Interstellar.MacOS.sln")
+    let linux = Path.Combine (repoDir, "Interstellar.Linux.sln")
 
 let artifactsPath = Path.Combine (repoDir, "artifacts")
 
@@ -53,6 +56,9 @@ module Templates =
         |> Seq.map (fun p -> p)
     let macosProjects =
         !! (Path.Combine (path, "**/*macos*.fsproj"))
+        |> Seq.map (fun p -> p)
+    let linuxProjects =
+        !! (Path.Combine (path, "**/*GtkSharp*.fsproj"))
         |> Seq.map (fun p -> p)
 
 type PackageInfo = XmlProvider<asmAndPackageInfoFilePath, ResolutionFolder=repoDir>
@@ -116,8 +122,9 @@ let addVersionInfo (versionInfo: PackageVersionInfo) =
 
 let projects = [
     yield Projects.coreLib
-    if Environment.isWindows then yield! [Projects.chromiumLib; Projects.winFormsLib; Projects.wpfLib]
-    if Environment.isMacOS then yield! [Projects.macosWkLib]
+    if Environment.isWindows then yield! [ Projects.chromiumLib; Projects.winFormsLib; Projects.wpfLib ]
+    if Environment.isMacOS then yield! [ Projects.macosWkLib ]
+    if Environment.isLinux then yield! [ Projects.gtkSharpLib ]
 ]
 
 let msBuildCfg (args: TargetParameter) =
@@ -151,6 +158,14 @@ let getNupkgPath version (projPath: string) =
     Path.Combine [|projDir; "bin"; "Release";
                     sprintf "%s%s.nupkg" (Path.GetFileNameWithoutExtension projPath) vstr|]
 
+let getOsName () =
+    if Environment.isWindows then "Windows"
+    elif Environment.isMacOS then "macOS"
+    elif Environment.isLinux then "Linux"
+    else Environment.OSVersion.Platform.ToString ()
+
+let raisePlatNotSupported () = failwithf $"Platform not supported (%s{getOsName ()})"
+
 let Clean args =
     Trace.log " --- Cleaning --- "
     for proj in projects do
@@ -159,8 +174,9 @@ let Clean args =
     !! (Path.Combine (artifactsPath, "**/*.nupkg")) |> File.deleteAll
     let projects =
         if Environment.isWindows then [for p in [ Projects.winFormsLib; Projects.wpfLib; yield! Templates.winProjects ] -> p]
-        else if Environment.isMacOS then [ yield Solutions.macos; for p in Templates.macosProjects -> p ]
-        else []
+        elif Environment.isMacOS then [ yield Solutions.macos; for p in Templates.macosProjects -> p ]
+        elif Environment.isLinux then [ yield Solutions.linux; for p in Templates.linuxProjects -> p ]
+        else raisePlatNotSupported ()
     for proj in projects do
         dotnetBuild args (addTarget "Clean") proj
     Shell.deleteDir ".fsdocs"
@@ -169,46 +185,46 @@ let Clean args =
 
 let Restore _ =
     DotNet.exec id "tool" "restore" |> ignore
-    let proj = if Environment.isWindows then Solutions.windows else if Environment.isMacOS then Solutions.macos else failwithf "Platform not supported"
-    // let projects = [
-    //     Projects.coreLib
-    //     if Environment.isWindows then
-    //         Projects.winFormsLib
-    //         Projects.wpfLib
-    //         Projects.winFormsExampleApp
-    //         Projects.wpfExampleApp
-    //     elif Environment.isMacOS then
-    //         Projects.macosWkLib
-    //         Projects.macosExampleApp
-    // ]
-    // for proj in projects do
-    //     Trace.logf $"Restoring: %s{proj}"
-    //     DotNet.restore id proj
+    let proj =
+        if Environment.isWindows then
+            Solutions.windows
+        else if Environment.isMacOS then
+            Solutions.macos
+        else if Environment.isLinux then
+            Solutions.linux
+        else
+            raisePlatNotSupported ()
     DotNet.restore id proj
 
 let Build args =
     Trace.log " --- Building --- "
-    // if Environment.isWindows then
-    //     msbuild (addTarget "Restore") Solutions.windows
-    // else
-    //     msbuild (addTarget "Restore") Solutions.macos
-    if Environment.isWindows then
-        dotnetBuild args (addTarget "Restore") Solutions.windows
-    else
-        dotnetBuild args (addTarget "Restore") Solutions.macos
-    if Environment.isWindows then
-        dotnetBuild args (doRestore << addTarget "Build") Projects.winFormsLib
-        dotnetBuild args (doRestore << addTarget "Build") Projects.wpfLib
-    else if Environment.isMacOS then
-        dotnetBuild args (doRestore << addTarget "Build") Projects.macosWkLib
+
+    let restoreProj, buildProjs =
+        if Environment.isWindows then
+            Solutions.windows, [ Projects.winFormsLib; Projects.wpfLib ]
+        elif Environment.isMacOS then
+            Solutions.macos, [ Projects.macosWkLib ]
+        elif Environment.isLinux then
+            Solutions.linux, [ Projects.gtkSharpLib ]
+        else
+            raisePlatNotSupported ()
+
+    dotnetBuild args (addTarget "Restore") restoreProj
+    for proj in buildProjs do
+        dotnetBuild args (doRestore << addTarget "Build") proj
 
 let Run args =
     Trace.log " --- Running example app --- "
     if Environment.isWindows then
         DotNet.exec id "run" ("-p " + Projects.wpfExampleApp) |> ignore
-    else
+    elif Environment.isMacOS then
         Shell.cd (Path.GetDirectoryName Projects.macosExampleApp)
         dotnetBuild args (addTarget "Run") Projects.macosExampleApp
+    elif Environment.isLinux then
+        Shell.cd (Path.GetDirectoryName Projects.gtkSharpExampleApp)
+        dotnetBuild args (addTarget "Run") Projects.gtkSharpExampleApp
+    else
+        raisePlatNotSupported ()
 
 let Test _ =
     Trace.log " --- Running tests --- "
@@ -254,13 +270,20 @@ let BuildTemplateProjects args =
             DotNet.restore id proj
         for proj in p do
             DotNet.build id proj
-    else if Environment.isMacOS then
+    elif Environment.isMacOS then
         let p = [ yield! Templates.macosProjects ]
         for proj in p do
             dotnetBuild args (addTarget "Restore") proj
         for proj in p do
             dotnetBuild args (addTarget "Build") proj
-
+    elif Environment.isLinux then
+        let p = [ yield! Templates.linuxProjects ]
+        for proj in p do
+            dotnetBuild args (addTarget "Restore") proj
+        for proj in p do
+            dotnetBuild args (addTarget "Build") proj
+    else
+        raisePlatNotSupported ()
 
 let PackTemplates _ =
     Trace.log " --- Packing template packages --- "

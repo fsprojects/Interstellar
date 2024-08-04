@@ -15,7 +15,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Interstellar.GtkSharp.WebKit", "src\Interstellar.GtkSharp.WebKit\Interstellar.GtkSharp.WebKit.fsproj", "{D8257812-AF39-46C2-B55F-D179D16516EA}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Examples.GtkSharp.Webkit", "Examples\Examples.GtkSharp.Webkit\Examples.GtkSharp.Webkit.fsproj", "{269B546E-C1A6-4A70-AE5B-586FADCFFDB2}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Examples.GtkSharp.WebKit", "Examples\Examples.GtkSharp.WebKit\Examples.GtkSharp.WebKit.fsproj", "{269B546E-C1A6-4A70-AE5B-586FADCFFDB2}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "build", "build\build.fsproj", "{8F10DEC7-442B-46A4-AC7A-4887C3A09B2B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{E1DEB9D4-FA97-4F81-8F2C-E2583E355B58}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,5 +47,12 @@ Global
 		{269B546E-C1A6-4A70-AE5B-586FADCFFDB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{269B546E-C1A6-4A70-AE5B-586FADCFFDB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{269B546E-C1A6-4A70-AE5B-586FADCFFDB2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F10DEC7-442B-46A4-AC7A-4887C3A09B2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F10DEC7-442B-46A4-AC7A-4887C3A09B2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F10DEC7-442B-46A4-AC7A-4887C3A09B2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F10DEC7-442B-46A4-AC7A-4887C3A09B2B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8F10DEC7-442B-46A4-AC7A-4887C3A09B2B} = {E1DEB9D4-FA97-4F81-8F2C-E2583E355B58}
 	EndGlobalSection
 EndGlobal
