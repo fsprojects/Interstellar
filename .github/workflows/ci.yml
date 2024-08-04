@@ -43,7 +43,7 @@ jobs:
         dotnet-version: 8.0.x
     - name: Restore
       run: |
-        sudo dotnet workload restore
+        sudo dotnet workload install macos
         dotnet tool restore
         dotnet paket restore
         dotnet restore Interstellar.MacOS.sln
@@ -72,7 +72,7 @@ jobs:
           dotnet-version: 8.0.x
       - name: Restore
         run: |
-          sudo dotnet workload restore
+          sudo dotnet workload install macos
           dotnet tool restore
           dotnet paket restore
           dotnet restore Interstellar.MacOS.sln
