@@ -201,14 +201,14 @@ let Build args =
 
     let restoreProj, buildProjs =
         if Environment.isWindows then
-            Solutions.windows, [ Projects.winFormsLib; Projects.wpfLib ]
+            Solutions.windows, [ Projects.winFormsLib; Projects.wpfLib; Projects.winFormsExampleApp; Projects.wpfExampleApp ]
         elif Environment.isMacOS then
-            Solutions.macos, [ Projects.macosWkLib ]
+            Solutions.macos, [ Projects.macosWkLib; Projects.macosExampleApp ]
         elif Environment.isLinux then
-            Solutions.linux, [ Projects.gtkSharpLib ]
+            Solutions.linux, [ Projects.gtkSharpLib; Projects.gtkSharpExampleApp ]
         else
             raisePlatNotSupported ()
-
+    
     dotnetBuild args (addTarget "Restore") restoreProj
     for proj in buildProjs do
         dotnetBuild args (doRestore << addTarget "Build") proj
@@ -338,6 +338,9 @@ let initTargets () =
     "PackTemplates"
         ==> "PackAll"
         ==> "All"
+
+    "Build"
+        ==> "Run"
 
     "Build"
         ==> "BuildDocs"
