@@ -112,7 +112,7 @@ let addVersionInfo (versionInfo: PackageVersionInfo) =
         "VersionPrefix", versionPrefix
         match versionSuffix with Some versionSuffix -> "VersionSuffix", versionSuffix | _ -> ()
         "PackageReleaseNotes", versionInfo.versionChanges
-    ]    
+    ]
 
 let projects = [
     yield Projects.coreLib
@@ -120,8 +120,13 @@ let projects = [
     if Environment.isMacOS then yield! [Projects.macosWkLib]
 ]
 
-let buildOptions setParams =
-    let buildMode = Environment.environVarOrDefault "buildMode" "Release"
+let msBuildCfg (args: TargetParameter) =
+    args.Context.Arguments
+    |> List.tryPick (fun x -> if x.ToLower () = "debug" then Some "Debug" else None)
+    |> Option.defaultValue "Release"
+
+let buildOptions args setParams =
+    let buildMode = msBuildCfg args
     let commit = Git.Information.getCurrentSHA1 repoDir
 
     quiet <<
@@ -129,7 +134,7 @@ let buildOptions setParams =
     addProperties ["Configuration", buildMode; "RepositoryCommit", commit] <<
     addVersionInfo (currentVersionInfo.Force()) << setParams
 
-let dotnetBuild (setParams: DotNet.BuildOptions -> DotNet.BuildOptions) project = project |> DotNet.build (buildOptions setParams)
+let dotnetBuild args (setParams: DotNet.BuildOptions -> DotNet.BuildOptions) project = project |> DotNet.build (buildOptions args setParams)
 
 // *** Define Targets ***
 let PackageDescription _ =
@@ -143,10 +148,10 @@ let doRestore (dotnetBuildOptions: DotNet.BuildOptions) = { dotnetBuildOptions w
 let getNupkgPath version (projPath: string) =
     let vstr = match version with Some v -> sprintf ".%s" v | None -> ""
     let projDir = Path.GetDirectoryName projPath
-    Path.Combine ([|projDir; "bin"; "Release";
-                    sprintf "%s%s.nupkg" (Path.GetFileNameWithoutExtension projPath) vstr|])
+    Path.Combine [|projDir; "bin"; "Release";
+                    sprintf "%s%s.nupkg" (Path.GetFileNameWithoutExtension projPath) vstr|]
 
-let Clean _ =
+let Clean args =
     Trace.log " --- Cleaning --- "
     for proj in projects do
         let vstr = currentVersionInfo.Force().versionName
@@ -157,7 +162,7 @@ let Clean _ =
         else if Environment.isMacOS then [ yield Solutions.macos; for p in Templates.macosProjects -> p ]
         else []
     for proj in projects do
-        dotnetBuild (addTarget "Clean") proj
+        dotnetBuild args (addTarget "Clean") proj
     Shell.deleteDir ".fsdocs"
     Shell.deleteDir "output"
     Shell.deleteDir "temp"
@@ -181,29 +186,29 @@ let Restore _ =
     //     DotNet.restore id proj
     DotNet.restore id proj
 
-let Build _ =
+let Build args =
     Trace.log " --- Building --- "
     // if Environment.isWindows then
     //     msbuild (addTarget "Restore") Solutions.windows
     // else
     //     msbuild (addTarget "Restore") Solutions.macos
     if Environment.isWindows then
-        dotnetBuild (addTarget "Restore") Solutions.windows
+        dotnetBuild args (addTarget "Restore") Solutions.windows
     else
-        dotnetBuild (addTarget "Restore") Solutions.macos
+        dotnetBuild args (addTarget "Restore") Solutions.macos
     if Environment.isWindows then
-        dotnetBuild (doRestore << addTarget "Build") Projects.winFormsLib
-        dotnetBuild (doRestore << addTarget "Build") Projects.wpfLib
+        dotnetBuild args (doRestore << addTarget "Build") Projects.winFormsLib
+        dotnetBuild args (doRestore << addTarget "Build") Projects.wpfLib
     else if Environment.isMacOS then
-        dotnetBuild (doRestore << addTarget "Build") Projects.macosWkLib
+        dotnetBuild args (doRestore << addTarget "Build") Projects.macosWkLib
 
-let Run _ =
+let Run args =
     Trace.log " --- Running example app --- "
     if Environment.isWindows then
         DotNet.exec id "run" ("-p " + Projects.wpfExampleApp) |> ignore
     else
         Shell.cd (Path.GetDirectoryName Projects.macosExampleApp)
-        dotnetBuild (addTarget "Run") Projects.macosExampleApp
+        dotnetBuild args (addTarget "Run") Projects.macosExampleApp
 
 let Test _ =
     Trace.log " --- Running tests --- "
@@ -225,10 +230,10 @@ let ReleaseDocs _ =
     |> printfn "%s"
     Git.Branches.pushBranch "temp/gh-pages" "origin" "gh-pages"
 
-let Pack _ =
+let Pack args =
     Trace.log " --- Packing NuGet packages --- "
     let props = ["SolutionDir", repoDir; "RepositoryCommit", Git.Information.getCurrentSHA1 repoDir]
-    let dotnetBuild f = dotnetBuild (doRestore << addTargets ["Pack"] << addProperties props << f)
+    let dotnetBuild f = dotnetBuild args (doRestore << addTargets ["Pack"] << addProperties props << f)
     Trace.logf "PROJECT LIST: %A" projects
     for proj in projects do
         dotnetBuild id proj
@@ -241,7 +246,7 @@ let Pack _ =
     !! (Path.Combine (artifactsPath, "**", "*.nupkg"))
     |> Seq.iter (NupkgHack.hackNupkgAtPath)
 
-let BuildTemplateProjects _ =
+let BuildTemplateProjects args =
     Trace.log " --- Building template projects --- "
     if Environment.isWindows then
         let p = [ yield! Templates.winProjects ]
@@ -252,9 +257,9 @@ let BuildTemplateProjects _ =
     else if Environment.isMacOS then
         let p = [ yield! Templates.macosProjects ]
         for proj in p do
-            dotnetBuild (addTarget "Restore") proj
+            dotnetBuild args (addTarget "Restore") proj
         for proj in p do
-            dotnetBuild (addTarget "Build") proj
+            dotnetBuild args (addTarget "Build") proj
 
 
 let PackTemplates _ =
@@ -296,48 +301,48 @@ let initTargets () =
     Target.create "PackAll" PackAll
     Target.create "TestAll" TestAll
     Target.create "All" All
-    
+
     // *** Define Dependencies ***
     "Restore"
         ==> "Build"
         ==> "Pack"
         ==> "PackAll"
         ==> "All"
-    
+
     "Restore"
         ==> "Run"
-    
+
     "PackTemplates"
         ==> "PackAll"
         ==> "All"
-    
+
     "Build"
         ==> "BuildDocs"
         ==> "ReleaseDocs"
         ==> "All"
-    
+
     "BuildTemplateProjects"
         ==> "TestAll"
-    
+
     // "Build"
         // ==> "Test"
     "Test"
         ==> "TestAll"
-    
+
     "Build"
         ==> "BuildTemplateProjects"
 
 [<EntryPoint>]
 let main args =
     Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
-    
+
     args
     |> Array.toList
     |> Context.FakeExecutionContext.Create false "build.fs"
     |> Context.RuntimeContext.Fake
     |> Context.setExecutionContext
-    
+
     initTargets ()
     Target.runOrDefaultWithArguments "Build"
-    
+
     0
