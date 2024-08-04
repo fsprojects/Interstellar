@@ -1,4 +1,5 @@
-#r "System.IO.Compression"
+module build.NupkgHack
+
 open System
 open System.IO
 open System.IO.Compression
@@ -6,8 +7,6 @@ open System.Text
 open System.Text.RegularExpressions
 open Fake.Core
 open Fake.IO
-
-Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
 
 let changeVersionConstraints text =
     Regex("(?<=id=\"Interstellar.+?\"\\s+version=\")[^[\\]]*?(?=\")")

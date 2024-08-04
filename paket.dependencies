@@ -9,7 +9,14 @@ nuget NuGet.Build.Tasks.Pack
 nuget System.Text.Encodings.Web
 
 group Build
-
     source https://api.nuget.org/v3/index.json
+    framework: net8.0
 
-    nuget FSharp.DependencyManager.Paket
+    nuget Fake.Tools.Git
+    nuget FSharp.Core ~> 8.0
+    nuget FSharp.Data
+    nuget FSharp.DependencyManager.Paket ~> 7.0
+    nuget Fake.Core.Target ~> 6.0.0
+    nuget Fake.DotNet.Cli ~> 6.0.0
+    nuget Fake.DotNet.MSBuild ~> 6.0.0
+    nuget Fake.DotNet.Paket ~> 6.0.0

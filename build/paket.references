@@ -1,0 +1,9 @@
+group Build
+FSharp.Core
+FSharp.Data
+FSharp.DependencyManager.Paket
+Fake.Core.Target
+Fake.DotNet.Cli
+Fake.DotNet.MSBuild
+Fake.DotNet.Paket
+Fake.Tools.Git

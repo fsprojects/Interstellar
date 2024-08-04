@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <IsWindows>$([System.OperatingSystem]::IsWindows())</IsWindows>
+    <IsLinux>$([System.OperatingSystem]::IsLinux())</IsLinux>
+    <IsMacOS>$([System.OperatingSystem]::IsMacOS())</IsMacOS>
+  </PropertyGroup>
+  <PropertyGroup>
+    <DefineConstants Condition="$(IsWindows)">OS_WINDOWS</DefineConstants>
+    <DefineConstants Condition="$(IsLinux)">OS_LINUX</DefineConstants>
+    <DefineConstants Condition="$(IsMacOS)">OS_MACOS</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="paket.references" />
+    <Compile Include="NupkgHack.fs" />
+    <Compile Include="build.fs" />
+  </ItemGroup>
+  <Import Project="..\.paket\Paket.Restore.targets" />
+</Project>
