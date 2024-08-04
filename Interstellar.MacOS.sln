@@ -7,7 +7,6 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Examples.SharedCode", "Exam
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BE6ABDEA-53B5-4D1C-9E46-6B783CD97234}"
 	ProjectSection(SolutionItems) = preProject
-		global.json = global.json
 		AssemblyAndPackageInfo.props = AssemblyAndPackageInfo.props
 		paket.dependencies = paket.dependencies
 	EndProjectSection
