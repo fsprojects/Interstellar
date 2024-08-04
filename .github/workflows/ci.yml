@@ -29,7 +29,7 @@ jobs:
         path: artifacts
     - name: Test
       run: |
-        dotnet fake build -t Test -- Release
+        .\build.cmd -t Test -- Release
 
   build-macos:
     name: CI (macOS)
@@ -40,7 +40,7 @@ jobs:
     - uses: actions/checkout@v3
     - uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 8.0.3
+        dotnet-version: 8.0.x
     - name: Restore
       run: |
         sudo dotnet workload install macos
