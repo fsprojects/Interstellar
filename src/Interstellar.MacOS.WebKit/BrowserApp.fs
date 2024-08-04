@@ -19,5 +19,5 @@ module BrowserApp =
         do! app.onStart mainCtx windowCreator
         do! Async.SwitchToContext mainCtx
     }
-
+    
     let run app = Async.Start <| runAsync SynchronizationContext.Current app
