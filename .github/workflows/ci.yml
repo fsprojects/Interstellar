@@ -59,3 +59,31 @@ jobs:
     - name: Test
       run: |
         ./build.sh -t Test
+
+  build-ubuntu:
+    name: CI (Ubuntu)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.0.x
+      - name: Restore
+        run: |
+          dotnet tool restore
+          dotnet paket restore
+          dotnet restore Interstellar.MacOS.sln
+      - name: Build
+        run: ./build.sh -t Build
+      - name: Pack
+        run: ./build.sh -t PackAll
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: interstellar-linux
+          path: artifacts/
+      - name: Test
+        run: |
+          ./build.sh -t Test

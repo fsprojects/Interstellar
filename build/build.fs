@@ -208,7 +208,7 @@ let Build args =
             Solutions.linux, [ Projects.gtkSharpLib; Projects.gtkSharpExampleApp ]
         else
             raisePlatNotSupported ()
-    
+
     dotnetBuild args (addTarget "Restore") restoreProj
     for proj in buildProjs do
         dotnetBuild args (doRestore << addTarget "Build") proj
