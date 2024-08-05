@@ -137,7 +137,7 @@ NUGET
     FSharp.Control.Reactive (5.0.5)
       FSharp.Core (>= 4.7.2)
       System.Reactive (>= 5.0 < 6.0)
-    FSharp.Core (8.0.301)
+    FSharp.Core (6.0.5)
     FSharp.Data (6.4)
       FSharp.Core (>= 6.0.1)
       FSharp.Data.Csv.Core (>= 6.4)
