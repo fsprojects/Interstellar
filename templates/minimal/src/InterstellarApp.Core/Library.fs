@@ -180,7 +180,7 @@ module BrowserApp =
                     // For example, modify this line to use Browser.ExecuteJavascript and sprintf instead of ExecuteJavascriptf,
                     // then paste this malicous payload into the input text box when you run the app: //;)'olleh'(trela;)'oof
                     outputWindow.Browser.ExecuteJavascriptf "updateOutput('%s')" (String (Array.rev (msg.ToCharArray ())))
-            ), null)   
+            ), null)
         )
 
         do! inputWindow.Show ()
@@ -238,7 +238,7 @@ module BrowserApp =
             })
         return selectorWindow
     }
-
+    
     let app onMainWindowCreated : BrowserApp<'TWindow> = BrowserApp.create (fun mainCtx createWindow -> async {
         let! mainWindow = appletSelectorWindow onMainWindowCreated mainCtx createWindow
         do! Async.AwaitEvent mainWindow.Closed

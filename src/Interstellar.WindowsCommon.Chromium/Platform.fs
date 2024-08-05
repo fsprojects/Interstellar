@@ -13,7 +13,7 @@ open CefSharp.WinForms
 type Platform private() =
     static let mutable isInitialized = false
     static let initLock = new Object()
-    
+
     static member Initialize () =
         lock initLock (fun () ->
             if not isInitialized then
@@ -32,7 +32,7 @@ type Platform private() =
     static member private InitAnyCpuCefSharp () =
         // Required to fix high DPI issue: https://github.com/fsprojects/Interstellar/issues/25
         Cef.EnableHighDPISupport()
-        
+
         let browserSubpath = Platform.GetPlatformAssemblyPath("CefSharp.BrowserSubprocess.exe")
         let settings = new CefSettings(BrowserSubprocessPath = browserSubpath)
         //settings.RegisterExtension Browser.bridgeExtension

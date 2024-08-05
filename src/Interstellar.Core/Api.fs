@@ -9,10 +9,20 @@ type BrowserEngine =
     ///     <a href="https://bitbucket.org/chromiumembedded/cef/src/master/">ChromiumEmbeddedFramework</a>
     /// </summary>
     | Chromium = 0
-    /// <summary>Apple's native <a href="https://developer.apple.com/documentation/webkit">WebKit</a> browser engine built-in to macOS</summary>
-    | AppleWebKit = 0b1
+    /// <summary>
+    ///     Apple's native <a href="https://developer.apple.com/documentation/webkit">WebKit</a> browser engine built-in to macOS
+    /// </summary>
+    | AppleWebKit = 1
+    /// <summary>
+    ///     <a href="https://webkitgtk.org/">GTK WebKit</a>; part of the GNOME desktop environment
+    /// </summary>
+    | GtkWebKit = 2
 /// <summary>Indicates a host GUI framework, which is whatever will be used to create new windows and interact with the graphical system of the OS.</summary>
-type BrowserWindowPlatform = | Wpf = 0b01 | WinForms = 0b11 | MacOS = 0b100
+type BrowserWindowPlatform =
+    | Wpf       = 0b0001
+    | WinForms  = 0b0011
+    | MacOS     = 0b0100
+    | Gtk       = 0b1000
 
 type IBrowser =
     /// <summary>The address which the browser is currently displaying, if any</summary>
@@ -210,7 +220,7 @@ module Printf =
 
     type private TextEncoderPrintfEnv<'Result>(k: string -> 'Result, encoder: TextEncoder) =
         inherit PrintfEnv<unit, string, 'Result>()
-        
+
         let sb = new StringBuilder()
 
         override this.Finalize () = k (sb.ToString ())
@@ -221,7 +231,7 @@ module Printf =
                 | _ -> s.FormatAsPrintF ()
             sb.Append value |> ignore
         override this.WriteT (s: string) = sb.Append (encoder.Encode s) |> ignore
-    
+
     /// <summary>Like sprintf, but escapes the format parameters for Javascript to prevent code injection, allowing you to safely deal with untrusted format parameters. Think SQL prepared statements.</summary>
     let javascriptf (format: StringFormat<'T, string>) =
         doPrintf format (fun n -> TextEncoderPrintfEnv(id, JavaScriptEncoder.Default))

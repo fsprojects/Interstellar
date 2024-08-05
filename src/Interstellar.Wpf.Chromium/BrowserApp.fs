@@ -18,7 +18,7 @@ module BrowserApp =
         do! Async.SwitchToContext mainCtx
         Application.Current.Shutdown ()
     }
-
+    
     /// <summary>Starts and runs a BrowserApp's lifecycle in a WPF + Chromium host, using the current thread as the UI thread</summary>
     /// <param name="app">Describes the application lifecycle</param>
     let run app = Async.Start <| runAsync SynchronizationContext.Current app
