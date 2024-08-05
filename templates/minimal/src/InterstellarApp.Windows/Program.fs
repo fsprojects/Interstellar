@@ -9,7 +9,7 @@ open Interstellar.Chromium.Wpf
 
 type App() =
     inherit Application(ShutdownMode = ShutdownMode.OnExplicitShutdown)
-
+    
     override this.OnStartup (e: StartupEventArgs) =
         base.OnStartup e
         let onMainWindowCreated (w: IBrowserWindow<Window>) =

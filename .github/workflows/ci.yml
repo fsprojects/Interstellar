@@ -6,21 +6,22 @@ jobs:
   build-windows:
     name: CI (Windows)
     runs-on: windows-latest
+    timeout-minutes: 25
 
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-dotnet@v1
+    - uses: actions/checkout@v3
+    - uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '6.0.400'
+        dotnet-version: 8.0.x
     - name: Restore
       run: |
         dotnet tool restore
         dotnet paket restore
     - name: Build
-      run: dotnet fake build
+      run: .\build.cmd -t Build
     - name: Pack
       run: |
-        dotnet fake build -t PackAll
+        .\build.cmd -t PackAll
     - name: Upload artifacts
       uses: actions/upload-artifact@v2
       with:
@@ -28,29 +29,28 @@ jobs:
         path: artifacts
     - name: Test
       run: |
-        dotnet fake build -t Test -- Release
+        .\build.cmd -t Test -- Release
 
   build-macos:
     name: CI (macOS)
     runs-on: macos-latest
+    timeout-minutes: 25
 
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-dotnet@v1
+    - uses: actions/checkout@v3
+    - uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '6.0.400'
-    - name: Install workloads
-      run: |
-        dotnet tool restore
-        sudo dotnet workload install macos
+        dotnet-version: 8.0.x
     - name: Restore
       run: |
+        sudo dotnet workload install macos
         dotnet tool restore
         dotnet paket restore
+        dotnet restore Interstellar.MacOS.sln
     - name: Build
-      run: dotnet fake build -- Release
+      run: ./build.sh -t Build
     - name: Pack
-      run: dotnet fake build -t PackAll -- Release
+      run: ./build.sh -t PackAll
     - name: Upload artifacts
       uses: actions/upload-artifact@v2
       with:
@@ -58,4 +58,4 @@ jobs:
         path: artifacts/
     - name: Test
       run: |
-        dotnet fake build -t Test -- Release
+        ./build.sh -t Test

@@ -26,5 +26,5 @@ type AppDelegate() =
             do! BrowserApp.runAsync mainCtx (InterstellarApp.BrowserApp.app ignore)
             NSApplication.SharedApplication.Terminate null
         }
-
+        
         ()

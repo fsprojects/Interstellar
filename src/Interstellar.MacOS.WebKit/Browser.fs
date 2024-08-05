@@ -43,7 +43,7 @@ type Browser(config: BrowserWindowConfig<NSWindow>) =
     let mutable pageTitleObserverHandle = null
 
     static let wkBridgeName = "interstellarWkBridge"
-    
+
     do
         wkBrowser.NavigationDelegate <- {
             new WKNavigationDelegate() with

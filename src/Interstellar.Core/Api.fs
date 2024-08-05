@@ -210,7 +210,7 @@ module Printf =
 
     type private TextEncoderPrintfEnv<'Result>(k: string -> 'Result, encoder: TextEncoder) =
         inherit PrintfEnv<unit, string, 'Result>()
-        
+
         let sb = new StringBuilder()
 
         override this.Finalize () = k (sb.ToString ())
@@ -221,7 +221,7 @@ module Printf =
                 | _ -> s.FormatAsPrintF ()
             sb.Append value |> ignore
         override this.WriteT (s: string) = sb.Append (encoder.Encode s) |> ignore
-    
+
     /// <summary>Like sprintf, but escapes the format parameters for Javascript to prevent code injection, allowing you to safely deal with untrusted format parameters. Think SQL prepared statements.</summary>
     let javascriptf (format: StringFormat<'T, string>) =
         doPrintf format (fun n -> TextEncoderPrintfEnv(id, JavaScriptEncoder.Default))

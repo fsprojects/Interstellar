@@ -15,7 +15,7 @@ type NiblessViewController(view: NSView) =
 
 type BrowserWindow(config: BrowserWindowConfig<NSWindow>) as this =
     inherit NSWindowController("BrowserWindow")
-    
+
     let browser = new Browser(config)
 
     let closedEvt = new Event<_>()

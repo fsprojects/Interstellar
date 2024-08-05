@@ -64,7 +64,7 @@ type BrowserWindow(config: BrowserWindowConfig<Window>) as this =
         member this.Title
             with get () = (this :> Window).Title
             and set title = (this :> Window).Title <- title
-
+    
     override this.OnContentRendered e =
         base.OnContentRendered e
         if not alreadyShown then
